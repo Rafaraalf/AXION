@@ -578,7 +578,7 @@ button:disabled { opacity:.55;cursor:wait; }
 .est-filtro-btn{border:0;background:transparent;color:var(--muted);padding:4px 6px;border-radius:6px;cursor:pointer}
 .est-filtro-btn.ativo{color:var(--accent);background:#16324a}
 .est-filtro-btn:hover{background:#23425e;color:var(--text)}
-.est-cabecalho{display:flex;align-items:center;gap:5px;justify-content:space-between}
+.est-cabecalho{display:flex;align-items:center;gap:5px;justify-content:flex-start}
 .est-filtro-pop{position:fixed;z-index:120;width:min(310px,calc(100vw - 24px));max-height:min(460px,75vh);overflow:auto;background:var(--surface);border:1px solid #456078;border-radius:12px;box-shadow:0 18px 55px #0009;padding:14px}
 .est-filtro-pop input[type=search],.est-filtro-pop input[type=number]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;margin:6px 0}
 .est-filtro-opcoes{max-height:235px;overflow:auto;margin:10px 0}
@@ -588,6 +588,12 @@ button:disabled { opacity:.55;cursor:wait; }
 .est-filtro-acoes button{border:1px solid var(--border);background:#16324a;color:var(--accent);border-radius:7px;padding:8px 10px}
 .est-filtro-ordenar{display:flex;gap:8px;margin-bottom:8px}
 .est-filtro-ordenar button{flex:1;border:1px solid var(--border);border-radius:7px;background:#16324a;color:var(--accent);padding:8px}
+#est-filtros-mobile{display:none}
+.est-painel-mobile{padding:14px;margin:-4px 0 15px;background:#101c2e;border:1px solid var(--border);border-radius:12px}
+.est-painel-grade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}
+.est-painel-grade button{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.est-painel-grade button.ativo{border-color:var(--accent);color:#fff}
+@media(max-width:760px){#est-filtros-mobile{display:block}.est-painel-grade{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Estoque v1.6 */
 #est-arquivo{max-width:100%;min-width:200px;color:var(--text);padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}
 #est-versoes{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -671,6 +677,7 @@ button:disabled { opacity:.55;cursor:wait; }
   #page-historico .data-table tbody td:nth-child(9),
   #page-historico .data-table tbody td:nth-child(12){grid-column:1/-1}
   #page-estoque .est-filtro-pop{max-width:calc(100vw - 24px)}
+  .est-filtro-pop{max-height:65dvh;overflow:auto}
   .modal-card{max-height:calc(100dvh - 32px);overflow:auto}
   .modal-buttons{flex-wrap:wrap}
 }
@@ -816,7 +823,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v1.9</span>
+      <span>AXION WEB · v2.0</span>
     </header>
 
     <div class="content">
@@ -1005,7 +1012,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
         <div class="panel" style="margin-bottom:20px">
           <h2>Pesquisar produtos</h2>
           <div class="toolbar"><input id="est-busca" type="search" placeholder="EAN, REF, descrição, marca, cor, tamanho, posição ou loja..."><button class="secondary" id="est-recarregar" type="button">↻ Atualizar consulta</button></div>
-          <div class="toolbar"><button class="secondary" type="button" id="est-limpar-filtros">Limpar filtros</button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
+          <div class="toolbar"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false">☷ Filtros por coluna</button><button class="secondary" type="button" id="est-limpar-filtros">Limpar filtros</button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
           <p class="status-line" id="est-resultados">Carregando...</p>
           <div class="table-wrap"><table class="data-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
         </div>
@@ -1225,6 +1232,29 @@ const API = "https://axion-api.rafa-losneto.workers.dev";
 const $ = id => document.getElementById(id);
 
 let tokenSessao = null;
+const AXION_SESSAO_KEY = 'axion_web_sessao_v2';
+function axionSalvarSessao(token, usuario, expira) {
+  try { localStorage.setItem(AXION_SESSAO_KEY, JSON.stringify({token,usuario,expira})); } catch(e) { console.warn('Sessão não persistida:',e); }
+}
+function axionLimparSessao() {
+  try { localStorage.removeItem(AXION_SESSAO_KEY); } catch(e) {}
+}
+async function axionRestaurarSessao() {
+  let sessao;
+  try { sessao=JSON.parse(localStorage.getItem(AXION_SESSAO_KEY)||'null'); } catch(e) { axionLimparSessao();return; }
+  if (!sessao || !/^[a-f0-9]{64}$/i.test(sessao.token||'') || !Number.isFinite(Number(sessao.expira)) || Number(sessao.expira)<=Date.now()) {axionLimparSessao();return;}
+  try {
+    const resposta=await fetch(API+'/auth/me',{headers:{Authorization:'Bearer '+sessao.token},cache:'no-store'});
+    if (resposta.status===401) {axionLimparSessao();return;}
+    if (!resposta.ok) return;
+    const dados=await resposta.json();
+    if (!dados.ok) {axionLimparSessao();return;}
+    tokenSessao=sessao.token;
+    mostrarPainel(dados.usuario||sessao.usuario);
+    carregarDashboard();carregarPendentes();carregarAtividadeRecente();
+  } catch(e) { console.warn('Não foi possível validar a sessão nesta tentativa:',e); }
+}
+
 
 let pendentesCache = [];
 let pendentesCarregados = false;
@@ -1255,6 +1285,23 @@ let estPopup=null;
 const estTexto=v=>String(v??'').trim();
 const estNorm=v=>estTexto(v).toLocaleLowerCase('pt-BR');
 function fecharFiltroEstoque(){if(estPopup){estPopup.remove();estPopup=null;}}
+function abrirFiltrosMobile() {
+ const existente=document.getElementById('est-painel-mobile');
+ const btn=$('est-filtros-mobile');
+ if(existente){existente.remove();btn.setAttribute('aria-expanded','false');return;}
+ const painel=document.createElement('div');painel.id='est-painel-mobile';painel.className='est-painel-mobile';
+ const titulo=document.createElement('strong');titulo.textContent='Filtrar estoque por coluna';painel.appendChild(titulo);
+ const grid=document.createElement('div');grid.className='est-painel-grade';
+ for(const col of EST_COLUNAS){
+  const b=document.createElement('button');b.type='button';b.className='secondary';b.dataset.mobileCol=col;
+  b.textContent=EST_NOMES[col]+(estFiltros[col]?' ✓':'');
+  b.addEventListener('click',()=>abrirFiltroEstoque(col,b));grid.appendChild(b);
+ }
+ painel.appendChild(grid);
+ btn.closest('.toolbar').after(painel);btn.setAttribute('aria-expanded','true');
+}
+$('est-filtros-mobile').addEventListener('click',abrirFiltrosMobile);
+
 function iniciarCabecalhosEstoque(){
  document.querySelectorAll('#page-estoque th[data-est-col]').forEach(th=>{
   const col=th.dataset.estCol;
@@ -1271,6 +1318,7 @@ function atualizarIndicadoresEstoque(){
  const ativos=Object.keys(estFiltros).length;
  $('est-filtros-ativos').textContent=ativos?`${ativos} ${ativos===1?'coluna filtrada':'colunas filtradas'}`:'Nenhum filtro por coluna ativo';
  document.querySelectorAll('[data-est-botao]').forEach(b=>b.classList.toggle('ativo',!!estFiltros[b.dataset.estBotao]||estOrdem.coluna===b.dataset.estBotao));
+ document.querySelectorAll('[data-mobile-col]').forEach(b=>{const c=b.dataset.mobileCol;b.textContent=EST_NOMES[c]+(estFiltros[c]?' ✓':'');b.classList.toggle('ativo',!!estFiltros[c]);});
 }
 function estNumero(v){const n=Number(estTexto(v).replace(',','.'));return Number.isFinite(n)?n:0;}
 function estAtende(x,col,f){
@@ -1323,7 +1371,9 @@ function abrirFiltroEstoque(col,botao){
   aplicar.addEventListener('click',()=>{if(selecionados.size===opcoes.length)delete estFiltros[col];else estFiltros[col]={tipo:'lista',valores:[...selecionados]};fecharFiltroEstoque();renderizarEstoque();});
  }
  acoes.append(limpar,aplicar);pop.appendChild(acoes);document.body.appendChild(pop);estPopup=pop;
- const r=botao.getBoundingClientRect();const largura=pop.offsetWidth;pop.style.left=Math.max(12,Math.min(r.left,innerWidth-largura-12))+'px';pop.style.top=Math.max(12,Math.min(r.bottom+5,innerHeight-pop.offsetHeight-12))+'px';
+ const r=botao.getBoundingClientRect();const largura=pop.offsetWidth;
+ if(innerWidth<=760){pop.style.left=Math.max(12,(innerWidth-largura)/2)+'px';pop.style.top=Math.max(12,(innerHeight-pop.offsetHeight)/2)+'px';}
+ else {pop.style.left=Math.max(12,Math.min(r.left,innerWidth-largura-12))+'px';pop.style.top=Math.max(12,Math.min(r.bottom+5,innerHeight-pop.offsetHeight-12))+'px';}
 }
 document.addEventListener('click',e=>{if(estPopup&&!estPopup.contains(e.target)&&!e.target.closest('[data-est-botao]'))fecharFiltroEstoque();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharFiltroEstoque();});
@@ -2399,6 +2449,7 @@ $("formLogin").addEventListener(
       }
 
       tokenSessao = dados.token;
+      axionSalvarSessao(dados.token,dados.usuario,dados.expira);
 
       $("senha").value = "";
 
@@ -2431,6 +2482,7 @@ $("sair").addEventListener("click", async () => {
   const token = tokenSessao;
 
   tokenSessao = null;
+  axionLimparSessao();
 
   pendentesCache = [];
   pendentesCarregados = false;
@@ -2466,6 +2518,8 @@ $("sair").addEventListener("click", async () => {
   }
 });
 
+// Recupera a sessão válida após F5, sem solicitar a senha novamente.
+axionRestaurarSessao();
 </script>
 </body>
 </html>
