@@ -34,6 +34,8 @@ button { cursor:pointer; }
 button:disabled { opacity:.55;cursor:wait; }
 .hidden { display:none!important; }
 
+/* LOGIN */
+
 #loginView {
   min-height:100vh;
   display:grid;
@@ -97,6 +99,8 @@ button:disabled { opacity:.55;cursor:wait; }
   margin-top:15px;
 }
 
+/* ESTRUTURA */
+
 #appView {
   display:flex;
   min-height:100vh;
@@ -159,7 +163,11 @@ button:disabled { opacity:.55;cursor:wait; }
   margin-bottom:12px;
 }
 
-.user-box strong { display:block;margin-bottom:6px; }
+.user-box strong {
+  display:block;
+  margin-bottom:6px;
+}
+
 .user-box small { color:var(--muted); }
 
 .logout {
@@ -197,8 +205,19 @@ button:disabled { opacity:.55;cursor:wait; }
 .page.active { display:block; }
 
 .heading { margin-bottom:28px; }
-.heading h1 { margin:0 0 10px;font-size:29px; }
-.heading p { margin:0;color:var(--muted);line-height:1.6; }
+
+.heading h1 {
+  margin:0 0 10px;
+  font-size:29px;
+}
+
+.heading p {
+  margin:0;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+/* DASHBOARD */
 
 .stats {
   display:grid;
@@ -241,7 +260,10 @@ button:disabled { opacity:.55;cursor:wait; }
   margin-top:22px;
 }
 
-.panel h2 { font-size:17px;margin:0 0 18px; }
+.panel h2 {
+  font-size:17px;
+  margin:0 0 18px;
+}
 
 .empty {
   border:1px dashed #40516a;
@@ -261,6 +283,89 @@ button:disabled { opacity:.55;cursor:wait; }
   color:#bae6fd;
 }
 
+/* ATIVIDADE RECENTE V1.5 */
+
+.atividade-cabecalho {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.atividade-cabecalho h2 { margin:0; }
+
+.atividade-cabecalho button {
+  padding:8px 12px;
+  font-size:12px;
+}
+
+.atividade-lista {
+  display:flex;
+  flex-direction:column;
+}
+
+.atividade-item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:15px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.atividade-item:last-child { border-bottom:0; }
+
+.atividade-icone {
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  font-size:17px;
+  font-weight:800;
+}
+
+.atividade-icone.ok {
+  background:#14532d;
+  color:var(--green);
+}
+
+.atividade-icone.se {
+  background:#7f1d1d;
+  color:var(--red);
+}
+
+.atividade-info {
+  flex:1;
+  min-width:0;
+}
+
+.atividade-nome {
+  font-size:13px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+
+.atividade-detalhe,
+.atividade-data {
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+  line-height:1.5;
+}
+
+.atividade-resultado {
+  flex-shrink:0;
+  font-size:12px;
+  font-weight:800;
+}
+
+.atividade-resultado.ok { color:var(--green); }
+.atividade-resultado.se { color:var(--red); }
+
+/* TABELAS E FILTROS */
+
 .toolbar {
   display:flex;
   gap:12px;
@@ -269,7 +374,8 @@ button:disabled { opacity:.55;cursor:wait; }
   margin-bottom:16px;
 }
 
-.toolbar input, .toolbar select {
+.toolbar input,
+.toolbar select {
   flex:1;
   min-width:160px;
   padding:12px;
@@ -306,7 +412,8 @@ button:disabled { opacity:.55;cursor:wait; }
   font-size:13px;
 }
 
-.data-table th,.data-table td {
+.data-table th,
+.data-table td {
   padding:12px 10px;
   border-bottom:1px solid var(--border);
   text-align:left;
@@ -442,6 +549,8 @@ button:disabled { opacity:.55;cursor:wait; }
   line-height:1.5;
 }
 
+/* RESPONSIVIDADE */
+
 @media(max-width:1100px) {
   .stats { grid-template-columns:repeat(2,1fr); }
 }
@@ -461,6 +570,8 @@ button:disabled { opacity:.55;cursor:wait; }
 
 @media(max-width:420px) {
   .stats { grid-template-columns:1fr; }
+  .atividade-item { gap:8px; }
+  .atividade-resultado { font-size:11px; }
 }
 </style>
 </head>
@@ -468,20 +579,30 @@ button:disabled { opacity:.55;cursor:wait; }
 <body>
 
 <!-- LOGIN -->
+
 <main id="loginView">
   <section class="login-card">
     <h1 class="brand">AXION</h1>
+
     <p class="subtitle">
       Gestão inteligente de estoque e abastecimento
     </p>
 
     <form id="formLogin">
       <label for="usuario">Usuário</label>
-      <input id="usuario" autocomplete="username" required>
+      <input
+        id="usuario"
+        autocomplete="username"
+        required
+      >
 
       <label for="senha">Senha</label>
-      <input id="senha" type="password"
-             autocomplete="current-password" required>
+      <input
+        id="senha"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
 
       <button class="primary" id="entrar" type="submit">
         Entrar no AXION
@@ -493,9 +614,11 @@ button:disabled { opacity:.55;cursor:wait; }
 </main>
 
 <!-- SISTEMA -->
+
 <div id="appView" class="hidden">
 
   <aside class="sidebar">
+
     <div class="sidebar-brand">AXION</div>
     <div class="sidebar-caption">STOCK MANAGEMENT</div>
 
@@ -503,15 +626,19 @@ button:disabled { opacity:.55;cursor:wait; }
       <button class="active" data-page="dashboard">
         ▦ Dashboard
       </button>
+
       <button data-page="abastecimento">
         ↻ Abastecimento
       </button>
+
       <button data-page="estoque">
         ▤ Estoque
       </button>
+
       <button data-page="historico">
         ◷ Histórico
       </button>
+
       <button data-page="configuracoes">
         ⚙ Configurações
       </button>
@@ -522,26 +649,32 @@ button:disabled { opacity:.55;cursor:wait; }
         <strong id="usuarioLogado">Usuário</strong>
         <small>Administrador</small>
       </div>
+
       <button class="logout" id="sair">Sair</button>
     </div>
+
   </aside>
 
   <div class="main">
+
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v1.4</span>
+      <span>AXION WEB · v1.5</span>
     </header>
 
     <div class="content">
 
       <!-- DASHBOARD -->
+
       <section class="page active" id="page-dashboard">
+
         <div class="heading">
           <h1>Visão geral</h1>
           <p>Acompanhe o estoque e o abastecimento.</p>
         </div>
 
         <div class="stats">
+
           <div class="stat">
             <div class="label">Produtos cadastrados</div>
             <div class="value blue" id="stat-produtos">—</div>
@@ -565,22 +698,43 @@ button:disabled { opacity:.55;cursor:wait; }
             <div class="value" id="stat-semEstoque">—</div>
             <div class="detail">Dados do Google Sheets</div>
           </div>
+
         </div>
 
         <div class="panel-grid">
+
           <div class="panel">
             <h2>Abastecimentos pendentes</h2>
+
             <div id="resumoPendentes" class="empty">
               Carregando pendências...
             </div>
           </div>
 
           <div class="panel">
-            <h2>Atividade recente</h2>
-            <div class="empty">
-              O histórico detalhado será implementado aqui.
+
+            <div class="atividade-cabecalho">
+              <h2>Atividade recente</h2>
+
+              <button
+                class="secondary"
+                type="button"
+                id="atualizarAtividade"
+              >
+                ↻ Atualizar
+              </button>
             </div>
+
+            <div
+              id="atividadeRecente"
+              class="empty"
+              role="status"
+            >
+              Carregando movimentações...
+            </div>
+
           </div>
+
         </div>
 
         <div class="notice">
@@ -588,10 +742,13 @@ button:disabled { opacity:.55;cursor:wait; }
             Conectando ao Google Sheets...
           </span>
         </div>
+
       </section>
 
       <!-- ABASTECIMENTO -->
+
       <section class="page" id="page-abastecimento">
+
         <div class="heading">
           <h1>Abastecimento</h1>
           <p>
@@ -609,23 +766,32 @@ button:disabled { opacity:.55;cursor:wait; }
               type="search"
               placeholder="Buscar produto, EAN, posição, loja..."
             >
-            <button id="atualizarPendentes" type="button">
+
+            <button
+              id="atualizarPendentes"
+              type="button"
+            >
               ↻ Atualizar lista
             </button>
           </div>
 
-          <div id="feedbackAbastecimento"
-               class="feedback hidden"
-               role="status"></div>
+          <div
+            id="feedbackAbastecimento"
+            class="feedback hidden"
+            role="status"
+          ></div>
 
-          <p id="estadoPendentes"
-             class="status-line"
-             role="status">
+          <p
+            id="estadoPendentes"
+            class="status-line"
+            role="status"
+          >
             Aguardando consulta...
           </p>
 
           <div class="table-wrap">
             <table class="data-table">
+
               <thead>
                 <tr>
                   <th>Loja</th>
@@ -641,11 +807,13 @@ button:disabled { opacity:.55;cursor:wait; }
                   <th>Ações</th>
                 </tr>
               </thead>
+
               <tbody id="listaPendentes">
                 <tr>
                   <td colspan="11">Carregando...</td>
                 </tr>
               </tbody>
+
             </table>
           </div>
 
@@ -653,11 +821,14 @@ button:disabled { opacity:.55;cursor:wait; }
             * Saldo cadastrado ainda não conferido por balanço.
             Não impede o abastecimento.
           </p>
+
         </div>
       </section>
 
       <!-- ESTOQUE -->
+
       <section class="page" id="page-estoque">
+
         <div class="heading">
           <h1>Estoque</h1>
           <p>Consulta de produtos e posições físicas.</p>
@@ -665,76 +836,137 @@ button:disabled { opacity:.55;cursor:wait; }
 
         <div class="panel">
           <h2>DADOS/POSIÇÕES</h2>
+
           <div class="empty">
             O cadastro e as localizações estão reunidos
             na aba DADOS/POSIÇÕES do Google Sheets.
           </div>
         </div>
+
       </section>
 
       <!-- HISTÓRICO -->
+
       <section class="page" id="page-historico">
+
         <div class="heading">
           <h1>Histórico de Abastecimentos</h1>
-          <p>Consulte os registros de OK e S/E realizados no AXION.</p>
+          <p>
+            Consulte os registros de OK e S/E realizados no AXION.
+          </p>
         </div>
 
         <div class="stats" style="margin-bottom:22px">
+
           <div class="stat">
             <div class="label">Movimentações</div>
             <div class="value blue" id="hist-total">—</div>
           </div>
+
           <div class="stat">
             <div class="label">Unidades abastecidas</div>
             <div class="value green" id="hist-ok">—</div>
           </div>
+
           <div class="stat">
             <div class="label">Unidades sem estoque</div>
             <div class="value orange" id="hist-se">—</div>
           </div>
+
         </div>
 
         <div class="panel">
+
           <h2>Movimentações registradas</h2>
+
           <div class="toolbar">
-            <input id="hist-busca" type="search"
-                   placeholder="Buscar produto, REF, cor, tamanho, EAN...">
-            <input id="hist-data" type="date" aria-label="Filtrar por data">
-            <select id="hist-loja" aria-label="Filtrar por loja">
+
+            <input
+              id="hist-busca"
+              type="search"
+              placeholder="Buscar produto, REF, cor, tamanho, EAN..."
+            >
+
+            <input
+              id="hist-data"
+              type="date"
+              aria-label="Filtrar por data"
+            >
+
+            <select
+              id="hist-loja"
+              aria-label="Filtrar por loja"
+            >
               <option value="">Todas as lojas</option>
             </select>
-            <select id="hist-tipo" aria-label="Filtrar por operação">
+
+            <select
+              id="hist-tipo"
+              aria-label="Filtrar por operação"
+            >
               <option value="">Todas as operações</option>
               <option value="OK">OK</option>
               <option value="S/E">S/E</option>
             </select>
-            <button class="secondary" type="button" id="hist-atualizar">
+
+            <button
+              class="secondary"
+              type="button"
+              id="hist-atualizar"
+            >
               ↻ Atualizar
             </button>
+
           </div>
-          <p class="status-line" id="hist-estado" role="status">
+
+          <p
+            class="status-line"
+            id="hist-estado"
+            role="status"
+          >
             Aguardando consulta...
           </p>
+
           <div class="table-wrap">
+
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Data</th><th>Hora</th><th>Loja</th>
-                  <th>Marca</th><th>Descrição</th><th>REF</th>
-                  <th>Cor</th><th>Tamanho</th><th>EAN</th>
-                  <th>Operação</th><th>Qtd.</th><th>Origem</th>
+                  <th>Data</th>
+                  <th>Hora</th>
+                  <th>Loja</th>
+                  <th>Marca</th>
+                  <th>Descrição</th>
+                  <th>REF</th>
+                  <th>Cor</th>
+                  <th>Tamanho</th>
+                  <th>EAN</th>
+                  <th>Operação</th>
+                  <th>Qtd.</th>
+                  <th>Origem</th>
                 </tr>
               </thead>
+
               <tbody id="hist-lista">
-                <tr><td colspan="12">Abra o Histórico para consultar.</td></tr>
+                <tr>
+                  <td colspan="12">
+                    Abra o Histórico para consultar.
+                  </td>
+                </tr>
               </tbody>
+
             </table>
+
           </div>
+
         </div>
+
       </section>
 
       <!-- CONFIGURAÇÕES -->
+
       <section class="page" id="page-configuracoes">
+
         <div class="heading">
           <h1>Configurações</h1>
           <p>Informações do sistema.</p>
@@ -742,14 +974,18 @@ button:disabled { opacity:.55;cursor:wait; }
 
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 1.4</p>
+          <p>Versão da interface: 1.5</p>
+
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
             Interface: GitHub Pages<br>
             Dados: Google Sheets<br>
-            Abastecimento: OK / S/E
+            Abastecimento: OK / S/E<br>
+            Histórico: Ativo<br>
+            Atividade recente: Ativa
           </p>
         </div>
+
       </section>
 
     </div>
@@ -757,16 +993,22 @@ button:disabled { opacity:.55;cursor:wait; }
 </div>
 
 <!-- MODAL DE CONFIRMAÇÃO -->
+
 <div id="modalAbastecimento" class="modal hidden">
-  <div class="modal-card" role="dialog"
-       aria-modal="true"
-       aria-labelledby="modalTitulo">
+
+  <div
+    class="modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitulo"
+  >
 
     <h2 id="modalTitulo">Confirmar abastecimento</h2>
 
     <div id="modalProduto" class="modal-product"></div>
 
     <form id="formAbastecimento">
+
       <label for="quantidadeAbastecimento">
         Quantidade a registrar
       </label>
@@ -782,34 +1024,52 @@ button:disabled { opacity:.55;cursor:wait; }
       <p id="modalErro" role="alert"></p>
 
       <div class="modal-buttons">
-        <button class="secondary"
-                type="button"
-                id="cancelarAbastecimento">
+
+        <button
+          class="secondary"
+          type="button"
+          id="cancelarAbastecimento"
+        >
           Cancelar
         </button>
 
-        <button class="primary"
-                type="submit"
-                id="confirmarAbastecimento">
+        <button
+          class="primary"
+          type="submit"
+          id="confirmarAbastecimento"
+        >
           Confirmar
         </button>
+
       </div>
+
     </form>
   </div>
 </div>
 
 <script>
+
+// =====================================================
+// AXION WEB v1.5
+// =====================================================
+
 const API = "https://axion-api.rafa-losneto.workers.dev";
 
 const $ = id => document.getElementById(id);
 
 let tokenSessao = null;
+
 let pendentesCache = [];
 let pendentesCarregados = false;
+
 let movimentoAtual = null;
 let enviandoMovimento = false;
+
 let historicoCache = [];
 let historicoCarregado = false;
+
+let atividadeCarregando = false;
+let historicoPromise = null;
 
 // =====================================================
 // LOGIN / SESSÃO
@@ -886,7 +1146,7 @@ async function carregarDashboard() {
     for (const [id, chave] of Object.entries(campos)) {
       const valor = Number(dados[chave]);
 
-      $( "stat-" + id ).textContent =
+      $("stat-" + id).textContent =
         Number.isFinite(valor)
           ? valor.toLocaleString("pt-BR")
           : "—";
@@ -917,6 +1177,7 @@ function mostrarFeedback(texto, tipo = "") {
 function limparFeedback() {
   $("feedbackAbastecimento").className =
     "feedback hidden";
+
   $("feedbackAbastecimento").textContent = "";
 }
 
@@ -1006,6 +1267,7 @@ function renderizarPendentes() {
     }
 
     // EAN
+
     const eans = eansDoItem(item);
     const celulaEAN = linha.insertCell();
 
@@ -1018,6 +1280,7 @@ function renderizarPendentes() {
     }
 
     // POSIÇÕES
+
     const posicoes = posicoesDoItem(item);
     const celulaPosicao = linha.insertCell();
 
@@ -1045,12 +1308,14 @@ function renderizarPendentes() {
 
         celulaPosicao.appendChild(detalhe);
       }
+
     } else {
       celulaPosicao.textContent = "Não localizado";
       celulaPosicao.className = "not-found";
     }
 
     // SALDO NÃO CONFERIDO
+
     const celulaSaldo = linha.insertCell();
     const locais = localizacoesDoItem(item);
 
@@ -1068,6 +1333,7 @@ function renderizarPendentes() {
       "Quantidade cadastrada, ainda não conferida por balanço.";
 
     // QUANTIDADE PENDENTE
+
     const celulaQtd = linha.insertCell();
 
     celulaQtd.textContent =
@@ -1076,25 +1342,30 @@ function renderizarPendentes() {
     celulaQtd.className = "qty";
 
     // BOTÕES
+
     const celulaAcoes = linha.insertCell();
     const acoes = document.createElement("div");
 
     acoes.className = "actions";
 
     const botaoOK = document.createElement("button");
+
     botaoOK.type = "button";
     botaoOK.className = "btn-ok";
     botaoOK.textContent = "✓ OK";
     botaoOK.disabled = enviandoMovimento;
+
     botaoOK.addEventListener("click", () =>
       abrirConfirmacao(item, "OK")
     );
 
     const botaoSE = document.createElement("button");
+
     botaoSE.type = "button";
     botaoSE.className = "btn-se";
     botaoSE.textContent = "S/E";
     botaoSE.disabled = enviandoMovimento;
+
     botaoSE.addEventListener("click", () =>
       abrirConfirmacao(item, "S/E")
     );
@@ -1152,7 +1423,9 @@ async function carregarPendentes() {
       "Não foi possível consultar as pendências.";
 
   } finally {
-    $("atualizarPendentes").disabled = false;
+    if (token === tokenSessao) {
+      $("atualizarPendentes").disabled = false;
+    }
   }
 }
 
@@ -1228,6 +1501,7 @@ async function confirmarMovimento(evento) {
   if (!movimentoAtual || enviandoMovimento) return;
 
   const atual = movimentoAtual;
+
   const quantidade = Number(
     $("quantidadeAbastecimento").value
   );
@@ -1242,8 +1516,9 @@ async function confirmarMovimento(evento) {
     return;
   }
 
-  // Uma mesma tentativa mantém o ID.
-  // Isso evita registrar duas vezes caso a resposta se perca.
+  // Mantém o mesmo ID ao repetir uma tentativa
+  // com a mesma quantidade.
+
   if (atual.quantidadeEnviada !== quantidade) {
     atual.id = crypto.randomUUID().replaceAll("-", "");
     atual.quantidadeEnviada = quantidade;
@@ -1268,7 +1543,7 @@ async function confirmarMovimento(evento) {
   const token = tokenSessao;
 
   try {
-    const dados = await requisicaoAPI("/api/abastecer", {
+    await requisicaoAPI("/api/abastecer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1278,10 +1553,11 @@ async function confirmarMovimento(evento) {
 
     if (token !== tokenSessao) return;
 
-    const descricao = atual.item.descricao || atual.item.ref;
+    const descricao =
+      atual.item.descricao || atual.item.ref;
 
-    // Registro confirmado pelo servidor.
     movimentoAtual = null;
+
     $("modalAbastecimento").classList.add("hidden");
 
     mostrarFeedback(
@@ -1290,13 +1566,14 @@ async function confirmarMovimento(evento) {
       "success"
     );
 
-    // O histórico será recarregado na próxima abertura.
+    // Atualiza Dashboard, pendências e atividade recente.
+
     historicoCarregado = false;
 
-    // Atualiza a lista apenas depois da confirmação.
-    await Promise.all([
+    await Promise.allSettled([
       carregarPendentes(),
-      carregarDashboard()
+      carregarDashboard(),
+      carregarAtividadeRecente(true)
     ]);
 
   } catch (erro) {
@@ -1314,83 +1591,323 @@ async function confirmarMovimento(evento) {
 }
 
 // =====================================================
+// HISTÓRICO - CONSULTA COMPARTILHADA
+// =====================================================
+
+async function consultarHistorico(forcar = false) {
+  const token = tokenSessao;
+
+  if (!token) {
+    throw new Error("Sessão encerrada.");
+  }
+
+  if (historicoPromise) {
+    await historicoPromise;
+
+    if (!forcar) return historicoCache;
+  }
+
+  if (historicoCarregado && !forcar) {
+    return historicoCache;
+  }
+
+  const consulta = (async () => {
+    const dados = await requisicaoAPI("/api/historico");
+
+    if (token !== tokenSessao) {
+      throw new Error("Sessão alterada.");
+    }
+
+    if (!Array.isArray(dados.itens)) {
+      throw new Error("Lista de movimentações inválida.");
+    }
+
+    historicoCache = dados.itens;
+    historicoCarregado = true;
+
+    return historicoCache;
+  })();
+
+  historicoPromise = consulta;
+
+  try {
+    return await consulta;
+  } finally {
+    if (historicoPromise === consulta) {
+      historicoPromise = null;
+    }
+  }
+}
+
+// =====================================================
+// ATIVIDADE RECENTE V1.5
+// =====================================================
+
+function renderizarAtividadeRecente() {
+  const destino = $("atividadeRecente");
+
+  destino.replaceChildren();
+
+  // A API do histórico retorna as movimentações
+  // ordenadas da mais recente para a mais antiga.
+
+  const ultimas = historicoCache.slice(0, 5);
+
+  if (!ultimas.length) {
+    destino.className = "empty";
+    destino.textContent =
+      "Nenhuma movimentação registrada.";
+    return;
+  }
+
+  destino.className = "atividade-lista";
+
+  for (const item of ultimas) {
+    const tipo = String(item.tipo || "").toUpperCase();
+    const semEstoque = tipo === "S/E";
+
+    const linha = document.createElement("div");
+    linha.className = "atividade-item";
+
+    const icone = document.createElement("div");
+    icone.className =
+      "atividade-icone " + (semEstoque ? "se" : "ok");
+
+    icone.textContent = semEstoque ? "!" : "✓";
+
+    const informacoes = document.createElement("div");
+    informacoes.className = "atividade-info";
+
+    const nome = document.createElement("div");
+    nome.className = "atividade-nome";
+
+    nome.textContent =
+      item.descricao ||
+      item.marca ||
+      item.ref ||
+      "Produto não identificado";
+
+    const detalhe = document.createElement("div");
+    detalhe.className = "atividade-detalhe";
+
+    detalhe.textContent = [
+      item.ref ? "REF " + item.ref : "",
+      item.cor,
+      item.tamanho,
+      item.loja ? "Loja " + item.loja : ""
+    ].filter(Boolean).join(" · ");
+
+    const data = document.createElement("div");
+    data.className = "atividade-data";
+
+    data.textContent = [
+      item.data,
+      item.hora
+    ].filter(Boolean).join(" · ");
+
+    informacoes.append(nome, detalhe, data);
+
+    const resultado = document.createElement("div");
+
+    resultado.className =
+      "atividade-resultado " + (semEstoque ? "se" : "ok");
+
+    resultado.textContent =
+      (semEstoque ? "S/E" : "OK") +
+      " · " +
+      (Number(item.quantidade) || 0);
+
+    linha.append(
+      icone,
+      informacoes,
+      resultado
+    );
+
+    destino.appendChild(linha);
+  }
+}
+
+async function carregarAtividadeRecente(
+  forcarAtualizacao = false
+) {
+  if (atividadeCarregando || !tokenSessao) return;
+
+  if (historicoCarregado && !forcarAtualizacao) {
+    renderizarAtividadeRecente();
+    return;
+  }
+
+  const token = tokenSessao;
+
+  atividadeCarregando = true;
+  $("atualizarAtividade").disabled = true;
+
+  if (!historicoCarregado) {
+    $("atividadeRecente").className = "empty";
+
+    $("atividadeRecente").textContent =
+      "Consultando últimas movimentações...";
+  }
+
+  try {
+    await consultarHistorico(forcarAtualizacao);
+
+    if (token !== tokenSessao) return;
+
+    renderizarAtividadeRecente();
+    atualizarFiltroLojasHistorico();
+    renderizarHistorico();
+
+  } catch (erro) {
+    if (token !== tokenSessao) return;
+
+    if (!historicoCarregado) {
+      $("atividadeRecente").className = "empty";
+
+      $("atividadeRecente").textContent =
+        "Não foi possível carregar a atividade recente.";
+    }
+
+    console.error("AXION atividade recente:", erro);
+
+  } finally {
+    atividadeCarregando = false;
+
+    if (token === tokenSessao) {
+      $("atualizarAtividade").disabled = false;
+    }
+  }
+}
+
+// =====================================================
 // HISTÓRICO DE ABASTECIMENTOS
 // =====================================================
 
 function atualizarFiltroLojasHistorico() {
   const seletor = $("hist-loja");
   const atual = seletor.value;
+
   const lojas = [...new Set(
-    historicoCache.map(item => String(item.loja ?? "").trim())
+    historicoCache
+      .map(item => String(item.loja ?? "").trim())
       .filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
+  )].sort((a, b) =>
+    a.localeCompare(b, "pt-BR", { numeric:true })
+  );
 
   seletor.replaceChildren();
+
   const todas = document.createElement("option");
+
   todas.value = "";
   todas.textContent = "Todas as lojas";
+
   seletor.appendChild(todas);
 
   for (const loja of lojas) {
     const opcao = document.createElement("option");
+
     opcao.value = loja;
     opcao.textContent = "Loja " + loja;
+
     seletor.appendChild(opcao);
   }
+
   seletor.value = lojas.includes(atual) ? atual : "";
 }
 
 function renderizarHistorico() {
-  const busca = $("hist-busca").value.trim().toLocaleLowerCase("pt-BR");
+  const busca = $("hist-busca")
+    .value.trim().toLocaleLowerCase("pt-BR");
+
   const data = $("hist-data").value;
   const loja = $("hist-loja").value;
   const tipo = $("hist-tipo").value;
 
   const filtrados = historicoCache.filter(item => {
     const texto = [
-      item.loja, item.marca, item.descricao, item.ref,
-      item.cor, item.tamanho, item.ean, item.origem
-    ].map(x => String(x ?? "")).join(" ").toLocaleLowerCase("pt-BR");
+      item.loja,
+      item.marca,
+      item.descricao,
+      item.ref,
+      item.cor,
+      item.tamanho,
+      item.ean,
+      item.origem
+    ].map(x => String(x ?? ""))
+      .join(" ")
+      .toLocaleLowerCase("pt-BR");
 
-    return (!busca || texto.includes(busca)) &&
+    return (
+      (!busca || texto.includes(busca)) &&
       (!data || item.dataISO === data) &&
       (!loja || String(item.loja ?? "") === loja) &&
-      (!tipo || item.tipo === tipo);
+      (!tipo || item.tipo === tipo)
+    );
   });
 
-  $("hist-total").textContent = filtrados.length.toLocaleString("pt-BR");
+  $("hist-total").textContent =
+    filtrados.length.toLocaleString("pt-BR");
+
   $("hist-ok").textContent = filtrados
     .filter(item => item.tipo === "OK")
-    .reduce((s, item) => s + (Number(item.quantidade) || 0), 0)
+    .reduce(
+      (s, item) => s + (Number(item.quantidade) || 0),
+      0
+    )
     .toLocaleString("pt-BR");
+
   $("hist-se").textContent = filtrados
     .filter(item => item.tipo === "S/E")
-    .reduce((s, item) => s + (Number(item.quantidade) || 0), 0)
+    .reduce(
+      (s, item) => s + (Number(item.quantidade) || 0),
+      0
+    )
     .toLocaleString("pt-BR");
 
   const corpo = $("hist-lista");
+
   corpo.replaceChildren();
 
   if (!filtrados.length) {
     const celula = corpo.insertRow().insertCell();
+
     celula.colSpan = 12;
-    celula.textContent = "Nenhuma movimentação encontrada.";
+    celula.textContent =
+      "Nenhuma movimentação encontrada.";
   }
 
   for (const item of filtrados) {
     const linha = corpo.insertRow();
+
     const valores = [
-      item.data, item.hora, item.loja, item.marca,
-      item.descricao, item.ref, item.cor, item.tamanho,
-      item.ean, item.tipo, item.quantidade, item.origem
+      item.data,
+      item.hora,
+      item.loja,
+      item.marca,
+      item.descricao,
+      item.ref,
+      item.cor,
+      item.tamanho,
+      item.ean,
+      item.tipo,
+      item.quantidade,
+      item.origem
     ];
+
     valores.forEach((valor, indice) => {
       const celula = linha.insertCell();
+
       celula.textContent = String(valor ?? "");
+
       if (indice === 9) {
-        celula.className = item.tipo === "OK" ? "hist-ok" : "hist-se";
+        celula.className =
+          item.tipo === "OK" ? "hist-ok" : "hist-se";
       }
-      if (indice === 10) celula.className = "qty";
+
+      if (indice === 10) {
+        celula.className = "qty";
+      }
     });
   }
 
@@ -1398,42 +1915,70 @@ function renderizarHistorico() {
     `${filtrados.length} movimentação(ões) encontrada(s).`;
 }
 
-async function carregarHistorico() {
+async function carregarHistorico(forcar = false) {
   const token = tokenSessao;
+
   if (!token) return;
 
-  $("hist-estado").textContent = "Consultando histórico no Google Sheets...";
+  $("hist-estado").textContent =
+    "Consultando histórico no Google Sheets...";
+
   $("hist-atualizar").disabled = true;
 
   try {
-    const dados = await requisicaoAPI("/api/historico");
+    await consultarHistorico(forcar);
+
     if (token !== tokenSessao) return;
-    if (!Array.isArray(dados.itens)) {
-      throw new Error("Lista de movimentações inválida.");
-    }
-    historicoCache = dados.itens;
-    historicoCarregado = true;
+
     atualizarFiltroLojasHistorico();
     renderizarHistorico();
+    renderizarAtividadeRecente();
+
   } catch (erro) {
     if (token !== tokenSessao) return;
+
     $("hist-estado").textContent =
       "Erro ao carregar histórico: " + erro.message;
+
   } finally {
-    if (token === tokenSessao) $("hist-atualizar").disabled = false;
+    if (token === tokenSessao) {
+      $("hist-atualizar").disabled = false;
+    }
   }
 }
 
-["hist-busca", "hist-data", "hist-loja", "hist-tipo"].forEach(id => {
-  $(id).addEventListener(id === "hist-busca" ? "input" : "change", () => {
-    if (historicoCarregado) renderizarHistorico();
-  });
+// =====================================================
+// EVENTOS DO HISTÓRICO
+// =====================================================
+
+[
+  "hist-busca",
+  "hist-data",
+  "hist-loja",
+  "hist-tipo"
+].forEach(id => {
+  $(id).addEventListener(
+    id === "hist-busca" ? "input" : "change",
+    () => {
+      if (historicoCarregado) {
+        renderizarHistorico();
+      }
+    }
+  );
 });
 
-$("hist-atualizar").addEventListener("click", carregarHistorico);
+$("hist-atualizar").addEventListener(
+  "click",
+  () => carregarHistorico(true)
+);
+
+$("atualizarAtividade").addEventListener(
+  "click",
+  () => carregarAtividadeRecente(true)
+);
 
 // =====================================================
-// EVENTOS
+// EVENTOS DO ABASTECIMENTO
 // =====================================================
 
 $("formAbastecimento").addEventListener(
@@ -1455,6 +2000,7 @@ $("atualizarPendentes").addEventListener(
   "click",
   async () => {
     if (enviandoMovimento) return;
+
     limparFeedback();
     await carregarPendentes();
   }
@@ -1469,7 +2015,10 @@ document.querySelectorAll("[data-page]").forEach(botao => {
     const pagina = botao.dataset.page;
 
     document.querySelectorAll("[data-page]").forEach(item => {
-      item.classList.toggle("active", item === botao);
+      item.classList.toggle(
+        "active",
+        item === botao
+      );
     });
 
     document.querySelectorAll(".page").forEach(secao => {
@@ -1482,11 +2031,19 @@ document.querySelectorAll("[data-page]").forEach(botao => {
     $("tituloPagina").textContent =
       botao.textContent.trim();
 
-    if (pagina === "abastecimento" && !pendentesCarregados) {
+    if (
+      pagina === "abastecimento" &&
+      !pendentesCarregados
+    ) {
       carregarPendentes();
     }
-    if (pagina === "historico" && !historicoCarregado) {
+
+    if (pagina === "historico") {
       carregarHistorico();
+    }
+
+    if (pagina === "dashboard") {
+      carregarAtividadeRecente();
     }
   });
 });
@@ -1495,49 +2052,65 @@ document.querySelectorAll("[data-page]").forEach(botao => {
 // LOGIN
 // =====================================================
 
-$("formLogin").addEventListener("submit", async evento => {
-  evento.preventDefault();
+$("formLogin").addEventListener(
+  "submit",
+  async evento => {
+    evento.preventDefault();
 
-  $("mensagem").textContent = "";
-  $("entrar").disabled = true;
-  $("entrar").textContent = "Entrando...";
+    $("mensagem").textContent = "";
+    $("entrar").disabled = true;
+    $("entrar").textContent = "Entrando...";
 
-  try {
-    const resposta = await fetch(API + "/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        usuario: $("usuario").value,
-        senha: $("senha").value
-      })
-    });
+    try {
+      const resposta = await fetch(
+        API + "/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            usuario: $("usuario").value,
+            senha: $("senha").value
+          })
+        }
+      );
 
-    const dados = await resposta.json();
+      const dados = await resposta.json();
 
-    if (!resposta.ok || !dados.ok || !dados.token) {
+      if (
+        !resposta.ok ||
+        !dados.ok ||
+        !dados.token
+      ) {
+        $("mensagem").textContent =
+          dados.erro || "Não foi possível entrar.";
+
+        return;
+      }
+
+      tokenSessao = dados.token;
+
+      $("senha").value = "";
+
+      mostrarPainel(dados.usuario);
+
+      // Carregamento inicial da v1.5
+
+      carregarDashboard();
+      carregarPendentes();
+      carregarAtividadeRecente();
+
+    } catch {
       $("mensagem").textContent =
-        dados.erro || "Não foi possível entrar.";
-      return;
+        "Não foi possível conectar à API.";
+
+    } finally {
+      $("entrar").disabled = false;
+      $("entrar").textContent = "Entrar no AXION";
     }
-
-    tokenSessao = dados.token;
-
-    $("senha").value = "";
-    mostrarPainel(dados.usuario);
-
-    carregarDashboard();
-    carregarPendentes();
-
-  } catch {
-    $("mensagem").textContent =
-      "Não foi possível conectar à API.";
-  } finally {
-    $("entrar").disabled = false;
-    $("entrar").textContent = "Entrar no AXION";
   }
-});
+);
 
 // =====================================================
 // LOGOUT
@@ -1549,13 +2122,21 @@ $("sair").addEventListener("click", async () => {
   const token = tokenSessao;
 
   tokenSessao = null;
+
   pendentesCache = [];
   pendentesCarregados = false;
+
   historicoCache = [];
   historicoCarregado = false;
+  historicoPromise = null;
+
   movimentoAtual = null;
 
   $("modalAbastecimento").classList.add("hidden");
+
+  $("atividadeRecente").className = "empty";
+  $("atividadeRecente").textContent =
+    "Carregando movimentações...";
 
   mostrarLogin();
 
@@ -1567,11 +2148,13 @@ $("sair").addEventListener("click", async () => {
           Authorization: "Bearer " + token
         }
       });
+
     } catch (erro) {
       console.error("Falha no logout:", erro);
     }
   }
 });
+
 </script>
 </body>
 </html>
