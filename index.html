@@ -326,6 +326,10 @@
     .data-table th { color:var(--muted); font-weight:600; }
     .data-table td.qty { color:var(--orange); font-weight:800; }
     .status-line { color:var(--muted); margin:0 0 16px; font-size:13px; }
+    .position-pill { display:inline-block; padding:5px 8px; border-radius:7px; background:#12334a; color:#7dd3fc; margin:2px 3px 2px 0; font-size:12px; }
+    .stock-amount { color:var(--green); font-weight:700; }
+    .not-found { color:#fbbf24; font-size:12px; }
+    .positions-detail { margin-top:7px; color:var(--muted); font-size:12px; white-space:normal; min-width:150px; }
     .page { display: none; }
     .page.active { display: block; }
 
@@ -434,7 +438,7 @@
     <div class="main">
       <header class="topbar">
         <strong id="tituloPagina">Dashboard</strong>
-        <span>AXION WEB · v1.0</span>
+        <span>AXION WEB · v1.2</span>
       </header>
 
       <div class="content">
@@ -500,7 +504,7 @@
           <div class="panel">
             <h2>Lista de abastecimento</h2>
             <div class="toolbar">
-              <input id="buscaPendentes" type="search" placeholder="Buscar marca, descrição, referência, EAN, loja...">
+              <input id="buscaPendentes" type="search" placeholder="Buscar marca, descrição, referência, EAN, posição, loja...">
               <button id="atualizarPendentes" type="button">↻ Atualizar lista</button>
             </div>
             <p id="estadoPendentes" class="status-line" role="status">Aguardando consulta...</p>
@@ -508,10 +512,10 @@
               <table class="data-table">
                 <thead><tr>
                   <th>Loja</th><th>Marca</th><th>Descrição</th><th>Referência</th>
-                  <th>Cor</th><th>Tamanho</th><th>EAN</th><th>Qtd.</th>
+                  <th>Cor</th><th>Tamanho</th><th>EAN</th><th>Posição / locais</th><th>Saldo</th><th>Qtd. pendente</th>
                 </tr></thead>
                 <tbody id="listaPendentes">
-                  <tr><td colspan="8">Carregando...</td></tr>
+                  <tr><td colspan="10">Carregando...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -555,7 +559,7 @@
           </div>
           <div class="panel">
             <h2>AXION Web</h2>
-            <p>Versão da interface: 1.0</p>
+            <p>Versão da interface: 1.2</p>
             <p style="color:var(--muted)">
               Autenticação: Cloudflare Workers<br>
               Interface: GitHub Pages<br>
@@ -626,37 +630,77 @@
     function renderizarPendentes() {
       const corpo = document.getElementById("listaPendentes");
       const busca = document.getElementById("buscaPendentes").value.trim().toLowerCase();
-      const filtrados = pendentesCache.filter(item =>
-        [item.loja, item.marca, item.descricao, item.ref, item.cor, item.tamanho, item.ean]
-          .some(valor => String(valor ?? "").toLowerCase().includes(busca))
-      );
+      const filtrados = pendentesCache.filter(item => {
+        const locais = Array.isArray(item.localizacoes) ? item.localizacoes : [];
+        const campos = [item.loja, item.marca, item.descricao, item.ref,
+          item.cor, item.tamanho, item.ean, item.posicao,
+          ...(Array.isArray(item.posicoes) ? item.posicoes : []),
+          ...locais.map(local => local.posicao)];
+        return campos.some(valor => String(valor ?? "").toLowerCase().includes(busca));
+      });
 
       corpo.replaceChildren();
-
       if (!filtrados.length) {
         const linha = corpo.insertRow();
         const celula = linha.insertCell();
-        celula.colSpan = 8;
+        celula.colSpan = 10;
         celula.textContent = busca ? "Nenhum produto encontrado." : "Nenhum abastecimento pendente.";
       }
 
       for (const item of filtrados) {
         const linha = corpo.insertRow();
-        const valores = [
-          item.loja, item.marca, item.descricao, item.ref,
-          item.cor, item.tamanho, item.ean, item.quantidade
-        ];
-        valores.forEach((valor, indice) => {
-          const celula = linha.insertCell();
-          celula.textContent = valor == null ? "" : String(valor);
-          if (indice === 7) celula.className = "qty";
+        [item.loja, item.marca, item.descricao, item.ref, item.cor, item.tamanho].forEach(valor => {
+          linha.insertCell().textContent = valor == null ? "" : String(valor);
         });
+
+        const locais = Array.isArray(item.localizacoes) ? item.localizacoes : [];
+        const eans = [...new Set([
+          ...String(item.ean ?? "").split(","),
+          ...locais.map(local => String(local.ean ?? ""))
+        ].map(v => v.trim()).filter(Boolean))];
+        const eanCell = linha.insertCell();
+        eanCell.textContent = eans.length ? eans.join(", ") : "Não cadastrado";
+        if (!eans.length) eanCell.className = "not-found";
+
+        const posCell = linha.insertCell();
+        const posicoes = [...new Set([
+          ...(Array.isArray(item.posicoes) ? item.posicoes : []),
+          ...locais.map(local => local.posicao), item.posicao
+        ].map(v => String(v ?? "").trim()).filter(Boolean))];
+        if (posicoes.length) {
+          for (const pos of posicoes) {
+            const etiqueta = document.createElement("span");
+            etiqueta.className = "position-pill";
+            etiqueta.textContent = pos;
+            posCell.appendChild(etiqueta);
+          }
+          if (locais.length) {
+            const detalhe = document.createElement("div");
+            detalhe.className = "positions-detail";
+            detalhe.textContent = locais.map(local =>
+              `${local.posicao || "Sem posição"}: ${Number(local.saldo) || 0}`
+            ).join(" · ");
+            posCell.appendChild(detalhe);
+          }
+        } else {
+          posCell.textContent = "Não localizado";
+          posCell.className = "not-found";
+        }
+
+        const saldoCell = linha.insertCell();
+        const temCadastro = item.cadastrado === true || locais.length > 0;
+        saldoCell.textContent = temCadastro && Number.isFinite(Number(item.saldoTotal))
+          ? Number(item.saldoTotal).toLocaleString("pt-BR") : "—";
+        saldoCell.className = "stock-amount";
+        const quantidadeCell = linha.insertCell();
+        quantidadeCell.textContent = Number(item.quantidade || 0).toLocaleString("pt-BR");
+        quantidadeCell.className = "qty";
       }
 
       const unidades = filtrados.reduce((total, item) =>
         total + (Number(item.quantidade) || 0), 0);
       document.getElementById("estadoPendentes").textContent =
-        `${filtrados.length} produto(s) exibido(s) · ${unidades.toLocaleString("pt-BR")} unidade(s)`;
+        `${filtrados.length} produto(s) exibido(s) · ${unidades.toLocaleString("pt-BR")} unidade(s) pendente(s)`;
       document.getElementById("resumoPendentes").textContent =
         `${pendentesCache.length} produto(s) na lista de abastecimento. Abra a aba Abastecimento para consultar.`;
     }
