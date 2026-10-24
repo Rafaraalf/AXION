@@ -596,9 +596,9 @@
           document.getElementById("stat-" + id).textContent =
             valor.toLocaleString("pt-BR");
         }
-        estado.textContent = "● Dados atualizados a partir do Google Sheets.";
+        if (estado) estado.textContent = "● Dados atualizados a partir do Google Sheets.";
       } catch (erro) {
-        estado.textContent = "● Erro ao carregar Dashboard: " + erro.message;
+       if (estado) estado.textContent = "● Erro ao carregar Dashboard: " + erro.message;
       }
     }
 
