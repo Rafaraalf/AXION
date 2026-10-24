@@ -575,7 +575,7 @@
 
     async function carregarDashboard() {
       const estado = document.getElementById("estadoDashboard");
-      estado.textContent = "● Consultando Google Sheets...";
+     if (estado) estado.textContent = "Consultando Google Sheets...";
       try {
         const resposta = await fetch(API + "/api/dashboard", {
           headers: { Authorization: "Bearer " + tokenSessao },
