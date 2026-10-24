@@ -737,6 +737,15 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   }
 }
 
+
+/* Histórico: botão de edição visível também nos cartões mobile */
+#page-historico .data-table td:last-child button { min-height:38px; white-space:nowrap; }
+@media(max-width:760px){
+  #page-historico .data-table tbody td:nth-child(13){grid-column:1/-1}
+  #page-historico .data-table tbody td:nth-child(13)::before{content:'Ações'}
+  #page-historico .data-table tbody td:nth-child(13) button{width:100%}
+}
+
 </style>
 </head>
 
@@ -1118,12 +1127,13 @@ button:focus-visible, input:focus-visible, select:focus-visible {
                   <th>Operação</th>
                   <th>Qtd.</th>
                   <th>Origem</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
 
               <tbody id="hist-lista">
                 <tr>
-                  <td colspan="12">
+                  <td colspan="13">
                     Abra o Histórico para consultar.
                   </td>
                 </tr>
@@ -2171,6 +2181,42 @@ function atualizarFiltroLojasHistorico() {
   seletor.value = lojas.includes(atual) ? atual : "";
 }
 
+
+// AXION 2.1: edição segura com confirmação e trilha de auditoria no Sheets.
+async function editarMovimentoHistorico(item) {
+  if (!item.id) { alert("Movimentação sem identificador. Não é possível editar."); return; }
+  const tipo = prompt("Novo status: OK ou S/E",item.tipo);
+  if (tipo === null) return;
+  const novoTipo = tipo.trim().toUpperCase();
+  if (!["OK","S/E"].includes(novoTipo)) { alert("Escolha OK ou S/E."); return; }
+  const textoQtd = prompt("Nova quantidade (número inteiro):",String(item.quantidade));
+  if (textoQtd === null) return;
+  const quantidade = Number(textoQtd.trim());
+  if (!Number.isSafeInteger(quantidade) || quantidade < 1 || quantidade > 100000) {
+    alert("Informe uma quantidade inteira entre 1 e 100.000."); return;
+  }
+  if (novoTipo === item.tipo && quantidade === Number(item.quantidade)) {
+    alert("Nenhuma alteração foi feita."); return;
+  }
+  const motivo = prompt("Motivo da correção (obrigatório):", "Correção de lançamento");
+  if (motivo === null) return;
+  if (!motivo.trim() || motivo.trim().length > 500) { alert("Informe um motivo com até 500 caracteres."); return; }
+  if (!confirm(`Corrigir ${item.ref} (loja ${item.loja}) de ${item.tipo} / ${item.quantidade} para ${novoTipo} / ${quantidade}?`)) return;
+  try {
+    const resposta = await requisicaoAPI("/api/historico/editar",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id:item.id,tipo:novoTipo,quantidade,motivo:motivo.trim()})
+    });
+    if (!resposta.ok) throw new Error(resposta.erro || "Falha na edição.");
+    historicoCarregado = false;
+    await consultarHistorico(true);
+    atualizarFiltroLojasHistorico();
+    renderizarHistorico();
+    renderizarAtividadeRecente();
+    alert(resposta.alterado ? "Movimentação corrigida e pendências recalculadas." : "Nenhuma alteração necessária.");
+  } catch (erro) { alert("Não foi possível salvar: " + erro.message); }
+}
+
 function renderizarHistorico() {
   const busca = $("hist-busca")
     .value.trim().toLocaleLowerCase("pt-BR");
@@ -2227,7 +2273,7 @@ function renderizarHistorico() {
   if (!filtrados.length) {
     const celula = corpo.insertRow().insertCell();
 
-    celula.colSpan = 12;
+    celula.colSpan = 13;
     celula.textContent =
       "Nenhuma movimentação encontrada.";
   }
@@ -2264,6 +2310,13 @@ function renderizarHistorico() {
         celula.className = "qty";
       }
     });
+    const acao = linha.insertCell();
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "secondary";
+    botao.textContent = "✎ Editar";
+    botao.addEventListener("click", () => editarMovimentoHistorico(item));
+    acao.appendChild(botao);
   }
 
   $("hist-estado").textContent =
