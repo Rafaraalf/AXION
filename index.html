@@ -632,7 +632,7 @@ button:disabled { opacity:.55;cursor:wait; }
   #page-abastecimento .data-table tbody td:nth-child(5)::before{content:'Cor'}
   #page-abastecimento .data-table tbody td:nth-child(6)::before{content:'Tamanho'}
   #page-abastecimento .data-table tbody td:nth-child(7)::before{content:'EAN'}
-  #page-abastecimento .data-table tbody td:nth-child(8)::before{content:'Posição / locais'}
+  #page-abastecimento .data-table tbody td:nth-child(8)::before{content:'Posições / locais'}
   #page-abastecimento .data-table tbody td:nth-child(9)::before{content:'Saldo cadastrado'}
   #page-abastecimento .data-table tbody td:nth-child(10)::before{content:'Pendente'}
   #page-abastecimento .data-table tbody td:nth-child(11)::before{content:'Ações'}
@@ -673,6 +673,61 @@ button:disabled { opacity:.55;cursor:wait; }
   #page-estoque .est-filtro-pop{max-width:calc(100vw - 24px)}
   .modal-card{max-height:calc(100dvh - 32px);overflow:auto}
   .modal-buttons{flex-wrap:wrap}
+}
+
+
+/* AXION v1.9 | Microinterações discretas e acessíveis */
+:root { --motion-fast:160ms; --motion-medium:240ms; }
+button, .nav button, input, select {
+  transition: background-color var(--motion-fast) ease,
+              border-color var(--motion-fast) ease,
+              color var(--motion-fast) ease,
+              box-shadow var(--motion-fast) ease,
+              transform var(--motion-fast) ease;
+}
+button:not(:disabled):active { transform:scale(.975); }
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+}
+.nav button:not(.active):hover { background:#1d3049; color:#fff; }
+.primary:not(:disabled):hover { background:#7dd3fc; box-shadow:0 5px 18px rgba(56,189,248,.15); }
+.secondary:not(:disabled):hover, .toolbar button:not(:disabled):hover {
+  border-color:#397ca2; background:#1b405c;
+}
+.btn-ok:not(:disabled):hover { background:#166534; }
+.btn-se:not(:disabled):hover { background:#991b1b; }
+.data-table tbody tr { transition:background-color var(--motion-fast) ease; }
+@media (min-width:761px) {
+  .data-table tbody tr:hover { background:rgba(56,189,248,.055); }
+}
+.page.active { animation:axionPageIn var(--motion-medium) ease-out both; }
+.modal:not(.hidden) .modal-card { animation:axionModalIn 190ms ease-out both; }
+.feedback:not(.hidden) { animation:axionFeedbackIn var(--motion-medium) ease-out both; }
+.stat { transition:border-color var(--motion-medium) ease, transform var(--motion-medium) ease; }
+@media (hover:hover) and (min-width:761px) {
+  .stat:hover { border-color:#3b607e; transform:translateY(-2px); }
+}
+#est-versoes button:hover { border-color:var(--accent); }
+@keyframes axionPageIn {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes axionModalIn {
+  from { opacity:0; transform:translateY(10px) scale(.985); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes axionFeedbackIn {
+  from { opacity:0; transform:translateY(-5px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@media (prefers-reduced-motion:reduce) {
+  *, *::before, *::after {
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
 }
 
 </style>
@@ -761,7 +816,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v1.8</span>
+      <span>AXION WEB · v1.9</span>
     </header>
 
     <div class="content">
@@ -772,7 +827,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
         <div class="heading">
           <h1>Visão geral</h1>
-          <p>Acompanhe o estoque e o abastecimento.</p>
+          <p>Acompanhe o estoque e as operações de abastecimento.</p>
         </div>
 
         <div class="stats">
@@ -903,7 +958,7 @@ button:disabled { opacity:.55;cursor:wait; }
                   <th>Cor</th>
                   <th>Tamanho</th>
                   <th>EAN</th>
-                  <th>Posição / locais</th>
+                  <th>Posições / locais</th>
                   <th>Saldo*</th>
                   <th>Pendente</th>
                   <th>Ações</th>
@@ -920,7 +975,7 @@ button:disabled { opacity:.55;cursor:wait; }
           </div>
 
           <p class="status-line" style="margin-top:16px">
-            * Saldo cadastrado ainda não conferido por balanço.
+            * Saldo cadastrado, ainda não conferido por inventário.
             Não impede o abastecimento.
           </p>
 
@@ -929,7 +984,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
       <!-- ESTOQUE V1.6 -->
       <section class="page" id="page-estoque">
-        <div class="heading"><h1>Estoque e Backup</h1><p>Consulte produtos e preserve cópias independentes do Google Sheets.</p></div>
+        <div class="heading"><h1>Estoque e backups</h1><p>Consulte produtos e mantenha cópias de segurança independentes do Google Sheets.</p></div>
         <div class="stats" style="margin-bottom:20px">
           <div class="stat"><div class="label">Linhas cadastradas</div><div class="value blue" id="est-linhas">—</div></div>
           <div class="stat"><div class="label">Produtos</div><div class="value" id="est-produtos">—</div></div>
@@ -937,14 +992,14 @@ button:disabled { opacity:.55;cursor:wait; }
           <div class="stat"><div class="label">Posições</div><div class="value orange" id="est-posicoes">—</div></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
-          <h2>Atualizar cadastro</h2>
+          <h2>Importar cadastro</h2>
           <p class="status-line">Exporte a aba DADOS/POSIÇÕES como CSV e selecione o arquivo. O upload substitui apenas a cópia do AXION e preserva versões anteriores.</p>
           <div class="toolbar">
             <input id="est-arquivo" type="file" accept=".csv,text/csv" aria-label="Selecionar CSV de estoque">
-            <button class="primary" id="est-enviar" type="button">↑ Enviar novo cadastro</button>
-            <button class="secondary" id="est-baixar" type="button">↓ Baixar cópia atual</button>
+            <button class="primary" id="est-enviar" type="button">↑ Importar novo cadastro</button>
+            <button class="secondary" id="est-baixar" type="button">↓ Baixar backup atual</button>
           </div>
-          <p class="status-line" id="est-atualizacao">Nenhum backup carregado.</p>
+          <p class="status-line" id="est-atualizacao">Nenhum backup consultado.</p>
           <div class="feedback hidden" id="est-mensagem" role="status"></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
@@ -954,7 +1009,7 @@ button:disabled { opacity:.55;cursor:wait; }
           <p class="status-line" id="est-resultados">Carregando...</p>
           <div class="table-wrap"><table class="data-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
         </div>
-        <div class="panel"><h2>Versões anteriores</h2><p class="status-line">As três últimas versões podem ser baixadas para recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
+        <div class="panel"><h2>Histórico de backups</h2><p class="status-line">As três versões mais recentes ficam disponíveis para download e recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
       </section>
 
       <!-- HISTÓRICO -->
@@ -962,7 +1017,7 @@ button:disabled { opacity:.55;cursor:wait; }
       <section class="page" id="page-historico">
 
         <div class="heading">
-          <h1>Histórico de Abastecimentos</h1>
+          <h1>Histórico de abastecimentos</h1>
           <p>
             Consulte os registros de OK e S/E realizados no AXION.
           </p>
@@ -1086,7 +1141,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 1.8</p>
+          <p>Versão da interface: 1.9</p>
 
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
@@ -1214,7 +1269,7 @@ function iniciarCabecalhosEstoque(){
 }
 function atualizarIndicadoresEstoque(){
  const ativos=Object.keys(estFiltros).length;
- $('est-filtros-ativos').textContent=ativos?`${ativos} coluna(s) filtrada(s)`:'Nenhum filtro de coluna ativo';
+ $('est-filtros-ativos').textContent=ativos?`${ativos} ${ativos===1?'coluna filtrada':'colunas filtradas'}`:'Nenhum filtro por coluna ativo';
  document.querySelectorAll('[data-est-botao]').forEach(b=>b.classList.toggle('ativo',!!estFiltros[b.dataset.estBotao]||estOrdem.coluna===b.dataset.estBotao));
 }
 function estNumero(v){const n=Number(estTexto(v).replace(',','.'));return Number.isFinite(n)?n:0;}
@@ -2357,7 +2412,7 @@ $("formLogin").addEventListener(
 
     } catch {
       $("mensagem").textContent =
-        "Não foi possível conectar à API.";
+        "Não foi possível conectar ao servidor.";
 
     } finally {
       $("entrar").disabled = false;
