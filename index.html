@@ -573,6 +573,12 @@ button:disabled { opacity:.55;cursor:wait; }
   .atividade-item { gap:8px; }
   .atividade-resultado { font-size:11px; }
 }
+
+/* Estoque v1.6 */
+#est-arquivo{max-width:100%;min-width:200px;color:var(--text);padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}
+#est-versoes{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#est-versoes button{border:1px solid var(--border);border-radius:8px;background:#16324a;color:var(--accent);padding:10px}
+
 </style>
 </head>
 
@@ -659,7 +665,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v1.5</span>
+      <span>AXION WEB · v1.6</span>
     </header>
 
     <div class="content">
@@ -825,24 +831,33 @@ button:disabled { opacity:.55;cursor:wait; }
         </div>
       </section>
 
-      <!-- ESTOQUE -->
-
+      <!-- ESTOQUE V1.6 -->
       <section class="page" id="page-estoque">
-
-        <div class="heading">
-          <h1>Estoque</h1>
-          <p>Consulta de produtos e posições físicas.</p>
+        <div class="heading"><h1>Estoque e Backup</h1><p>Consulte produtos e preserve cópias independentes do Google Sheets.</p></div>
+        <div class="stats" style="margin-bottom:20px">
+          <div class="stat"><div class="label">Linhas cadastradas</div><div class="value blue" id="est-linhas">—</div></div>
+          <div class="stat"><div class="label">Produtos</div><div class="value" id="est-produtos">—</div></div>
+          <div class="stat"><div class="label">EANs</div><div class="value green" id="est-eans">—</div></div>
+          <div class="stat"><div class="label">Posições</div><div class="value orange" id="est-posicoes">—</div></div>
         </div>
-
-        <div class="panel">
-          <h2>DADOS/POSIÇÕES</h2>
-
-          <div class="empty">
-            O cadastro e as localizações estão reunidos
-            na aba DADOS/POSIÇÕES do Google Sheets.
+        <div class="panel" style="margin-bottom:20px">
+          <h2>Atualizar cadastro</h2>
+          <p class="status-line">Exporte a aba DADOS/POSIÇÕES como CSV e selecione o arquivo. O upload substitui apenas a cópia do AXION e preserva versões anteriores.</p>
+          <div class="toolbar">
+            <input id="est-arquivo" type="file" accept=".csv,text/csv" aria-label="Selecionar CSV de estoque">
+            <button class="primary" id="est-enviar" type="button">↑ Enviar novo cadastro</button>
+            <button class="secondary" id="est-baixar" type="button">↓ Baixar cópia atual</button>
           </div>
+          <p class="status-line" id="est-atualizacao">Nenhum backup carregado.</p>
+          <div class="feedback hidden" id="est-mensagem" role="status"></div>
         </div>
-
+        <div class="panel" style="margin-bottom:20px">
+          <h2>Pesquisar produtos</h2>
+          <div class="toolbar"><input id="est-busca" type="search" placeholder="EAN, REF, descrição, marca, cor, tamanho, posição ou loja..."><button class="secondary" id="est-recarregar" type="button">↻ Atualizar consulta</button></div>
+          <p class="status-line" id="est-resultados">Carregando...</p>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>Posição</th><th>EAN</th><th>REF</th><th>Descrição</th><th>Marca</th><th>Cor</th><th>Tamanho</th><th>Qtd.</th><th>Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
+        </div>
+        <div class="panel"><h2>Versões anteriores</h2><p class="status-line">As três últimas versões podem ser baixadas para recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
       </section>
 
       <!-- HISTÓRICO -->
@@ -974,7 +989,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 1.5</p>
+          <p>Versão da interface: 1.6</p>
 
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
@@ -1070,6 +1085,74 @@ let historicoCarregado = false;
 
 let atividadeCarregando = false;
 let historicoPromise = null;
+
+
+// =====================================================
+// AXION WEB v1.6 - ESTOQUE E BACKUP R2
+// =====================================================
+let estoqueCache=[];
+let estoqueCarregado=false;
+let estoqueOcupado=false;
+function estoqueMensagem(msg,erro=false){const el=$('est-mensagem');el.className='feedback '+(erro?'error':'success');el.textContent=msg;}
+function formatarEstoqueData(data){return data?new Date(data).toLocaleString('pt-BR'):'Não disponível';}
+function renderizarEstoque(){
+ const busca=$('est-busca').value.trim().toLocaleLowerCase('pt-BR');
+ const itens=estoqueCache.filter(x=>!busca||Object.values(x).some(v=>String(v??'').toLocaleLowerCase('pt-BR').includes(busca)));
+ const corpo=$('est-lista');corpo.replaceChildren();
+ $('est-resultados').textContent=`${itens.length.toLocaleString('pt-BR')} registro(s) encontrado(s).`;
+ if(!itens.length){const td=corpo.insertRow().insertCell();td.colSpan=9;td.textContent='Nenhum item encontrado.';return;}
+ for(const x of itens.slice(0,500)){
+   const linha=corpo.insertRow();
+   for(const k of ['posicao','ean','ref','descricao','marca','cor','tamanho','quantidade','loja'])linha.insertCell().textContent=String(x[k]??'');
+ }
+ if(itens.length>500)$('est-resultados').textContent+=' Exibindo os primeiros 500. Refine a busca.';
+}
+async function carregarEstoque(){
+ if(!tokenSessao||estoqueOcupado)return;
+ estoqueOcupado=true;$('est-recarregar').disabled=true;
+ try{
+  const d=await requisicaoAPI('/api/estoque');
+  estoqueCache=d.itens||[];estoqueCarregado=true;
+  $('est-linhas').textContent=(d.total||0).toLocaleString('pt-BR');
+  $('est-produtos').textContent=(d.produtos||0).toLocaleString('pt-BR');
+  $('est-eans').textContent=(d.eans||0).toLocaleString('pt-BR');
+  $('est-posicoes').textContent=(d.posicoes||0).toLocaleString('pt-BR');
+  $('est-atualizacao').textContent=d.existe?'Última atualização: '+formatarEstoqueData(d.atualizadoEm):'Nenhum arquivo importado. Faça o primeiro upload.';
+  renderizarEstoque();await carregarVersoesEstoque();
+ }catch(e){estoqueMensagem('Erro ao consultar estoque: '+e.message,true);}
+ finally{estoqueOcupado=false;$('est-recarregar').disabled=false;}
+}
+async function baixarEstoque(versao='atual'){
+ try{
+  const resposta=await fetch(API+'/api/estoque/backup?versao='+encodeURIComponent(versao),{headers:{Authorization:'Bearer '+tokenSessao},cache:'no-store'});
+  if(!resposta.ok){const erro=await resposta.json().catch(()=>({}));throw new Error(erro.erro||'Download indisponível');}
+  const blob=await resposta.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=versao==='atual'?'AXION_estoque_atual.csv':versao;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
+ }catch(e){estoqueMensagem('Erro no download: '+e.message,true);}
+}
+async function carregarVersoesEstoque(){
+ const destino=$('est-versoes');destino.replaceChildren();
+ try{
+  const d=await requisicaoAPI('/api/estoque/backups');
+  if(!d.versoes?.length){destino.textContent='Nenhum backup salvo.';return;}
+  for(const v of d.versoes){const b=document.createElement('button');b.type='button';b.textContent='↓ '+formatarEstoqueData(v.data)+' · '+Math.ceil(v.bytes/1024)+' KB';b.addEventListener('click',()=>baixarEstoque(v.id));destino.appendChild(b);}
+ }catch(e){destino.textContent='Não foi possível listar versões: '+e.message;}
+}
+$('est-busca').addEventListener('input',renderizarEstoque);
+$('est-recarregar').addEventListener('click',carregarEstoque);
+$('est-baixar').addEventListener('click',()=>baixarEstoque());
+$('est-enviar').addEventListener('click',async()=>{
+ const arquivo=$('est-arquivo').files[0];if(!arquivo){estoqueMensagem('Selecione um arquivo CSV.',true);return;}
+ if(arquivo.size>3*1024*1024){estoqueMensagem('O CSV deve ter até 3 MB.',true);return;}
+ if(!confirm('Importar '+arquivo.name+'? A cópia atual será substituída e o backup anterior ficará disponível.'))return;
+ const botao=$('est-enviar');botao.disabled=true;
+ try{
+  const texto=await arquivo.text();
+  const d=await requisicaoAPI('/api/estoque/importar',{method:'POST',headers:{'Content-Type':'text/csv; charset=utf-8'},body:texto});
+  estoqueMensagem('Backup salvo com sucesso! '+d.total+' registros importados.');
+  $('est-arquivo').value='';await carregarEstoque();
+ }catch(e){estoqueMensagem('Importação não concluída: '+e.message,true);}
+ finally{botao.disabled=false;}
+});
 
 // =====================================================
 // LOGIN / SESSÃO
@@ -2042,6 +2125,10 @@ document.querySelectorAll("[data-page]").forEach(botao => {
       carregarHistorico();
     }
 
+    if (pagina === "estoque" && !estoqueCarregado) {
+      carregarEstoque();
+    }
+
     if (pagina === "dashboard") {
       carregarAtividadeRecente();
     }
@@ -2129,6 +2216,8 @@ $("sair").addEventListener("click", async () => {
   historicoCache = [];
   historicoCarregado = false;
   historicoPromise = null;
+  estoqueCache = [];
+  estoqueCarregado = false;
 
   movimentoAtual = null;
 
