@@ -2,840 +2,1397 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AXION | Gestão de Estoque</title>
-  <style>
-    :root {
-      --bg: #0b1220;
-      --sidebar: #111c2e;
-      --surface: #172438;
-      --border: #2b3a50;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --green: #4ade80;
-      --orange: #fbbf24;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AXION | Gestão de Estoque</title>
 
-    * { box-sizing: border-box; }
+<style>
+:root {
+  --bg:#0b1220;
+  --sidebar:#111c2e;
+  --surface:#172438;
+  --border:#2b3a50;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --accent:#38bdf8;
+  --green:#4ade80;
+  --orange:#fbbf24;
+  --red:#f87171;
+}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-    }
+* { box-sizing:border-box; }
 
-    button, input { font: inherit; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+}
 
-    button { cursor: pointer; }
+button,input { font:inherit; }
+button { cursor:pointer; }
+button:disabled { opacity:.55;cursor:wait; }
+.hidden { display:none!important; }
 
-    .hidden { display: none !important; }
+#loginView {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:20px;
+}
 
-    /* LOGIN */
+.login-card {
+  width:100%;
+  max-width:410px;
+  padding:35px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+}
 
-    #loginView {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-    }
+.brand {
+  text-align:center;
+  font-size:36px;
+  font-weight:800;
+  letter-spacing:5px;
+}
 
-    .login-card {
-      width: 100%;
-      max-width: 410px;
-      padding: 36px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-    }
+.subtitle {
+  color:var(--muted);
+  text-align:center;
+  line-height:1.6;
+}
 
-    .brand {
-      text-align: center;
-      font-size: 36px;
-      font-weight: 800;
-      letter-spacing: 5px;
-      margin: 0;
-    }
+.login-card label {
+  display:block;
+  margin:20px 0 8px;
+}
 
-    .subtitle {
-      color: var(--muted);
-      text-align: center;
-      margin: 14px 0 32px;
-      line-height: 1.5;
-    }
+.login-card input {
+  width:100%;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--bg);
+  color:var(--text);
+}
 
-    .login-card label {
-      display: block;
-      margin: 18px 0 8px;
-      font-size: 14px;
-    }
+.primary {
+  background:var(--accent);
+  color:#07111f;
+  border:0;
+  border-radius:10px;
+  padding:13px 20px;
+  font-weight:700;
+}
 
-    .login-card input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #40516a;
-      border-radius: 10px;
-      background: var(--bg);
-      color: white;
-    }
+.login-card .primary {
+  width:100%;
+  margin-top:25px;
+}
 
-    input:focus {
-      outline: 2px solid var(--accent);
-      outline-offset: 1px;
-    }
+#mensagem {
+  color:var(--red);
+  text-align:center;
+  margin-top:15px;
+}
 
-    .primary {
-      border: 0;
-      border-radius: 10px;
-      background: var(--accent);
-      color: #07111f;
-      font-weight: 700;
-      padding: 14px 20px;
-    }
+#appView {
+  display:flex;
+  min-height:100vh;
+}
 
-    .primary:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
+.sidebar {
+  width:250px;
+  flex-shrink:0;
+  background:var(--sidebar);
+  border-right:1px solid var(--border);
+  padding:26px 16px;
+  display:flex;
+  flex-direction:column;
+}
 
-    .login-card .primary {
-      width: 100%;
-      margin-top: 26px;
-    }
+.sidebar-brand {
+  font-size:29px;
+  font-weight:800;
+  letter-spacing:4px;
+  padding:0 14px;
+}
 
-    #mensagem {
-      color: #fca5a5;
-      text-align: center;
-      min-height: 20px;
-      margin-top: 16px;
-      font-size: 14px;
-    }
+.sidebar-caption {
+  color:var(--muted);
+  font-size:12px;
+  padding:8px 14px 30px;
+}
 
-    /* APLICAÇÃO */
+.nav {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
 
-    #appView {
-      min-height: 100vh;
-      display: flex;
-    }
+.nav button {
+  text-align:left;
+  padding:14px;
+  border:1px solid transparent;
+  border-radius:11px;
+  background:transparent;
+  color:#cbd5e1;
+}
 
-    .sidebar {
-      width: 250px;
-      flex-shrink: 0;
-      background: var(--sidebar);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 26px 16px;
-    }
+.nav button.active {
+  background:#16324a;
+  color:var(--accent);
+  border-color:#245171;
+  font-weight:bold;
+}
 
-    .sidebar-brand {
-      font-size: 29px;
-      font-weight: 800;
-      letter-spacing: 4px;
-      padding: 0 14px;
-    }
+.sidebar-bottom {
+  margin-top:auto;
+  padding-top:24px;
+}
 
-    .sidebar-caption {
-      font-size: 12px;
-      color: var(--muted);
-      padding: 8px 14px 30px;
-    }
+.user-box {
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:12px;
+}
 
-    .nav {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
+.user-box strong { display:block;margin-bottom:6px; }
+.user-box small { color:var(--muted); }
 
-    .nav button {
-      width: 100%;
-      text-align: left;
-      padding: 14px;
-      border: 1px solid transparent;
-      border-radius: 11px;
-      background: transparent;
-      color: #cbd5e1;
-      font-size: 14px;
-    }
+.logout {
+  width:100%;
+  padding:12px;
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+}
 
-    .nav button:hover {
-      background: #1d2c42;
-    }
+.main { flex:1;min-width:0; }
 
-    .nav button.active {
-      color: var(--accent);
-      background: #16324a;
-      border-color: #245171;
-      font-weight: bold;
-    }
+.topbar {
+  min-height:78px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 32px;
+}
 
-    .sidebar-bottom {
-      margin-top: auto;
-      padding-top: 24px;
-    }
+.topbar span {
+  color:var(--muted);
+  font-size:13px;
+}
 
-    .user-box {
-      padding: 14px;
-      background: #19283e;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
+.content {
+  max-width:1500px;
+  margin:auto;
+  padding:32px;
+}
 
-    .user-box strong {
-      display: block;
-      margin-bottom: 6px;
-    }
+.page { display:none; }
+.page.active { display:block; }
 
-    .user-box small { color: var(--muted); }
+.heading { margin-bottom:28px; }
+.heading h1 { margin:0 0 10px;font-size:29px; }
+.heading p { margin:0;color:var(--muted);line-height:1.6; }
 
-    .logout {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #48546a;
-      background: transparent;
-      color: #f8fafc;
-    }
+.stats {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:18px;
+}
 
-    .main {
-      flex: 1;
-      min-width: 0;
-    }
+.stat,.panel {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+}
 
-    .topbar {
-      min-height: 78px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 32px;
-    }
+.stat .label {
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:18px;
+}
 
-    .topbar strong { font-size: 19px; }
+.stat .value {
+  font-size:34px;
+  font-weight:800;
+}
 
-    .topbar span {
-      color: var(--muted);
-      font-size: 13px;
-    }
+.stat .detail {
+  color:var(--muted);
+  font-size:12px;
+  margin-top:12px;
+}
 
-    .content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 32px;
-    }
+.blue { color:var(--accent); }
+.green { color:var(--green); }
+.orange { color:var(--orange); }
 
-    .heading {
-      margin-bottom: 28px;
-    }
+.panel-grid {
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:18px;
+  margin-top:22px;
+}
 
-    .heading h1 {
-      margin: 0 0 10px;
-      font-size: 29px;
-    }
+.panel h2 { font-size:17px;margin:0 0 18px; }
 
-    .heading p {
-      color: var(--muted);
-      margin: 0;
-      line-height: 1.6;
-    }
+.empty {
+  border:1px dashed #40516a;
+  border-radius:12px;
+  padding:35px 20px;
+  text-align:center;
+  color:var(--muted);
+  line-height:1.6;
+}
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-    }
+.notice {
+  margin-top:22px;
+  padding:17px 20px;
+  border:1px solid #245171;
+  border-radius:12px;
+  background:#10283d;
+  color:#bae6fd;
+}
 
-    .stat {
-      padding: 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
+.toolbar {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
 
-    .stat .label {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 18px;
-    }
+.toolbar input {
+  flex:1;
+  min-width:200px;
+  padding:12px;
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:9px;
+}
 
-    .stat .value {
-      font-size: 34px;
-      font-weight: 800;
-    }
+.toolbar button,.secondary {
+  padding:12px 16px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:#16324a;
+  color:var(--accent);
+}
 
-    .stat .detail {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 12px;
-    }
+.status-line {
+  color:var(--muted);
+  margin:0 0 16px;
+  font-size:13px;
+}
 
-    .blue { color: var(--accent); }
-    .green { color: var(--green); }
-    .orange { color: var(--orange); }
+.table-wrap { overflow-x:auto; }
 
-    .panel-grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 18px;
-      margin-top: 22px;
-    }
+.data-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
 
-    .panel {
-      padding: 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
+.data-table th,.data-table td {
+  padding:12px 10px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  white-space:nowrap;
+}
 
-    .panel h2 {
-      font-size: 17px;
-      margin: 0 0 18px;
-    }
+.data-table th {
+  color:var(--muted);
+  font-weight:600;
+}
 
-    .empty {
-      border: 1px dashed #40516a;
-      border-radius: 12px;
-      padding: 40px 20px;
-      text-align: center;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+.data-table td.qty {
+  color:var(--orange);
+  font-weight:800;
+}
 
-    .notice {
-      margin-top: 22px;
-      padding: 17px 20px;
-      border: 1px solid #245171;
-      background: #10283d;
-      border-radius: 12px;
-      color: #bae6fd;
-      font-size: 14px;
-      line-height: 1.6;
-    }
+.position-pill {
+  display:inline-block;
+  background:#16324a;
+  color:var(--accent);
+  padding:5px 8px;
+  margin:2px;
+  border-radius:7px;
+  font-weight:700;
+}
 
-    .toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
-    .toolbar input { flex:1; min-width:200px; padding:12px; border:1px solid var(--border); border-radius:9px; background:var(--bg); color:var(--text); }
-    .toolbar button { padding:12px 16px; border:1px solid var(--border); border-radius:9px; background:#16324a; color:var(--accent); }
-    .table-wrap { width:100%; overflow-x:auto; }
-    .data-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .data-table th, .data-table td { padding:12px 10px; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
-    .data-table th { color:var(--muted); font-weight:600; }
-    .data-table td.qty { color:var(--orange); font-weight:800; }
-    .status-line { color:var(--muted); margin:0 0 16px; font-size:13px; }
-    .position-pill { display:inline-block; padding:5px 8px; border-radius:7px; background:#12334a; color:#7dd3fc; margin:2px 3px 2px 0; font-size:12px; }
-    .stock-amount { color:var(--green); font-weight:700; }
-    .not-found { color:#fbbf24; font-size:12px; }
-    .positions-detail { margin-top:7px; color:var(--muted); font-size:12px; white-space:normal; min-width:150px; }
-    .page { display: none; }
-    .page.active { display: block; }
+.positions-detail {
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+}
 
-    @media (max-width: 1100px) {
-      .stats { grid-template-columns: repeat(2, 1fr); }
-    }
+.not-found { color:var(--muted); }
+.stock-amount { color:var(--muted); }
 
-    @media (max-width: 760px) {
-      #appView { flex-direction: column; }
+.actions {
+  display:flex;
+  gap:7px;
+}
 
-      .sidebar {
-        width: 100%;
-        padding: 16px;
-        border-right: 0;
-        border-bottom: 1px solid var(--border);
-      }
+.btn-ok,.btn-se {
+  border:0;
+  border-radius:8px;
+  padding:9px 13px;
+  font-weight:800;
+  white-space:nowrap;
+}
 
-      .sidebar-brand { font-size: 24px; }
-      .sidebar-caption { padding-bottom: 16px; }
+.btn-ok {
+  background:#14532d;
+  color:#bbf7d0;
+}
 
-      .nav {
-        flex-direction: row;
-        overflow-x: auto;
-      }
+.btn-se {
+  background:#7f1d1d;
+  color:#fecaca;
+}
 
-      .nav button {
-        white-space: nowrap;
-        width: auto;
-      }
+.feedback {
+  padding:12px 15px;
+  border-radius:10px;
+  margin-bottom:16px;
+  background:#16324a;
+  color:#bae6fd;
+}
 
-      .sidebar-bottom {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        padding-top: 14px;
-      }
+.feedback.error {
+  background:#451a1a;
+  color:#fecaca;
+}
 
-      .user-box {
-        flex: 1;
-        margin: 0;
-      }
+.feedback.success {
+  background:#153a2b;
+  color:#bbf7d0;
+}
 
-      .logout { width: auto; }
+/* CONFIRMAÇÃO */
 
-      .topbar { padding: 20px; }
-      .content { padding: 20px; }
-      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .panel-grid { grid-template-columns: 1fr; }
-    }
+.modal {
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.75);
+  display:grid;
+  place-items:center;
+  padding:20px;
+}
 
-    @media (max-width: 420px) {
-      .stats { grid-template-columns: 1fr; }
-    }
-  </style>
+.modal-card {
+  width:100%;
+  max-width:460px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:25px;
+}
+
+.modal-card h2 { margin:0 0 16px; }
+
+.modal-product {
+  color:var(--muted);
+  line-height:1.7;
+  margin-bottom:20px;
+}
+
+.modal-card label {
+  display:block;
+  margin-bottom:8px;
+}
+
+.modal-card input {
+  width:100%;
+  padding:13px;
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:9px;
+}
+
+.modal-buttons {
+  display:flex;
+  gap:10px;
+  margin-top:22px;
+}
+
+.modal-buttons button { flex:1; }
+
+#modalErro {
+  color:#fecaca;
+  margin-top:12px;
+  line-height:1.5;
+}
+
+@media(max-width:1100px) {
+  .stats { grid-template-columns:repeat(2,1fr); }
+}
+
+@media(max-width:760px) {
+  #appView { flex-direction:column; }
+  .sidebar { width:100%;padding:16px; }
+  .nav { flex-direction:row;overflow-x:auto; }
+  .nav button { white-space:nowrap; }
+  .sidebar-bottom { display:flex;gap:12px;align-items:center; }
+  .user-box { flex:1;margin:0; }
+  .logout { width:auto; }
+  .content { padding:20px; }
+  .topbar { padding:20px; }
+  .panel-grid { grid-template-columns:1fr; }
+}
+
+@media(max-width:420px) {
+  .stats { grid-template-columns:1fr; }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- LOGIN -->
-  <main id="loginView">
-    <section class="login-card">
-      <h1 class="brand">AXION</h1>
-      <p class="subtitle">Gestão inteligente de estoque e abastecimento</p>
+<!-- LOGIN -->
+<main id="loginView">
+  <section class="login-card">
+    <h1 class="brand">AXION</h1>
+    <p class="subtitle">
+      Gestão inteligente de estoque e abastecimento
+    </p>
 
-      <form id="formLogin">
-        <label for="usuario">Usuário</label>
-        <input id="usuario" autocomplete="username" required>
+    <form id="formLogin">
+      <label for="usuario">Usuário</label>
+      <input id="usuario" autocomplete="username" required>
 
-        <label for="senha">Senha</label>
-        <input id="senha" type="password"
-               autocomplete="current-password" required>
+      <label for="senha">Senha</label>
+      <input id="senha" type="password"
+             autocomplete="current-password" required>
 
-        <button id="entrar" class="primary" type="submit">
-          Entrar no AXION
-        </button>
-      </form>
+      <button class="primary" id="entrar" type="submit">
+        Entrar no AXION
+      </button>
+    </form>
 
-      <div id="mensagem" role="status"></div>
-    </section>
-  </main>
+    <div id="mensagem" role="status"></div>
+  </section>
+</main>
 
-  <!-- SISTEMA -->
-  <div id="appView" class="hidden">
+<!-- SISTEMA -->
+<div id="appView" class="hidden">
 
-    <aside class="sidebar">
-      <div class="sidebar-brand">AXION</div>
-      <div class="sidebar-caption">STOCK MANAGEMENT</div>
+  <aside class="sidebar">
+    <div class="sidebar-brand">AXION</div>
+    <div class="sidebar-caption">STOCK MANAGEMENT</div>
 
-      <nav class="nav" aria-label="Menu principal">
-        <button class="active" data-page="dashboard">▦ &nbsp; Dashboard</button>
-        <button data-page="abastecimento">↻ &nbsp; Abastecimento</button>
-        <button data-page="estoque">▤ &nbsp; Estoque</button>
-        <button data-page="historico">◷ &nbsp; Histórico</button>
-        <button data-page="configuracoes">⚙ &nbsp; Configurações</button>
-      </nav>
+    <nav class="nav">
+      <button class="active" data-page="dashboard">
+        ▦ Dashboard
+      </button>
+      <button data-page="abastecimento">
+        ↻ Abastecimento
+      </button>
+      <button data-page="estoque">
+        ▤ Estoque
+      </button>
+      <button data-page="historico">
+        ◷ Histórico
+      </button>
+      <button data-page="configuracoes">
+        ⚙ Configurações
+      </button>
+    </nav>
 
-      <div class="sidebar-bottom">
-        <div class="user-box">
-          <strong id="usuarioLogado">Usuário</strong>
-          <small>Administrador</small>
+    <div class="sidebar-bottom">
+      <div class="user-box">
+        <strong id="usuarioLogado">Usuário</strong>
+        <small>Administrador</small>
+      </div>
+      <button class="logout" id="sair">Sair</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <strong id="tituloPagina">Dashboard</strong>
+      <span>AXION WEB · v1.3</span>
+    </header>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <section class="page active" id="page-dashboard">
+        <div class="heading">
+          <h1>Visão geral</h1>
+          <p>Acompanhe o estoque e o abastecimento.</p>
         </div>
-        <button class="logout" id="sair">Sair</button>
-      </div>
-    </aside>
 
-    <div class="main">
-      <header class="topbar">
-        <strong id="tituloPagina">Dashboard</strong>
-        <span>AXION WEB · v1.2</span>
-      </header>
-
-      <div class="content">
-
-        <!-- DASHBOARD -->
-        <section class="page active" id="page-dashboard">
-          <div class="heading">
-            <h1>Visão geral</h1>
-            <p>Acompanhe as principais informações do estoque e abastecimento.</p>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Produtos cadastrados</div>
+            <div class="value blue" id="stat-produtos">—</div>
+            <div class="detail">Dados do Google Sheets</div>
           </div>
 
-          <div class="stats">
-            <div class="stat">
-              <div class="label">Produtos cadastrados</div>
-              <div class="value blue" id="stat-produtos">—</div>
-              <div class="detail">Dados do Google Sheets</div>
-            </div>
-
-            <div class="stat">
-              <div class="label">Unidades pendentes</div>
-              <div class="value orange" id="stat-pendentes">—</div>
-              <div class="detail">Dados do Google Sheets</div>
-            </div>
-
-            <div class="stat">
-              <div class="label">Unidades abastecidas</div>
-              <div class="value green" id="stat-abastecidas">—</div>
-              <div class="detail">Dados do Google Sheets</div>
-            </div>
-
-            <div class="stat">
-              <div class="label">Itens sem estoque</div>
-              <div class="value" id="stat-semEstoque">—</div>
-              <div class="detail">Dados do Google Sheets</div>
-            </div>
+          <div class="stat">
+            <div class="label">Unidades pendentes</div>
+            <div class="value orange" id="stat-pendentes">—</div>
+            <div class="detail">Dados do Google Sheets</div>
           </div>
 
-          <div class="panel-grid">
-            <div class="panel">
-              <h2>Abastecimentos pendentes</h2>
-              <div id="resumoPendentes" class="empty">Carregando pendências...</div>
-            </div>
-
-            <div class="panel">
-              <h2>Atividade recente</h2>
-              <div class="empty">
-                Os últimos registros do AXION aparecerão aqui.
-              </div>
-            </div>
+          <div class="stat">
+            <div class="label">Unidades abastecidas</div>
+            <div class="value green" id="stat-abastecidas">—</div>
+            <div class="detail">Dados do Google Sheets</div>
           </div>
 
-          <div class="notice">
-            <span id="estadoDashboard">Conectando ao Google Sheets...</span>
+          <div class="stat">
+            <div class="label">Itens sem estoque</div>
+            <div class="value" id="stat-semEstoque">—</div>
+            <div class="detail">Dados do Google Sheets</div>
           </div>
-        </section>
+        </div>
 
-        <!-- ABASTECIMENTO -->
-        <section class="page" id="page-abastecimento">
-          <div class="heading">
-            <h1>Abastecimento</h1>
-            <p>Consulte e acompanhe os produtos que precisam ser repostos.</p>
-          </div>
+        <div class="panel-grid">
           <div class="panel">
-            <h2>Lista de abastecimento</h2>
-            <div class="toolbar">
-              <input id="buscaPendentes" type="search" placeholder="Buscar marca, descrição, referência, EAN, posição, loja...">
-              <button id="atualizarPendentes" type="button">↻ Atualizar lista</button>
-            </div>
-            <p id="estadoPendentes" class="status-line" role="status">Aguardando consulta...</p>
-            <div class="table-wrap">
-              <table class="data-table">
-                <thead><tr>
-                  <th>Loja</th><th>Marca</th><th>Descrição</th><th>Referência</th>
-                  <th>Cor</th><th>Tamanho</th><th>EAN</th><th>Posição / locais</th><th>Saldo</th><th>Qtd. pendente</th>
-                </tr></thead>
-                <tbody id="listaPendentes">
-                  <tr><td colspan="10">Carregando...</td></tr>
-                </tbody>
-              </table>
+            <h2>Abastecimentos pendentes</h2>
+            <div id="resumoPendentes" class="empty">
+              Carregando pendências...
             </div>
           </div>
-        </section>
 
-        <!-- ESTOQUE -->
-        <section class="page" id="page-estoque">
-          <div class="heading">
-            <h1>Estoque</h1>
-            <p>Consulta de produtos, quantidades e posições físicas.</p>
-          </div>
           <div class="panel">
-            <h2>DADOS/POSIÇÕES</h2>
+            <h2>Atividade recente</h2>
             <div class="empty">
-              O cadastro de produtos e localizações será consultado
-              em uma única aba do Google Sheets.
+              O histórico detalhado será implementado aqui.
             </div>
           </div>
-        </section>
+        </div>
 
-        <!-- HISTÓRICO -->
-        <section class="page" id="page-historico">
-          <div class="heading">
-            <h1>Histórico</h1>
-            <p>Acompanhe as operações realizadas no AXION.</p>
-          </div>
-          <div class="panel">
-            <h2>Registros</h2>
-            <div class="empty">
-              Nenhum registro carregado.
-            </div>
-          </div>
-        </section>
+        <div class="notice">
+          <span id="estadoDashboard">
+            Conectando ao Google Sheets...
+          </span>
+        </div>
+      </section>
 
-        <!-- CONFIGURAÇÕES -->
-        <section class="page" id="page-configuracoes">
-          <div class="heading">
-            <h1>Configurações</h1>
-            <p>Informações e preferências do sistema.</p>
-          </div>
-          <div class="panel">
-            <h2>AXION Web</h2>
-            <p>Versão da interface: 1.2</p>
-            <p style="color:var(--muted)">
-              Autenticação: Cloudflare Workers<br>
-              Interface: GitHub Pages<br>
-              Dados: Google Sheets (Dashboard conectado)
-            </p>
-          </div>
-        </section>
+      <!-- ABASTECIMENTO -->
+      <section class="page" id="page-abastecimento">
+        <div class="heading">
+          <h1>Abastecimento</h1>
+          <p>
+            Localize os produtos e registre o abastecimento
+            diretamente no AXION.
+          </p>
+        </div>
 
-      </div>
+        <div class="panel">
+          <h2>Lista de abastecimento</h2>
+
+          <div class="toolbar">
+            <input
+              id="buscaPendentes"
+              type="search"
+              placeholder="Buscar produto, EAN, posição, loja..."
+            >
+            <button id="atualizarPendentes" type="button">
+              ↻ Atualizar lista
+            </button>
+          </div>
+
+          <div id="feedbackAbastecimento"
+               class="feedback hidden"
+               role="status"></div>
+
+          <p id="estadoPendentes"
+             class="status-line"
+             role="status">
+            Aguardando consulta...
+          </p>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>Marca</th>
+                  <th>Descrição</th>
+                  <th>Referência</th>
+                  <th>Cor</th>
+                  <th>Tamanho</th>
+                  <th>EAN</th>
+                  <th>Posição / locais</th>
+                  <th>Saldo*</th>
+                  <th>Pendente</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="listaPendentes">
+                <tr>
+                  <td colspan="11">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="status-line" style="margin-top:16px">
+            * Saldo cadastrado ainda não conferido por balanço.
+            Não impede o abastecimento.
+          </p>
+        </div>
+      </section>
+
+      <!-- ESTOQUE -->
+      <section class="page" id="page-estoque">
+        <div class="heading">
+          <h1>Estoque</h1>
+          <p>Consulta de produtos e posições físicas.</p>
+        </div>
+
+        <div class="panel">
+          <h2>DADOS/POSIÇÕES</h2>
+          <div class="empty">
+            O cadastro e as localizações estão reunidos
+            na aba DADOS/POSIÇÕES do Google Sheets.
+          </div>
+        </div>
+      </section>
+
+      <!-- HISTÓRICO -->
+      <section class="page" id="page-historico">
+        <div class="heading">
+          <h1>Histórico</h1>
+          <p>Operações registradas no AXION.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Movimentações</h2>
+          <div class="empty">
+            As operações OK e S/E são gravadas na aba
+            MOVIMENTACOES do Google Sheets.
+            A consulta do histórico pelo site será
+            implementada na próxima etapa.
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFIGURAÇÕES -->
+      <section class="page" id="page-configuracoes">
+        <div class="heading">
+          <h1>Configurações</h1>
+          <p>Informações do sistema.</p>
+        </div>
+
+        <div class="panel">
+          <h2>AXION Web</h2>
+          <p>Versão da interface: 1.3</p>
+          <p style="color:var(--muted);line-height:1.8">
+            Autenticação: Cloudflare Workers<br>
+            Interface: GitHub Pages<br>
+            Dados: Google Sheets<br>
+            Abastecimento: OK / S/E
+          </p>
+        </div>
+      </section>
+
     </div>
   </div>
+</div>
 
-  <script>
-    const API = "https://axion-api.rafa-losneto.workers.dev";
+<!-- MODAL DE CONFIRMAÇÃO -->
+<div id="modalAbastecimento" class="modal hidden">
+  <div class="modal-card" role="dialog"
+       aria-modal="true"
+       aria-labelledby="modalTitulo">
 
-    const loginView = document.getElementById("loginView");
-    const appView = document.getElementById("appView");
-    const mensagem = document.getElementById("mensagem");
-    const entrar = document.getElementById("entrar");
+    <h2 id="modalTitulo">Confirmar abastecimento</h2>
 
-    let tokenSessao = null;
+    <div id="modalProduto" class="modal-product"></div>
 
-    function mostrarPainel(usuario) {
-      document.getElementById("usuarioLogado").textContent =
-        usuario || "Administrador";
+    <form id="formAbastecimento">
+      <label for="quantidadeAbastecimento">
+        Quantidade a registrar
+      </label>
 
-      loginView.classList.add("hidden");
-      appView.classList.remove("hidden");
+      <input
+        id="quantidadeAbastecimento"
+        type="number"
+        min="1"
+        step="1"
+        required
+      >
+
+      <p id="modalErro" role="alert"></p>
+
+      <div class="modal-buttons">
+        <button class="secondary"
+                type="button"
+                id="cancelarAbastecimento">
+          Cancelar
+        </button>
+
+        <button class="primary"
+                type="submit"
+                id="confirmarAbastecimento">
+          Confirmar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const API = "https://axion-api.rafa-losneto.workers.dev";
+
+const $ = id => document.getElementById(id);
+
+let tokenSessao = null;
+let pendentesCache = [];
+let pendentesCarregados = false;
+let movimentoAtual = null;
+let enviandoMovimento = false;
+
+// =====================================================
+// LOGIN / SESSÃO
+// =====================================================
+
+function mostrarPainel(usuario) {
+  $("usuarioLogado").textContent =
+    usuario || "Administrador";
+
+  $("loginView").classList.add("hidden");
+  $("appView").classList.remove("hidden");
+}
+
+function mostrarLogin() {
+  $("appView").classList.add("hidden");
+  $("loginView").classList.remove("hidden");
+}
+
+async function requisicaoAPI(caminho, opcoes = {}) {
+  const token = tokenSessao;
+
+  if (!token) {
+    throw new Error("Sessão encerrada.");
+  }
+
+  const resposta = await fetch(API + caminho, {
+    ...opcoes,
+    headers: {
+      Authorization: "Bearer " + token,
+      ...(opcoes.headers || {})
+    },
+    cache: "no-store"
+  });
+
+  let dados;
+
+  try {
+    dados = await resposta.json();
+  } catch {
+    throw new Error("Resposta inválida do servidor.");
+  }
+
+  if (!resposta.ok || !dados.ok) {
+    throw new Error(
+      dados.erro || "Falha na comunicação com o servidor."
+    );
+  }
+
+  return dados;
+}
+
+// =====================================================
+// DASHBOARD
+// =====================================================
+
+async function carregarDashboard() {
+  const token = tokenSessao;
+
+  $("estadoDashboard").textContent =
+    "Consultando Google Sheets...";
+
+  try {
+    const dados = await requisicaoAPI("/api/dashboard");
+
+    if (token !== tokenSessao) return;
+
+    const campos = {
+      produtos: "produtos",
+      pendentes: "unidadesPendentes",
+      abastecidas: "unidadesAbastecidas",
+      semEstoque: "itensSemEstoque"
+    };
+
+    for (const [id, chave] of Object.entries(campos)) {
+      const valor = Number(dados[chave]);
+
+      $( "stat-" + id ).textContent =
+        Number.isFinite(valor)
+          ? valor.toLocaleString("pt-BR")
+          : "—";
     }
 
-    function mostrarLogin() {
-      appView.classList.add("hidden");
-      loginView.classList.remove("hidden");
+    $("estadoDashboard").textContent =
+      "● Dados atualizados a partir do Google Sheets.";
+
+  } catch (erro) {
+    if (token !== tokenSessao) return;
+
+    $("estadoDashboard").textContent =
+      "Erro ao carregar Dashboard: " + erro.message;
+  }
+}
+
+// =====================================================
+// MENSAGENS
+// =====================================================
+
+function mostrarFeedback(texto, tipo = "") {
+  const elemento = $("feedbackAbastecimento");
+
+  elemento.textContent = texto;
+  elemento.className = "feedback " + tipo;
+}
+
+function limparFeedback() {
+  $("feedbackAbastecimento").className =
+    "feedback hidden";
+  $("feedbackAbastecimento").textContent = "";
+}
+
+// =====================================================
+// LOCALIZAÇÕES
+// =====================================================
+
+function localizacoesDoItem(item) {
+  return Array.isArray(item.localizacoes)
+    ? item.localizacoes
+    : [];
+}
+
+function eansDoItem(item) {
+  return [...new Set([
+    ...String(item.ean ?? "").split(","),
+    ...localizacoesDoItem(item).map(
+      local => String(local.ean ?? "")
+    )
+  ].map(x => x.trim()).filter(Boolean))];
+}
+
+function posicoesDoItem(item) {
+  return [...new Set([
+    ...(Array.isArray(item.posicoes) ? item.posicoes : []),
+    ...localizacoesDoItem(item).map(
+      local => local.posicao
+    ),
+    item.posicao
+  ].map(x => String(x ?? "").trim()).filter(Boolean))];
+}
+
+// =====================================================
+// LISTA DE ABASTECIMENTO
+// =====================================================
+
+function renderizarPendentes() {
+  const corpo = $("listaPendentes");
+
+  const busca = $("buscaPendentes")
+    .value.trim().toLowerCase();
+
+  const filtrados = pendentesCache.filter(item => {
+    const campos = [
+      item.loja,
+      item.marca,
+      item.descricao,
+      item.ref,
+      item.cor,
+      item.tamanho,
+      ...eansDoItem(item),
+      ...posicoesDoItem(item)
+    ];
+
+    return campos.some(valor =>
+      String(valor ?? "").toLowerCase().includes(busca)
+    );
+  });
+
+  corpo.replaceChildren();
+
+  if (!filtrados.length) {
+    const linha = corpo.insertRow();
+    const celula = linha.insertCell();
+
+    celula.colSpan = 11;
+    celula.textContent = busca
+      ? "Nenhum produto encontrado."
+      : "Nenhum abastecimento pendente.";
+  }
+
+  for (const item of filtrados) {
+    const linha = corpo.insertRow();
+
+    const campos = [
+      item.loja,
+      item.marca,
+      item.descricao,
+      item.ref,
+      item.cor,
+      item.tamanho
+    ];
+
+    for (const valor of campos) {
+      linha.insertCell().textContent =
+        String(valor ?? "");
     }
 
-    async function carregarDashboard() {
-      const estado = document.getElementById("estadoDashboard");
-     if (estado) estado.textContent = "Consultando Google Sheets...";
-      try {
-        const resposta = await fetch(API + "/api/dashboard", {
-          headers: { Authorization: "Bearer " + tokenSessao },
-          cache: "no-store"
-        });
-        const dados = await resposta.json();
-        if (!resposta.ok || !dados.ok) throw new Error(dados.erro || "Falha na consulta");
-        if (!tokenSessao) return;
-        const campos = {
-          produtos: "produtos",
-          pendentes: "unidadesPendentes",
-          abastecidas: "unidadesAbastecidas",
-          semEstoque: "itensSemEstoque"
-        };
-        for (const [id, chave] of Object.entries(campos)) {
-          const valor = Number(dados[chave]);
-          if (!Number.isFinite(valor)) throw new Error("Dados incompletos");
-          document.getElementById("stat-" + id).textContent =
-            valor.toLocaleString("pt-BR");
-        }
-        if (estado) estado.textContent = "● Dados atualizados a partir do Google Sheets.";
-      } catch (erro) {
-       if (estado) estado.textContent = "● Erro ao carregar Dashboard: " + erro.message;
+    // EAN
+    const eans = eansDoItem(item);
+    const celulaEAN = linha.insertCell();
+
+    celulaEAN.textContent = eans.length
+      ? eans.join(", ")
+      : "Não cadastrado";
+
+    if (!eans.length) {
+      celulaEAN.className = "not-found";
+    }
+
+    // POSIÇÕES
+    const posicoes = posicoesDoItem(item);
+    const celulaPosicao = linha.insertCell();
+
+    if (posicoes.length) {
+      for (const posicao of posicoes) {
+        const etiqueta = document.createElement("span");
+
+        etiqueta.className = "position-pill";
+        etiqueta.textContent = posicao;
+
+        celulaPosicao.appendChild(etiqueta);
       }
+
+      const locais = localizacoesDoItem(item);
+
+      if (locais.length) {
+        const detalhe = document.createElement("div");
+
+        detalhe.className = "positions-detail";
+
+        detalhe.textContent = locais.map(local =>
+          `${local.posicao || "Sem posição"}: ` +
+          `${Number(local.saldo) || 0}`
+        ).join(" · ");
+
+        celulaPosicao.appendChild(detalhe);
+      }
+    } else {
+      celulaPosicao.textContent = "Não localizado";
+      celulaPosicao.className = "not-found";
     }
 
-    let pendentesCache = [];
-    let pendentesCarregados = false;
+    // SALDO NÃO CONFERIDO
+    const celulaSaldo = linha.insertCell();
+    const locais = localizacoesDoItem(item);
 
-    function renderizarPendentes() {
-      const corpo = document.getElementById("listaPendentes");
-      const busca = document.getElementById("buscaPendentes").value.trim().toLowerCase();
-      const filtrados = pendentesCache.filter(item => {
-        const locais = Array.isArray(item.localizacoes) ? item.localizacoes : [];
-        const campos = [item.loja, item.marca, item.descricao, item.ref,
-          item.cor, item.tamanho, item.ean, item.posicao,
-          ...(Array.isArray(item.posicoes) ? item.posicoes : []),
-          ...locais.map(local => local.posicao)];
-        return campos.some(valor => String(valor ?? "").toLowerCase().includes(busca));
-      });
+    const cadastrado =
+      item.cadastrado === true || locais.length > 0;
 
-      corpo.replaceChildren();
-      if (!filtrados.length) {
-        const linha = corpo.insertRow();
-        const celula = linha.insertCell();
-        celula.colSpan = 10;
-        celula.textContent = busca ? "Nenhum produto encontrado." : "Nenhum abastecimento pendente.";
-      }
+    celulaSaldo.textContent =
+      cadastrado &&
+      Number.isFinite(Number(item.saldoTotal))
+        ? Number(item.saldoTotal).toLocaleString("pt-BR")
+        : "—";
 
-      for (const item of filtrados) {
-        const linha = corpo.insertRow();
-        [item.loja, item.marca, item.descricao, item.ref, item.cor, item.tamanho].forEach(valor => {
-          linha.insertCell().textContent = valor == null ? "" : String(valor);
-        });
+    celulaSaldo.className = "stock-amount";
+    celulaSaldo.title =
+      "Quantidade cadastrada, ainda não conferida por balanço.";
 
-        const locais = Array.isArray(item.localizacoes) ? item.localizacoes : [];
-        const eans = [...new Set([
-          ...String(item.ean ?? "").split(","),
-          ...locais.map(local => String(local.ean ?? ""))
-        ].map(v => v.trim()).filter(Boolean))];
-        const eanCell = linha.insertCell();
-        eanCell.textContent = eans.length ? eans.join(", ") : "Não cadastrado";
-        if (!eans.length) eanCell.className = "not-found";
+    // QUANTIDADE PENDENTE
+    const celulaQtd = linha.insertCell();
 
-        const posCell = linha.insertCell();
-        const posicoes = [...new Set([
-          ...(Array.isArray(item.posicoes) ? item.posicoes : []),
-          ...locais.map(local => local.posicao), item.posicao
-        ].map(v => String(v ?? "").trim()).filter(Boolean))];
-        if (posicoes.length) {
-          for (const pos of posicoes) {
-            const etiqueta = document.createElement("span");
-            etiqueta.className = "position-pill";
-            etiqueta.textContent = pos;
-            posCell.appendChild(etiqueta);
-          }
-          if (locais.length) {
-            const detalhe = document.createElement("div");
-            detalhe.className = "positions-detail";
-            detalhe.textContent = locais.map(local =>
-              `${local.posicao || "Sem posição"}: ${Number(local.saldo) || 0}`
-            ).join(" · ");
-            posCell.appendChild(detalhe);
-          }
-        } else {
-          posCell.textContent = "Não localizado";
-          posCell.className = "not-found";
-        }
+    celulaQtd.textContent =
+      Number(item.quantidade || 0).toLocaleString("pt-BR");
 
-        const saldoCell = linha.insertCell();
-        const temCadastro = item.cadastrado === true || locais.length > 0;
-        saldoCell.textContent = temCadastro && Number.isFinite(Number(item.saldoTotal))
-          ? Number(item.saldoTotal).toLocaleString("pt-BR") : "—";
-        saldoCell.className = "stock-amount";
-        const quantidadeCell = linha.insertCell();
-        quantidadeCell.textContent = Number(item.quantidade || 0).toLocaleString("pt-BR");
-        quantidadeCell.className = "qty";
-      }
+    celulaQtd.className = "qty";
 
-      const unidades = filtrados.reduce((total, item) =>
-        total + (Number(item.quantidade) || 0), 0);
-      document.getElementById("estadoPendentes").textContent =
-        `${filtrados.length} produto(s) exibido(s) · ${unidades.toLocaleString("pt-BR")} unidade(s) pendente(s)`;
-      document.getElementById("resumoPendentes").textContent =
-        `${pendentesCache.length} produto(s) na lista de abastecimento. Abra a aba Abastecimento para consultar.`;
+    // BOTÕES
+    const celulaAcoes = linha.insertCell();
+    const acoes = document.createElement("div");
+
+    acoes.className = "actions";
+
+    const botaoOK = document.createElement("button");
+    botaoOK.type = "button";
+    botaoOK.className = "btn-ok";
+    botaoOK.textContent = "✓ OK";
+    botaoOK.disabled = enviandoMovimento;
+    botaoOK.addEventListener("click", () =>
+      abrirConfirmacao(item, "OK")
+    );
+
+    const botaoSE = document.createElement("button");
+    botaoSE.type = "button";
+    botaoSE.className = "btn-se";
+    botaoSE.textContent = "S/E";
+    botaoSE.disabled = enviandoMovimento;
+    botaoSE.addEventListener("click", () =>
+      abrirConfirmacao(item, "S/E")
+    );
+
+    acoes.append(botaoOK, botaoSE);
+    celulaAcoes.appendChild(acoes);
+  }
+
+  const unidades = filtrados.reduce(
+    (total, item) =>
+      total + (Number(item.quantidade) || 0),
+    0
+  );
+
+  $("estadoPendentes").textContent =
+    `${filtrados.length} produto(s) · ` +
+    `${unidades.toLocaleString("pt-BR")} unidade(s) pendente(s)`;
+
+  $("resumoPendentes").textContent =
+    `${pendentesCache.length} produto(s) na lista. ` +
+    "Abra Abastecimento para consultar e confirmar.";
+}
+
+async function carregarPendentes() {
+  const token = tokenSessao;
+
+  if (!token) return;
+
+  $("estadoPendentes").textContent =
+    "Consultando pendências no Google Sheets...";
+
+  $("atualizarPendentes").disabled = true;
+
+  try {
+    const dados = await requisicaoAPI("/api/pendentes");
+
+    if (token !== tokenSessao) return;
+
+    if (!Array.isArray(dados.itens)) {
+      throw new Error("Lista de pendências inválida.");
     }
 
-    async function carregarPendentes() {
-      const token = tokenSessao;
-      if (!token) return;
+    pendentesCache = dados.itens;
+    pendentesCarregados = true;
 
-      const estado = document.getElementById("estadoPendentes");
-      const botao = document.getElementById("atualizarPendentes");
-      estado.textContent = "Consultando pendências no Google Sheets...";
-      botao.disabled = true;
+    renderizarPendentes();
 
-      try {
-        const resposta = await fetch(API + "/api/pendentes", {
-          headers: { Authorization: "Bearer " + token },
-          cache: "no-store"
-        });
-        const dados = await resposta.json();
+  } catch (erro) {
+    if (token !== tokenSessao) return;
 
-        if (!resposta.ok || !dados.ok || !Array.isArray(dados.itens)) {
-          throw new Error(dados.erro || "Resposta inválida da API");
-        }
-        if (token !== tokenSessao) return;
+    $("estadoPendentes").textContent =
+      "Erro ao carregar pendências: " + erro.message;
 
-        pendentesCache = dados.itens;
-        pendentesCarregados = true;
-        renderizarPendentes();
-      } catch (erro) {
-        if (token !== tokenSessao) return;
-        estado.textContent = "Erro ao carregar pendentes: " + erro.message;
-        document.getElementById("resumoPendentes").textContent =
-          "Não foi possível consultar a lista de pendências.";
-        console.error("AXION pendentes:", erro);
-      } finally {
-        botao.disabled = false;
-      }
-    }
+    $("resumoPendentes").textContent =
+      "Não foi possível consultar as pendências.";
 
-    document.getElementById("buscaPendentes").addEventListener("input", renderizarPendentes);
-    document.getElementById("atualizarPendentes").addEventListener("click", carregarPendentes);
+  } finally {
+    $("atualizarPendentes").disabled = false;
+  }
+}
 
-    // NAVEGAÇÃO
-    document.querySelectorAll("[data-page]").forEach(botao => {
-      botao.addEventListener("click", () => {
-        const pagina = botao.dataset.page;
+// =====================================================
+// CONFIRMAÇÃO OK / S/E
+// =====================================================
 
-        document.querySelectorAll("[data-page]").forEach(item => {
-          item.classList.toggle("active", item === botao);
-        });
+function abrirConfirmacao(item, tipo) {
+  if (enviandoMovimento || movimentoAtual) return;
 
-        document.querySelectorAll(".page").forEach(secao => {
-          secao.classList.toggle(
-            "active",
-            secao.id === "page-" + pagina
-          );
-        });
+  const quantidade = Number(item.quantidade);
 
-        document.getElementById("tituloPagina").textContent =
-          botao.textContent.trim();
-        if (pagina === "abastecimento" && !pendentesCarregados) {
-          carregarPendentes();
-        }
-      });
+  if (!Number.isSafeInteger(quantidade) || quantidade < 1) {
+    mostrarFeedback("Quantidade pendente inválida.", "error");
+    return;
+  }
+
+  movimentoAtual = {
+    item,
+    tipo,
+    id: crypto.randomUUID().replaceAll("-", ""),
+    quantidade
+  };
+
+  $("modalTitulo").textContent =
+    tipo === "OK"
+      ? "Confirmar abastecimento"
+      : "Confirmar sem estoque";
+
+  $("modalProduto").textContent =
+    `${item.descricao || item.marca || "Produto"} · ` +
+    `REF ${item.ref} · ${item.cor} · ${item.tamanho} · ` +
+    `Loja ${item.loja} · Pendente: ${quantidade}`;
+
+  $("quantidadeAbastecimento").value = quantidade;
+  $("quantidadeAbastecimento").max = quantidade;
+
+  $("confirmarAbastecimento").textContent =
+    tipo === "OK" ? "Confirmar OK" : "Confirmar S/E";
+
+  $("modalErro").textContent = "";
+  $("modalAbastecimento").classList.remove("hidden");
+
+  $("quantidadeAbastecimento").focus();
+  $("quantidadeAbastecimento").select();
+}
+
+function fecharConfirmacao() {
+  if (enviandoMovimento) return;
+
+  movimentoAtual = null;
+  $("modalAbastecimento").classList.add("hidden");
+  $("modalErro").textContent = "";
+}
+
+function bloquearConfirmacao(bloquear) {
+  enviandoMovimento = bloquear;
+
+  $("confirmarAbastecimento").disabled = bloquear;
+  $("cancelarAbastecimento").disabled = bloquear;
+  $("quantidadeAbastecimento").disabled = bloquear;
+
+  $("confirmarAbastecimento").textContent = bloquear
+    ? "Registrando..."
+    : movimentoAtual?.tipo === "OK"
+      ? "Confirmar OK"
+      : "Confirmar S/E";
+}
+
+async function confirmarMovimento(evento) {
+  evento.preventDefault();
+
+  if (!movimentoAtual || enviandoMovimento) return;
+
+  const atual = movimentoAtual;
+  const quantidade = Number(
+    $("quantidadeAbastecimento").value
+  );
+
+  if (
+    !Number.isSafeInteger(quantidade) ||
+    quantidade < 1 ||
+    quantidade > atual.quantidade
+  ) {
+    $("modalErro").textContent =
+      `Informe uma quantidade entre 1 e ${atual.quantidade}.`;
+    return;
+  }
+
+  // Uma mesma tentativa mantém o ID.
+  // Isso evita registrar duas vezes caso a resposta se perca.
+  if (atual.quantidadeEnviada !== quantidade) {
+    atual.id = crypto.randomUUID().replaceAll("-", "");
+    atual.quantidadeEnviada = quantidade;
+  }
+
+  const movimento = {
+    id_movimento: atual.id,
+    loja: String(atual.item.loja),
+    ref: String(atual.item.ref),
+    cor: String(atual.item.cor ?? ""),
+    tamanho: String(atual.item.tamanho ?? ""),
+    ean: eansDoItem(atual.item)[0] || "",
+    tipo: atual.tipo,
+    quantidade,
+    observacao: "Registrado pelo AXION Web"
+  };
+
+  $("modalErro").textContent = "";
+  bloquearConfirmacao(true);
+  renderizarPendentes();
+
+  const token = tokenSessao;
+
+  try {
+    const dados = await requisicaoAPI("/api/abastecer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ movimento })
     });
 
-    // LOGIN
-    document.getElementById("formLogin")
-      .addEventListener("submit", async (evento) => {
-        evento.preventDefault();
+    if (token !== tokenSessao) return;
 
-        mensagem.textContent = "";
-        entrar.disabled = true;
-        entrar.textContent = "Entrando...";
+    const descricao = atual.item.descricao || atual.item.ref;
 
-        try {
-          const resposta = await fetch(API + "/auth/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              usuario: document.getElementById("usuario").value,
-              senha: document.getElementById("senha").value
-            })
-          });
+    // Registro confirmado pelo servidor.
+    movimentoAtual = null;
+    $("modalAbastecimento").classList.add("hidden");
 
-          const dados = await resposta.json();
+    mostrarFeedback(
+      `${atual.tipo} registrado: ${quantidade} unidade(s) ` +
+      `de ${descricao}.`,
+      "success"
+    );
 
-          if (!resposta.ok || !dados.ok || !dados.token) {
-            mensagem.textContent =
-              dados.erro || "Não foi possível entrar.";
-            return;
-          }
+    // Atualiza a lista apenas depois da confirmação.
+    await Promise.all([
+      carregarPendentes(),
+      carregarDashboard()
+    ]);
 
-          tokenSessao = dados.token;
-          document.getElementById("senha").value = "";
-          mostrarPainel(dados.usuario);
-          carregarDashboard();
-          carregarPendentes();
+  } catch (erro) {
+    if (token !== tokenSessao) return;
 
-        } catch (erro) {
-          mensagem.textContent =
-            "Não foi possível conectar à API.";
-        } finally {
-          entrar.disabled = false;
-          entrar.textContent = "Entrar no AXION";
+    $("modalErro").textContent =
+      erro.message +
+      " Se a conexão falhou, tente novamente sem " +
+      "fechar esta confirmação.";
+
+  } finally {
+    bloquearConfirmacao(false);
+    renderizarPendentes();
+  }
+}
+
+// =====================================================
+// EVENTOS
+// =====================================================
+
+$("formAbastecimento").addEventListener(
+  "submit",
+  confirmarMovimento
+);
+
+$("cancelarAbastecimento").addEventListener(
+  "click",
+  fecharConfirmacao
+);
+
+$("buscaPendentes").addEventListener(
+  "input",
+  renderizarPendentes
+);
+
+$("atualizarPendentes").addEventListener(
+  "click",
+  async () => {
+    if (enviandoMovimento) return;
+    limparFeedback();
+    await carregarPendentes();
+  }
+);
+
+// =====================================================
+// NAVEGAÇÃO
+// =====================================================
+
+document.querySelectorAll("[data-page]").forEach(botao => {
+  botao.addEventListener("click", () => {
+    const pagina = botao.dataset.page;
+
+    document.querySelectorAll("[data-page]").forEach(item => {
+      item.classList.toggle("active", item === botao);
+    });
+
+    document.querySelectorAll(".page").forEach(secao => {
+      secao.classList.toggle(
+        "active",
+        secao.id === "page-" + pagina
+      );
+    });
+
+    $("tituloPagina").textContent =
+      botao.textContent.trim();
+
+    if (pagina === "abastecimento" && !pendentesCarregados) {
+      carregarPendentes();
+    }
+  });
+});
+
+// =====================================================
+// LOGIN
+// =====================================================
+
+$("formLogin").addEventListener("submit", async evento => {
+  evento.preventDefault();
+
+  $("mensagem").textContent = "";
+  $("entrar").disabled = true;
+  $("entrar").textContent = "Entrando...";
+
+  try {
+    const resposta = await fetch(API + "/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        usuario: $("usuario").value,
+        senha: $("senha").value
+      })
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok || !dados.ok || !dados.token) {
+      $("mensagem").textContent =
+        dados.erro || "Não foi possível entrar.";
+      return;
+    }
+
+    tokenSessao = dados.token;
+
+    $("senha").value = "";
+    mostrarPainel(dados.usuario);
+
+    carregarDashboard();
+    carregarPendentes();
+
+  } catch {
+    $("mensagem").textContent =
+      "Não foi possível conectar à API.";
+  } finally {
+    $("entrar").disabled = false;
+    $("entrar").textContent = "Entrar no AXION";
+  }
+});
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+$("sair").addEventListener("click", async () => {
+  if (enviandoMovimento) return;
+
+  const token = tokenSessao;
+
+  tokenSessao = null;
+  pendentesCache = [];
+  pendentesCarregados = false;
+  movimentoAtual = null;
+
+  $("modalAbastecimento").classList.add("hidden");
+
+  mostrarLogin();
+
+  if (token) {
+    try {
+      await fetch(API + "/auth/logout", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token
         }
       });
-
-    // LOGOUT
-    document.getElementById("sair")
-      .addEventListener("click", async () => {
-        const token = tokenSessao;
-        tokenSessao = null;
-        pendentesCache = [];
-        pendentesCarregados = false;
-        mostrarLogin();
-
-        if (token) {
-          try {
-            await fetch(API + "/auth/logout", {
-              method: "POST",
-              headers: {
-                Authorization: "Bearer " + token
-              }
-            });
-          } catch (erro) {
-            console.error("Falha ao encerrar sessão", erro);
-          }
-        }
-      });
-
-    // Sessão permanece apenas na memória desta página.
-    // Atualizar a página exige novo login.
-  </script>
+    } catch (erro) {
+      console.error("Falha no logout:", erro);
+    }
+  }
+});
+</script>
 </body>
 </html>
