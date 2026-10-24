@@ -440,26 +440,26 @@
           <div class="stats">
             <div class="stat">
               <div class="label">Produtos cadastrados</div>
-              <div class="value blue">0</div>
-              <div class="detail">Aguardando integração</div>
+              <div class="value blue" id="stat-produtos">—</div>
+              <div class="detail">Dados do Google Sheets</div>
             </div>
 
             <div class="stat">
               <div class="label">Unidades pendentes</div>
-              <div class="value orange">0</div>
-              <div class="detail">Aguardando integração</div>
+              <div class="value orange" id="stat-pendentes">—</div>
+              <div class="detail">Dados do Google Sheets</div>
             </div>
 
             <div class="stat">
               <div class="label">Unidades abastecidas</div>
-              <div class="value green">0</div>
-              <div class="detail">Aguardando integração</div>
+              <div class="value green" id="stat-abastecidas">—</div>
+              <div class="detail">Dados do Google Sheets</div>
             </div>
 
             <div class="stat">
               <div class="label">Itens sem estoque</div>
-              <div class="value">0</div>
-              <div class="detail">Aguardando integração</div>
+              <div class="value" id="stat-semEstoque">—</div>
+              <div class="detail">Dados do Google Sheets</div>
             </div>
           </div>
 
@@ -541,7 +541,7 @@
             <p style="color:var(--muted)">
               Autenticação: Cloudflare Workers<br>
               Interface: GitHub Pages<br>
-              Dados: Google Sheets (integração pendente)
+              Dados: Google Sheets (Dashboard conectado)
             </p>
           </div>
         </section>
@@ -571,6 +571,35 @@
     function mostrarLogin() {
       appView.classList.add("hidden");
       loginView.classList.remove("hidden");
+    }
+
+    async function carregarDashboard() {
+      const estado = document.getElementById("estadoDashboard");
+      estado.textContent = "● Consultando Google Sheets...";
+      try {
+        const resposta = await fetch(API + "/api/dashboard", {
+          headers: { Authorization: "Bearer " + tokenSessao },
+          cache: "no-store"
+        });
+        const dados = await resposta.json();
+        if (!resposta.ok || !dados.ok) throw new Error(dados.erro || "Falha na consulta");
+        if (!tokenSessao) return;
+        const campos = {
+          produtos: "produtos",
+          pendentes: "unidadesPendentes",
+          abastecidas: "unidadesAbastecidas",
+          semEstoque: "itensSemEstoque"
+        };
+        for (const [id, chave] of Object.entries(campos)) {
+          const valor = Number(dados[chave]);
+          if (!Number.isFinite(valor)) throw new Error("Dados incompletos");
+          document.getElementById("stat-" + id).textContent =
+            valor.toLocaleString("pt-BR");
+        }
+        estado.textContent = "● Dados atualizados a partir do Google Sheets.";
+      } catch (erro) {
+        estado.textContent = "● Erro ao carregar Dashboard: " + erro.message;
+      }
     }
 
     // NAVEGAÇÃO
@@ -626,6 +655,7 @@
           tokenSessao = dados.token;
           document.getElementById("senha").value = "";
           mostrarPainel(dados.usuario);
+          carregarDashboard();
 
         } catch (erro) {
           mensagem.textContent =
