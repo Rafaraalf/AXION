@@ -317,6 +317,15 @@
       line-height: 1.6;
     }
 
+    .toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+    .toolbar input { flex:1; min-width:200px; padding:12px; border:1px solid var(--border); border-radius:9px; background:var(--bg); color:var(--text); }
+    .toolbar button { padding:12px 16px; border:1px solid var(--border); border-radius:9px; background:#16324a; color:var(--accent); }
+    .table-wrap { width:100%; overflow-x:auto; }
+    .data-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .data-table th, .data-table td { padding:12px 10px; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+    .data-table th { color:var(--muted); font-weight:600; }
+    .data-table td.qty { color:var(--orange); font-weight:800; }
+    .status-line { color:var(--muted); margin:0 0 16px; font-size:13px; }
     .page { display: none; }
     .page.active { display: block; }
 
@@ -466,10 +475,7 @@
           <div class="panel-grid">
             <div class="panel">
               <h2>Abastecimentos pendentes</h2>
-              <div class="empty">
-                Nenhum dado carregado.<br>
-                A lista será exibida após conectarmos o Google Sheets.
-              </div>
+              <div id="resumoPendentes" class="empty">Carregando pendências...</div>
             </div>
 
             <div class="panel">
@@ -481,8 +487,7 @@
           </div>
 
           <div class="notice">
-            ● Estrutura visual pronta. A integração com os dados reais
-            será implementada na próxima etapa.
+            <span id="estadoDashboard">Conectando ao Google Sheets...</span>
           </div>
         </section>
 
@@ -494,8 +499,21 @@
           </div>
           <div class="panel">
             <h2>Lista de abastecimento</h2>
-            <div class="empty">
-              Aguardando conexão com o relatório de pendências.
+            <div class="toolbar">
+              <input id="buscaPendentes" type="search" placeholder="Buscar marca, descrição, referência, EAN, loja...">
+              <button id="atualizarPendentes" type="button">↻ Atualizar lista</button>
+            </div>
+            <p id="estadoPendentes" class="status-line" role="status">Aguardando consulta...</p>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr>
+                  <th>Loja</th><th>Marca</th><th>Descrição</th><th>Referência</th>
+                  <th>Cor</th><th>Tamanho</th><th>EAN</th><th>Qtd.</th>
+                </tr></thead>
+                <tbody id="listaPendentes">
+                  <tr><td colspan="8">Carregando...</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
@@ -602,6 +620,85 @@
       }
     }
 
+    let pendentesCache = [];
+    let pendentesCarregados = false;
+
+    function renderizarPendentes() {
+      const corpo = document.getElementById("listaPendentes");
+      const busca = document.getElementById("buscaPendentes").value.trim().toLowerCase();
+      const filtrados = pendentesCache.filter(item =>
+        [item.loja, item.marca, item.descricao, item.ref, item.cor, item.tamanho, item.ean]
+          .some(valor => String(valor ?? "").toLowerCase().includes(busca))
+      );
+
+      corpo.replaceChildren();
+
+      if (!filtrados.length) {
+        const linha = corpo.insertRow();
+        const celula = linha.insertCell();
+        celula.colSpan = 8;
+        celula.textContent = busca ? "Nenhum produto encontrado." : "Nenhum abastecimento pendente.";
+      }
+
+      for (const item of filtrados) {
+        const linha = corpo.insertRow();
+        const valores = [
+          item.loja, item.marca, item.descricao, item.ref,
+          item.cor, item.tamanho, item.ean, item.quantidade
+        ];
+        valores.forEach((valor, indice) => {
+          const celula = linha.insertCell();
+          celula.textContent = valor == null ? "" : String(valor);
+          if (indice === 7) celula.className = "qty";
+        });
+      }
+
+      const unidades = filtrados.reduce((total, item) =>
+        total + (Number(item.quantidade) || 0), 0);
+      document.getElementById("estadoPendentes").textContent =
+        `${filtrados.length} produto(s) exibido(s) · ${unidades.toLocaleString("pt-BR")} unidade(s)`;
+      document.getElementById("resumoPendentes").textContent =
+        `${pendentesCache.length} produto(s) na lista de abastecimento. Abra a aba Abastecimento para consultar.`;
+    }
+
+    async function carregarPendentes() {
+      const token = tokenSessao;
+      if (!token) return;
+
+      const estado = document.getElementById("estadoPendentes");
+      const botao = document.getElementById("atualizarPendentes");
+      estado.textContent = "Consultando pendências no Google Sheets...";
+      botao.disabled = true;
+
+      try {
+        const resposta = await fetch(API + "/api/pendentes", {
+          headers: { Authorization: "Bearer " + token },
+          cache: "no-store"
+        });
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.ok || !Array.isArray(dados.itens)) {
+          throw new Error(dados.erro || "Resposta inválida da API");
+        }
+        if (token !== tokenSessao) return;
+
+        pendentesCache = dados.itens;
+        pendentesCarregados = true;
+        renderizarPendentes();
+      } catch (erro) {
+        if (token !== tokenSessao) return;
+        estado.textContent = "Erro ao carregar pendentes: " + erro.message;
+        document.getElementById("resumoPendentes").textContent =
+          "Não foi possível consultar a lista de pendências.";
+        console.error("AXION pendentes:", erro);
+      } finally {
+        botao.disabled = false;
+      }
+    }
+
+    document.getElementById("buscaPendentes").addEventListener("input", renderizarPendentes);
+    document.getElementById("atualizarPendentes").addEventListener("click", carregarPendentes);
+
     // NAVEGAÇÃO
     document.querySelectorAll("[data-page]").forEach(botao => {
       botao.addEventListener("click", () => {
@@ -620,6 +717,9 @@
 
         document.getElementById("tituloPagina").textContent =
           botao.textContent.trim();
+        if (pagina === "abastecimento" && !pendentesCarregados) {
+          carregarPendentes();
+        }
       });
     });
 
@@ -656,6 +756,7 @@
           document.getElementById("senha").value = "";
           mostrarPainel(dados.usuario);
           carregarDashboard();
+          carregarPendentes();
 
         } catch (erro) {
           mensagem.textContent =
@@ -671,7 +772,8 @@
       .addEventListener("click", async () => {
         const token = tokenSessao;
         tokenSessao = null;
-
+        pendentesCache = [];
+        pendentesCarregados = false;
         mostrarLogin();
 
         if (token) {
