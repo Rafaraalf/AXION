@@ -574,6 +574,20 @@ button:disabled { opacity:.55;cursor:wait; }
   .atividade-resultado { font-size:11px; }
 }
 
+/* Estoque v1.7 - filtros individuais */
+.est-filtro-btn{border:0;background:transparent;color:var(--muted);padding:4px 6px;border-radius:6px;cursor:pointer}
+.est-filtro-btn.ativo{color:var(--accent);background:#16324a}
+.est-filtro-btn:hover{background:#23425e;color:var(--text)}
+.est-cabecalho{display:flex;align-items:center;gap:5px;justify-content:space-between}
+.est-filtro-pop{position:fixed;z-index:120;width:min(310px,calc(100vw - 24px));max-height:min(460px,75vh);overflow:auto;background:var(--surface);border:1px solid #456078;border-radius:12px;box-shadow:0 18px 55px #0009;padding:14px}
+.est-filtro-pop input[type=search],.est-filtro-pop input[type=number]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;margin:6px 0}
+.est-filtro-opcoes{max-height:235px;overflow:auto;margin:10px 0}
+.est-filtro-opcoes label{display:flex;align-items:center;gap:8px;padding:6px 3px;cursor:pointer;overflow-wrap:anywhere}
+.est-filtro-opcoes input{accent-color:var(--accent)}
+.est-filtro-acoes{display:flex;gap:8px;justify-content:space-between;margin-top:10px}
+.est-filtro-acoes button{border:1px solid var(--border);background:#16324a;color:var(--accent);border-radius:7px;padding:8px 10px}
+.est-filtro-ordenar{display:flex;gap:8px;margin-bottom:8px}
+.est-filtro-ordenar button{flex:1;border:1px solid var(--border);border-radius:7px;background:#16324a;color:var(--accent);padding:8px}
 /* Estoque v1.6 */
 #est-arquivo{max-width:100%;min-width:200px;color:var(--text);padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}
 #est-versoes{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -665,7 +679,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v1.6</span>
+      <span>AXION WEB · v1.7</span>
     </header>
 
     <div class="content">
@@ -854,8 +868,9 @@ button:disabled { opacity:.55;cursor:wait; }
         <div class="panel" style="margin-bottom:20px">
           <h2>Pesquisar produtos</h2>
           <div class="toolbar"><input id="est-busca" type="search" placeholder="EAN, REF, descrição, marca, cor, tamanho, posição ou loja..."><button class="secondary" id="est-recarregar" type="button">↻ Atualizar consulta</button></div>
+          <div class="toolbar"><button class="secondary" type="button" id="est-limpar-filtros">Limpar filtros</button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
           <p class="status-line" id="est-resultados">Carregando...</p>
-          <div class="table-wrap"><table class="data-table"><thead><tr><th>Posição</th><th>EAN</th><th>REF</th><th>Descrição</th><th>Marca</th><th>Cor</th><th>Tamanho</th><th>Qtd.</th><th>Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
         </div>
         <div class="panel"><h2>Versões anteriores</h2><p class="status-line">As três últimas versões podem ser baixadas para recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
       </section>
@@ -989,7 +1004,7 @@ button:disabled { opacity:.55;cursor:wait; }
 
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 1.6</p>
+          <p>Versão da interface: 1.7</p>
 
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
@@ -1095,18 +1110,88 @@ let estoqueCarregado=false;
 let estoqueOcupado=false;
 function estoqueMensagem(msg,erro=false){const el=$('est-mensagem');el.className='feedback '+(erro?'error':'success');el.textContent=msg;}
 function formatarEstoqueData(data){return data?new Date(data).toLocaleString('pt-BR'):'Não disponível';}
+const EST_COLUNAS=['posicao','ean','ref','descricao','marca','cor','tamanho','quantidade','loja'];
+const EST_NOMES={posicao:'Posição',ean:'EAN',ref:'REF',descricao:'Descrição',marca:'Marca',cor:'Cor',tamanho:'Tamanho',quantidade:'Qtd.',loja:'Loja'};
+const estFiltros={};
+let estOrdem={coluna:null,direcao:1};
+let estPopup=null;
+const estTexto=v=>String(v??'').trim();
+const estNorm=v=>estTexto(v).toLocaleLowerCase('pt-BR');
+function fecharFiltroEstoque(){if(estPopup){estPopup.remove();estPopup=null;}}
+function iniciarCabecalhosEstoque(){
+ document.querySelectorAll('#page-estoque th[data-est-col]').forEach(th=>{
+  const col=th.dataset.estCol;
+  th.replaceChildren();
+  const cab=document.createElement('div');cab.className='est-cabecalho';
+  const titulo=document.createElement('span');titulo.textContent=EST_NOMES[col];
+  const btn=document.createElement('button');btn.type='button';btn.className='est-filtro-btn';btn.textContent='☷';btn.title='Filtrar e ordenar '+EST_NOMES[col];
+  btn.setAttribute('aria-label',btn.title);btn.dataset.estBotao=col;
+  btn.addEventListener('click',e=>{e.stopPropagation();abrirFiltroEstoque(col,btn);});
+  cab.append(titulo,btn);th.appendChild(cab);
+ });
+}
+function atualizarIndicadoresEstoque(){
+ const ativos=Object.keys(estFiltros).length;
+ $('est-filtros-ativos').textContent=ativos?`${ativos} coluna(s) filtrada(s)`:'Nenhum filtro de coluna ativo';
+ document.querySelectorAll('[data-est-botao]').forEach(b=>b.classList.toggle('ativo',!!estFiltros[b.dataset.estBotao]||estOrdem.coluna===b.dataset.estBotao));
+}
+function estNumero(v){const n=Number(estTexto(v).replace(',','.'));return Number.isFinite(n)?n:0;}
+function estAtende(x,col,f){
+ const valor=estTexto(x[col]);
+ if(f.tipo==='intervalo'){const n=estNumero(valor);return (f.min===''||n>=Number(f.min))&&(f.max===''||n<=Number(f.max));}
+ if(f.tipo==='texto')return estNorm(valor).includes(estNorm(f.busca));
+ return f.valores.includes(valor);
+}
 function renderizarEstoque(){
- const busca=$('est-busca').value.trim().toLocaleLowerCase('pt-BR');
- const itens=estoqueCache.filter(x=>!busca||Object.values(x).some(v=>String(v??'').toLocaleLowerCase('pt-BR').includes(busca)));
+ const busca=estNorm($('est-busca').value);
+ const itens=estoqueCache.filter(x=>(!busca||Object.values(x).some(v=>estNorm(v).includes(busca)))&&Object.entries(estFiltros).every(([col,f])=>estAtende(x,col,f)));
+ if(estOrdem.coluna){const {coluna,direcao}=estOrdem;itens.sort((a,b)=>{if(coluna==='quantidade')return (estNumero(a[coluna])-estNumero(b[coluna]))*direcao;return estTexto(a[coluna]).localeCompare(estTexto(b[coluna]),'pt-BR',{numeric:true,sensitivity:'base'})*direcao;});}
  const corpo=$('est-lista');corpo.replaceChildren();
  $('est-resultados').textContent=`${itens.length.toLocaleString('pt-BR')} registro(s) encontrado(s).`;
- if(!itens.length){const td=corpo.insertRow().insertCell();td.colSpan=9;td.textContent='Nenhum item encontrado.';return;}
- for(const x of itens.slice(0,500)){
-   const linha=corpo.insertRow();
-   for(const k of ['posicao','ean','ref','descricao','marca','cor','tamanho','quantidade','loja'])linha.insertCell().textContent=String(x[k]??'');
- }
+ if(!itens.length){const td=corpo.insertRow().insertCell();td.colSpan=9;td.textContent='Nenhum item encontrado.';atualizarIndicadoresEstoque();return;}
+ const frag=document.createDocumentFragment();
+ for(const x of itens.slice(0,500)){const linha=document.createElement('tr');for(const k of EST_COLUNAS){const td=document.createElement('td');td.textContent=estTexto(x[k]);linha.appendChild(td);}frag.appendChild(linha);}
+ corpo.appendChild(frag);
  if(itens.length>500)$('est-resultados').textContent+=' Exibindo os primeiros 500. Refine a busca.';
+ atualizarIndicadoresEstoque();
 }
+function abrirFiltroEstoque(col,botao){
+ if(estPopup?.dataset.col===col){fecharFiltroEstoque();return;}
+ fecharFiltroEstoque();
+ const pop=document.createElement('div');pop.className='est-filtro-pop';pop.dataset.col=col;pop.addEventListener('click',e=>e.stopPropagation());
+ const titulo=document.createElement('strong');titulo.textContent='Filtrar '+EST_NOMES[col];pop.appendChild(titulo);
+ const ordem=document.createElement('div');ordem.className='est-filtro-ordenar';
+ for(const [rotulo,dir] of [['↑ Crescente',1],['↓ Decrescente',-1]]){const b=document.createElement('button');b.type='button';b.textContent=rotulo;b.addEventListener('click',()=>{estOrdem={coluna:col,direcao:dir};fecharFiltroEstoque();renderizarEstoque();});ordem.appendChild(b);}
+ pop.appendChild(ordem);
+ const anterior=estFiltros[col];
+ const acoes=document.createElement('div');acoes.className='est-filtro-acoes';
+ const limpar=document.createElement('button');limpar.type='button';limpar.textContent='Limpar coluna';limpar.addEventListener('click',()=>{delete estFiltros[col];if(estOrdem.coluna===col)estOrdem={coluna:null,direcao:1};fecharFiltroEstoque();renderizarEstoque();});
+ const aplicar=document.createElement('button');aplicar.type='button';aplicar.textContent='Aplicar';
+ if(col==='quantidade'){
+  const minimo=document.createElement('input');minimo.type='number';minimo.placeholder='Quantidade mínima';minimo.value=anterior?.tipo==='intervalo'?anterior.min:'';
+  const maximo=document.createElement('input');maximo.type='number';maximo.placeholder='Quantidade máxima';maximo.value=anterior?.tipo==='intervalo'?anterior.max:'';
+  pop.append(minimo,maximo);
+  aplicar.addEventListener('click',()=>{if(minimo.value!==''&&maximo.value!==''&&Number(minimo.value)>Number(maximo.value)){alert('O mínimo não pode ser maior que o máximo.');return;}if(minimo.value===''&&maximo.value==='')delete estFiltros[col];else estFiltros[col]={tipo:'intervalo',min:minimo.value,max:maximo.value};fecharFiltroEstoque();renderizarEstoque();});
+ }else if(['ean','ref','descricao'].includes(col)){
+  const campo=document.createElement('input');campo.type='search';campo.placeholder='Contém...';campo.value=anterior?.tipo==='texto'?anterior.busca:'';pop.appendChild(campo);
+  aplicar.addEventListener('click',()=>{if(!campo.value.trim())delete estFiltros[col];else estFiltros[col]={tipo:'texto',busca:campo.value.trim()};fecharFiltroEstoque();renderizarEstoque();});
+  campo.addEventListener('keydown',e=>{if(e.key==='Enter')aplicar.click();});
+ }else{
+  const pesquisa=document.createElement('input');pesquisa.type='search';pesquisa.placeholder='Localizar opção...';pop.appendChild(pesquisa);
+  const area=document.createElement('div');area.className='est-filtro-opcoes';pop.appendChild(area);
+  const opcoes=[...new Set(estoqueCache.map(x=>estTexto(x[col])))].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true,sensitivity:'base'}));
+  const selecionados=new Set(anterior?.tipo==='lista'?anterior.valores:opcoes);
+  function desenharOpcoes(){area.replaceChildren();for(const valor of opcoes.filter(v=>estNorm(v).includes(estNorm(pesquisa.value)))){const lab=document.createElement('label');const check=document.createElement('input');check.type='checkbox';check.checked=selecionados.has(valor);check.addEventListener('change',()=>{if(check.checked)selecionados.add(valor);else selecionados.delete(valor);});const txt=document.createElement('span');txt.textContent=valor||'(vazio)';lab.append(check,txt);area.appendChild(lab);}if(!area.childNodes.length)area.textContent='Nenhuma opção encontrada.';}
+  pesquisa.addEventListener('input',desenharOpcoes);desenharOpcoes();
+  aplicar.addEventListener('click',()=>{if(selecionados.size===opcoes.length)delete estFiltros[col];else estFiltros[col]={tipo:'lista',valores:[...selecionados]};fecharFiltroEstoque();renderizarEstoque();});
+ }
+ acoes.append(limpar,aplicar);pop.appendChild(acoes);document.body.appendChild(pop);estPopup=pop;
+ const r=botao.getBoundingClientRect();const largura=pop.offsetWidth;pop.style.left=Math.max(12,Math.min(r.left,innerWidth-largura-12))+'px';pop.style.top=Math.max(12,Math.min(r.bottom+5,innerHeight-pop.offsetHeight-12))+'px';
+}
+document.addEventListener('click',e=>{if(estPopup&&!estPopup.contains(e.target)&&!e.target.closest('[data-est-botao]'))fecharFiltroEstoque();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharFiltroEstoque();});
+$('est-limpar-filtros').addEventListener('click',()=>{for(const k of Object.keys(estFiltros))delete estFiltros[k];estOrdem={coluna:null,direcao:1};$('est-busca').value='';fecharFiltroEstoque();renderizarEstoque();});
+iniciarCabecalhosEstoque();
 async function carregarEstoque(){
  if(!tokenSessao||estoqueOcupado)return;
  estoqueOcupado=true;$('est-recarregar').disabled=true;
