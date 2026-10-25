@@ -1412,7 +1412,14 @@ function abrirFiltroEstoque(col,botao){
   const area=document.createElement('div');area.className='est-filtro-opcoes';pop.appendChild(area);
   const opcoes=[...new Set(estoqueCache.map(x=>estTexto(x[col])))].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true,sensitivity:'base'}));
   const selecionados=new Set(anterior?.tipo==='lista'?anterior.valores:opcoes);
-  function desenharOpcoes(){area.replaceChildren();for(const valor of opcoes.filter(v=>estNorm(v).includes(estNorm(pesquisa.value)))){const lab=document.createElement('label');const check=document.createElement('input');check.type='checkbox';check.checked=selecionados.has(valor);check.addEventListener('change',()=>{if(check.checked)selecionados.add(valor);else selecionados.delete(valor);});const txt=document.createElement('span');txt.textContent=valor||'(vazio)';lab.append(check,txt);area.appendChild(lab);}if(!area.childNodes.length)area.textContent='Nenhuma opção encontrada.';}
+  const selecao=document.createElement('div');selecao.className='est-filtro-ordenar';
+  const selecionarTudo=document.createElement('button');selecionarTudo.type='button';selecionarTudo.textContent='✓ Selecionar tudo';
+  const desmarcarTudo=document.createElement('button');desmarcarTudo.type='button';desmarcarTudo.textContent='✕ Desmarcar tudo';
+  const contador=document.createElement('div');contador.className='status-line';contador.style.margin='5px 0';
+  selecionarTudo.addEventListener('click',()=>{opcoes.forEach(v=>selecionados.add(v));desenharOpcoes();});
+  desmarcarTudo.addEventListener('click',()=>{selecionados.clear();desenharOpcoes();});
+  selecao.append(selecionarTudo,desmarcarTudo);pop.insertBefore(selecao,area);pop.insertBefore(contador,area);
+  function desenharOpcoes(){area.replaceChildren();for(const valor of opcoes.filter(v=>estNorm(v).includes(estNorm(pesquisa.value)))){const lab=document.createElement('label');const check=document.createElement('input');check.type='checkbox';check.checked=selecionados.has(valor);check.addEventListener('change',()=>{if(check.checked)selecionados.add(valor);else selecionados.delete(valor);contador.textContent=`${selecionados.size} de ${opcoes.length} selecionada(s)`;});const txt=document.createElement('span');txt.textContent=valor||'(vazio)';lab.append(check,txt);area.appendChild(lab);}if(!area.childNodes.length)area.textContent='Nenhuma opção encontrada.';contador.textContent=`${selecionados.size} de ${opcoes.length} selecionada(s)`;}
   pesquisa.addEventListener('input',desenharOpcoes);desenharOpcoes();
   aplicar.addEventListener('click',()=>{if(selecionados.size===opcoes.length)delete estFiltros[col];else estFiltros[col]={tipo:'lista',valores:[...selecionados]};fecharFiltroEstoque();renderizarEstoque();});
  }
