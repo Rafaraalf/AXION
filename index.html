@@ -2622,15 +2622,18 @@ axionRestaurarSessao();
 // AXION MAPA 3.0: layout no R2, cadastro de produtos no Google Sheets.
 let mapaDados=[],mapaLayout={},mapaCarregado=false,mapaEditando=false,mapaSelecionada='',mapaDivisao='',mapaRota=false;
 const mapaNorm=x=>String(x??'').trim().toUpperCase();
-const mapaParse=pos=>/^P(\d{1,4})-([CBMA])(\d{2,3})$/.exec(mapaNorm(pos));
+const mapaParse=pos=>/^P(\d{1,4})-([CBMA])(\d{1,3})$/.exec(mapaNorm(pos));
+const mapaCodigo=pos=>{const v=mapaNorm(pos);const m=mapaParse(v);return m?'P'+m[1].padStart(2,'0'):/^(CX|L)\d{1,4}$/.test(v)?v:null;};
+const mapaTipo=id=>id.startsWith('CX')?'Caixa aberta':id.startsWith('L')?'Caixa lacrada':'Prateleira';
+const mapaPosicoes=id=>[...new Set(mapaItens().filter(x=>mapaCodigo(x.posicao)===id).map(x=>mapaNorm(x.posicao)))].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true}));
 function mapaAviso(msg,erro=false){const e=$('map-feedback');e.className='feedback '+(erro?'error':'success');e.textContent=msg;}
 function mapaLoja(){return $('map-loja').value;}
 function mapaItens(){return mapaDados.filter(x=>String(x.loja)===mapaLoja());}
 function mapaPrateleiras(){return mapaLayout[mapaLoja()]||[];}
 function mapaGerar(){
  const atuais=mapaPrateleiras(),existentes=new Set(atuais.map(x=>x.id));
- const codigos=[...new Set(mapaItens().map(x=>mapaParse(x.posicao)?.[1]).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
- for(const n of codigos){const id='P'+n.padStart(2,'0');if(!existentes.has(id)){const i=atuais.length;atuais.push({id,x:30+(i%6)*145,y:35+Math.floor(i/6)*95,rotacao:0,divisoes:5});existentes.add(id);}}
+ const codigos=[...new Set(mapaItens().map(x=>mapaCodigo(x.posicao)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true}));
+ for(const id of codigos){if(!existentes.has(id)){const i=atuais.length;atuais.push({id,x:30+(i%6)*145,y:35+Math.floor(i/6)*95,rotacao:0});existentes.add(id);}}
  mapaLayout[mapaLoja()]=atuais;
 }
 async function carregarMapa(){
@@ -2648,40 +2651,46 @@ async function carregarMapa(){
 function mapaDesenhar(){
  const board=$('map-board');board.replaceChildren();const busca=mapaNorm($('map-busca').value);
  const itens=mapaItens();const matches=itens.filter(x=>[x.ean,x.ref,x.descricao,x.posicao,x.marca].some(v=>mapaNorm(v).includes(busca)));
- const codigosBusca=new Set(matches.map(x=>mapaParse(x.posicao)?.[1]).filter(Boolean));
+ const codigosBusca=new Set(matches.map(x=>mapaCodigo(x.posicao)).filter(Boolean));
  const pendencias=pendentesCache.filter(p=>p.quantidade>0);
- const codigosPendentes=new Set(itens.filter(x=>pendencias.some(p=>mapaNorm(p.ref)===mapaNorm(x.ref)&&mapaNorm(p.cor)===mapaNorm(x.cor)&&mapaNorm(p.tamanho)===mapaNorm(x.tamanho))).map(x=>mapaParse(x.posicao)?.[1]).filter(Boolean));
+ const codigosPendentes=new Set(itens.filter(x=>pendencias.some(p=>mapaNorm(p.ref)===mapaNorm(x.ref)&&mapaNorm(p.cor)===mapaNorm(x.cor)&&mapaNorm(p.tamanho)===mapaNorm(x.tamanho))).map(x=>mapaCodigo(x.posicao)).filter(Boolean));
  for(const p of mapaPrateleiras()){
-  if(busca&&!codigosBusca.has(String(Number(p.id.slice(1)))))continue;
-  const b=document.createElement('button');b.type='button';b.className='map-shelf'+(p.rotacao===90?' vertical':'')+(p.id===mapaSelecionada?' selected':'')+(mapaRota&&codigosPendentes.has(String(Number(p.id.slice(1))))?' route':'')+(mapaEditando?' editing':'');b.textContent=p.id;b.style.left=p.x+'px';b.style.top=p.y+'px';b.title=p.id+' · Estoque '+mapaLoja();
+  if(!mapaEditando&&!mapaItens().some(x=>mapaCodigo(x.posicao)===p.id))continue;
+  if(busca&&!codigosBusca.has(p.id))continue;
+  const b=document.createElement('button');b.type='button';b.className='map-shelf'+(p.rotacao===90?' vertical':'')+(p.id===mapaSelecionada?' selected':'')+(mapaRota&&codigosPendentes.has(p.id)?' route':'')+(mapaEditando?' editing':'');b.textContent=p.id;b.title=mapaTipo(p.id)+' · '+p.id;b.style.left=p.x+'px';b.style.top=p.y+'px';b.title=p.id+' · Estoque '+mapaLoja();
   if(mapaEditando){let origem=null; b.addEventListener('pointerdown',e=>{origem={x:e.clientX,y:e.clientY,px:p.x,py:p.y,moved:false};b.setPointerCapture(e.pointerId);});b.addEventListener('pointermove',e=>{if(!origem)return;const dx=e.clientX-origem.x,dy=e.clientY-origem.y;if(Math.abs(dx)+Math.abs(dy)>4)origem.moved=true;p.x=Math.max(0,Math.min(4900,Math.round(origem.px+dx)));p.y=Math.max(0,Math.min(4900,Math.round(origem.py+dy)));b.style.left=p.x+'px';b.style.top=p.y+'px';});b.addEventListener('pointerup',()=>{const move=origem?.moved;origem=null;if(!move){mapaSelecionada=p.id;mapaDivisao='';mapaDetalhes();mapaDesenhar();}});}
   else b.addEventListener('click',()=>{mapaSelecionada=p.id;mapaDivisao='';mapaDetalhes();mapaDesenhar();});
   board.appendChild(b);
  }
- $('map-status').textContent=mapaPrateleiras().length+' prateleira(s) · '+itens.length+' registro(s) no estoque '+mapaLoja()+(mapaRota?' · Amarelo: há produto pendente nesta prateleira':'');
+ $('map-status').textContent=mapaPrateleiras().length+' localização(ões) · '+itens.length+' registro(s) no estoque '+mapaLoja()+(mapaRota?' · Amarelo: há produto pendente nesta prateleira':'');
  mapaDetalhes();
 }
 function mapaDetalhes(){
  const d=$('map-detalhes');d.replaceChildren();const p=mapaPrateleiras().find(x=>x.id===mapaSelecionada);
- if(!p){d.textContent='Clique em uma prateleira para abrir suas linhas e divisões.';return;}
- const h=document.createElement('h2');h.textContent=p.id+' · Estoque '+mapaLoja();d.append(h);
+ if(!p){d.textContent='Selecione uma localização cadastrada para consultar os produtos.';return;}
+ const h=document.createElement('h2');h.textContent=p.id+' · '+mapaTipo(p.id)+' · Estoque '+mapaLoja();d.append(h);
  if(mapaEditando){
   const girar=document.createElement('button');girar.className='secondary';girar.textContent='↻ Girar';girar.onclick=()=>{p.rotacao=p.rotacao===90?0:90;mapaDesenhar()};
-  const qtd=document.createElement('input');qtd.type='number';qtd.min=1;qtd.max=100;qtd.value=p.divisoes;qtd.onchange=()=>{p.divisoes=Math.max(1,Math.min(100,Number(qtd.value)||5));mapaDetalhes()};
   const apagar=document.createElement('button');apagar.className='btn-se';apagar.textContent='Remover do mapa';apagar.onclick=()=>{if(!confirm('Remover '+p.id+' somente do mapa? Os produtos não serão apagados.'))return;mapaLayout[mapaLoja()]=mapaPrateleiras().filter(x=>x!==p);mapaSelecionada='';mapaDesenhar()};
-  const label=document.createElement('label');label.textContent='Divisões por linha';d.append(girar,label,qtd,apagar);
+  d.append(girar,apagar);
  }
- const legenda=document.createElement('p');legenda.className='status-line';legenda.textContent='Selecione uma linha e uma divisão:';d.append(legenda);
- for(const [sig,nome] of [['A','Alto'],['M','Meio'],['B','Baixo'],['C','Chão']]){
-  const row=document.createElement('div');row.className='map-level';row.style.setProperty('--divs',p.divisoes);
-  const lab=document.createElement('strong');lab.textContent=sig+' · '+nome;row.append(lab);
-  for(let i=1;i<=p.divisoes;i++){const div=sig+String(i).padStart(2,'0');const b=document.createElement('button');b.type='button';b.className='map-cell'+(mapaDivisao===div?' active':'');b.textContent=String(i).padStart(2,'0');b.onclick=()=>{mapaDivisao=div;mapaDetalhes()};row.append(b);}d.append(row);
- }
- if(!mapaDivisao)return;
- const pos=p.id+'-'+mapaDivisao;const registros=mapaItens().filter(x=>mapaNorm(x.posicao)===pos);
+ const posicoes=mapaPosicoes(p.id);
+ if(p.id.startsWith('P')){
+  const legenda=document.createElement('p');legenda.className='status-line';legenda.textContent='Somente divisões cadastradas:';d.append(legenda);
+  for(const [sig,nome] of [['A','Alto'],['M','Meio'],['B','Baixo'],['C','Chão']]){
+   const lista=posicoes.filter(pos=>new RegExp('^'+p.id+'-'+sig+'\\d+$').test(pos));
+   if(!lista.length)continue;
+   const row=document.createElement('div');row.className='map-level';row.style.setProperty('--divs',lista.length);
+   const lab=document.createElement('strong');lab.textContent=sig+' · '+nome;row.append(lab);
+   for(const pos of lista){const div=pos.slice(p.id.length+1);const b=document.createElement('button');b.type='button';b.className='map-cell'+(mapaDivisao===div?' active':'');b.textContent=div.slice(1);b.onclick=()=>{mapaDivisao=div;mapaDetalhes()};row.append(b);}d.append(row);
+  }
+ }else mapaDivisao='';
+ const pos=p.id.startsWith('P')?(mapaDivisao?p.id+'-'+mapaDivisao:''):p.id;
+ if(!pos)return;
+ const registros=mapaItens().filter(x=>mapaNorm(x.posicao)===pos);
  const bloco=document.createElement('div');bloco.className='map-products';const t=document.createElement('h3');t.textContent=pos+' · '+registros.length+' produto(s)';bloco.append(t);
  for(const x of registros){const linha=document.createElement('p');linha.textContent=[x.marca,x.descricao,x.ref,x.cor,x.tamanho,'EAN '+x.ean,'Saldo '+x.quantidade].filter(Boolean).join(' · ');bloco.append(linha);}
- if(!registros.length){const vazio=document.createElement('p');vazio.textContent='Nenhum produto cadastrado nesta divisão.';bloco.append(vazio);}
+ if(!registros.length){const vazio=document.createElement('p');vazio.textContent='Nenhum produto cadastrado nesta localização.';bloco.append(vazio);}
  const botao=document.createElement('button');botao.className='primary';botao.textContent='+ Adicionar produto';botao.onclick=()=>mapaFormulario(bloco,pos);bloco.append(botao);d.append(bloco);
 }
 function mapaFormulario(bloco,pos){
@@ -2689,15 +2698,15 @@ function mapaFormulario(bloco,pos){
  const campos=[['ean','EAN','text'],['ref','Referência','text'],['descricao','Descrição','text'],['marca','Marca','text'],['cor','Cor','text'],['tamanho','Tamanho','text'],['quantidade','Quantidade','number']];
  const els={};for(const [key,nome,tipo] of campos){const label=document.createElement('label');label.textContent=nome;const input=document.createElement('input');input.type=tipo;input.required=['ean','ref','quantidade'].includes(key);if(tipo==='number'){input.min=0;input.step=1;}els[key]=input;form.append(label,input);}
  const salvar=document.createElement('button');salvar.type='submit';salvar.className='primary';salvar.textContent='Salvar na planilha';form.append(salvar);
- form.onsubmit=async e=>{e.preventDefault();salvar.disabled=true;try{const item={loja:mapaLoja(),posicao:pos};for(const k of Object.keys(els))item[k]=k==='quantidade'?Number(els[k].value):els[k].value.trim();await requisicaoAPI('/api/mapa/cadastrar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item})});mapaAviso('Produto cadastrado na planilha. Atualize o CSV do R2 para manter a consulta de estoque sincronizada.');await carregarMapa();mapaSelecionada=pos.split('-')[0];mapaDivisao=pos.split('-')[1];mapaDesenhar();}catch(err){mapaAviso(err.message,true);}finally{salvar.disabled=false;}};bloco.append(form);
+ form.onsubmit=async e=>{e.preventDefault();salvar.disabled=true;try{const item={loja:mapaLoja(),posicao:pos};for(const k of Object.keys(els))item[k]=k==='quantidade'?Number(els[k].value):els[k].value.trim();await requisicaoAPI('/api/mapa/cadastrar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item})});mapaAviso('Produto cadastrado na planilha. Atualize o CSV do R2 para manter a consulta de estoque sincronizada.');await carregarMapa();mapaSelecionada=mapaCodigo(pos);mapaDivisao=pos.includes('-')?pos.split('-')[1]:'';mapaDesenhar();}catch(err){mapaAviso(err.message,true);}finally{salvar.disabled=false;}};bloco.append(form);
 }
 $('map-loja').addEventListener('change',()=>{mapaSelecionada='';mapaDivisao='';mapaGerar();mapaDesenhar()});
 $('map-busca').addEventListener('input',()=>{if(mapaCarregado)mapaDesenhar()});
 $('map-atualizar').onclick=carregarMapa;
 $('map-editar').onclick=()=>{mapaEditando=!mapaEditando;$('map-ferramentas').classList.toggle('hidden',!mapaEditando);$('map-editar').textContent=mapaEditando?'Concluir edição':'✎ Editar mapa';mapaDesenhar()};
-$('map-adicionar').onclick=()=>{const id=prompt('Código da prateleira (ex.: P11)');if(!id)return;const code=mapaNorm(id);if(!/^P\d{1,4}$/.test(code)){mapaAviso('Código inválido. Exemplo: P11',true);return;}if(mapaPrateleiras().some(p=>p.id===code)){mapaAviso('Esta prateleira já está no mapa.',true);return;}mapaPrateleiras().push({id:code,x:30,y:30,rotacao:0,divisoes:5});mapaSelecionada=code;mapaDesenhar()};
+$('map-adicionar').onclick=()=>{const id=prompt('Código da localização (ex.: P11, CX34 ou L05)');if(!id)return;const code=mapaNorm(id);if(!/^(P|CX|L)\d{1,4}$/.test(code)){mapaAviso('Código inválido. Exemplos: P11, CX34 ou L05',true);return;}if(mapaPrateleiras().some(p=>p.id===code)){mapaAviso('Esta prateleira já está no mapa.',true);return;}mapaPrateleiras().push({id:code,x:30,y:30,rotacao:0});mapaSelecionada=code;mapaDesenhar()};
 $('map-salvar').onclick=async()=>{try{await requisicaoAPI('/api/mapa/layout',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({layout:mapaLayout})});mapaAviso('Mapa salvo no Cloudflare R2.');}catch(e){mapaAviso(e.message,true)}};
-$('map-rota').onclick=()=>{mapaRota=!mapaRota;$('map-rota').textContent=mapaRota?'Ocultar rota':'↗ Rota de abastecimento';mapaDesenhar();if(mapaRota){const pend=pendentesCache.filter(x=>x.quantidade>0);const locais=mapaItens().filter(x=>pend.some(p=>mapaNorm(p.ref)===mapaNorm(x.ref)&&mapaNorm(p.cor)===mapaNorm(x.cor)&&mapaNorm(p.tamanho)===mapaNorm(x.tamanho)));const rota=mapaPrateleiras().filter(p=>locais.some(x=>mapaParse(x.posicao)?.[1]===String(Number(p.id.slice(1))))).sort((a,b)=>a.y-b.y||a.x-b.x).map(x=>x.id);mapaAviso('Sequência sugerida (aproximada): '+(rota.join(' → ')||'Nenhuma posição encontrada')+'. Não considera obstáculos nem distância real.');}};
+$('map-rota').onclick=()=>{mapaRota=!mapaRota;$('map-rota').textContent=mapaRota?'Ocultar rota':'↗ Rota de abastecimento';mapaDesenhar();if(mapaRota){const pend=pendentesCache.filter(x=>x.quantidade>0);const locais=mapaItens().filter(x=>pend.some(p=>mapaNorm(p.ref)===mapaNorm(x.ref)&&mapaNorm(p.cor)===mapaNorm(x.cor)&&mapaNorm(p.tamanho)===mapaNorm(x.tamanho)));const rota=mapaPrateleiras().filter(p=>locais.some(x=>mapaCodigo(x.posicao)===p.id)).sort((a,b)=>a.y-b.y||a.x-b.x).map(x=>x.id);mapaAviso('Sequência sugerida (aproximada): '+(rota.join(' → ')||'Nenhuma posição encontrada')+'. Não considera obstáculos nem distância real.');}};
 
 </script>
 </body>
