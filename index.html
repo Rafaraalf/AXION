@@ -746,6 +746,22 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   #page-historico .data-table tbody td:nth-child(13) button{width:100%}
 }
 
+
+/* AXION MAPA 3.0 */
+.map-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(310px,1fr);gap:16px}
+.map-board-wrap{overflow:auto;border:1px solid var(--border);border-radius:14px;background:repeating-linear-gradient(0deg,transparent 0 39px,#ffffff08 40px),repeating-linear-gradient(90deg,#101c2e 0 39px,#ffffff08 40px);min-height:520px}
+.map-board{position:relative;width:1000px;height:650px;min-width:100%;}
+.map-shelf{position:absolute;display:flex;align-items:center;justify-content:center;width:112px;height:58px;background:#16324a;border:2px solid #397ca2;border-radius:9px;color:#e0f2fe;font-weight:800;user-select:none;touch-action:none;cursor:pointer}
+.map-shelf.selected{border-color:#4ade80;background:#174435}.map-shelf.route{border-color:#fbbf24;background:#53401e}
+.map-shelf.vertical{width:58px;height:112px}.map-shelf.editing{cursor:grab;border-style:dashed}
+.map-details{background:#101c2e;border:1px solid var(--border);border-radius:14px;padding:18px;min-width:0;max-height:660px;overflow:auto}
+.map-level{display:grid;grid-template-columns:62px repeat(var(--divs),minmax(32px,1fr));gap:5px;align-items:center;margin:10px 0;overflow-x:auto}
+.map-cell{padding:10px 3px;background:#1b3049;border:1px solid var(--border);border-radius:7px;color:var(--text)}.map-cell.active{border-color:#38bdf8;background:#16425e}
+.map-products{margin-top:15px;padding:12px;border:1px solid var(--border);border-radius:10px}.map-products p{font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.map-details input,.map-details select{width:100%;padding:10px;margin:5px 0 10px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px}
+.map-details label{font-size:12px;color:var(--muted)}.map-details button{margin:4px}
+@media(max-width:980px){.map-grid{grid-template-columns:1fr}.map-board-wrap{min-height:420px}.map-details{max-height:none}}
+
 </style>
 </head>
 
@@ -807,6 +823,8 @@ button:focus-visible, input:focus-visible, select:focus-visible {
       <button data-page="estoque">
         ▤ Estoque
       </button>
+
+      <button data-page="mapa">▥ Mapa de estoque</button>
 
       <button data-page="historico">
         ◷ Histórico
@@ -1026,6 +1044,24 @@ button:focus-visible, input:focus-visible, select:focus-visible {
           <div class="table-wrap"><table class="data-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
         </div>
         <div class="panel"><h2>Histórico de backups</h2><p class="status-line">As três versões mais recentes ficam disponíveis para download e recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
+      </section>
+
+
+      <section class="page" id="page-mapa">
+        <div class="heading"><h1>Mapa de estoque</h1><p>Selecione um estoque, clique na prateleira e consulte suas linhas e divisões.</p></div>
+        <div class="panel">
+          <div class="toolbar">
+            <select id="map-loja" aria-label="Estoque físico"></select>
+            <input id="map-busca" type="search" placeholder="Buscar EAN, referência ou posição...">
+            <button id="map-atualizar" class="secondary" type="button">↻ Atualizar</button>
+            <button id="map-editar" class="secondary" type="button">✎ Editar mapa</button>
+            <button id="map-rota" class="secondary" type="button">↗ Rota de abastecimento</button>
+          </div>
+          <div id="map-ferramentas" class="toolbar hidden"><button class="secondary" id="map-adicionar" type="button">+ Prateleira</button><button class="primary" id="map-salvar" type="button">Salvar mapa</button><span class="status-line">Arraste as prateleiras para reorganizar. Clique para girar ou configurar divisões.</span></div>
+          <div class="feedback hidden" id="map-feedback" role="status"></div>
+          <div class="map-grid"><div class="map-board-wrap"><div class="map-board" id="map-board"></div></div><div class="map-details" id="map-detalhes"><h2>Selecione uma prateleira</h2><p class="status-line">As localizações seguem o padrão P10-B05.</p></div></div>
+          <p class="status-line" id="map-status">Carregando mapa...</p>
+        </div>
       </section>
 
       <!-- HISTÓRICO -->
@@ -2446,6 +2482,8 @@ document.querySelectorAll("[data-page]").forEach(botao => {
       carregarPendentes();
     }
 
+    if (pagina === "mapa") { carregarMapa(); }
+
     if (pagina === "historico") {
       carregarHistorico();
     }
@@ -2573,6 +2611,87 @@ $("sair").addEventListener("click", async () => {
 
 // Recupera a sessão válida após F5, sem solicitar a senha novamente.
 axionRestaurarSessao();
+
+// AXION MAPA 3.0: layout no R2, cadastro de produtos no Google Sheets.
+let mapaDados=[],mapaLayout={},mapaCarregado=false,mapaEditando=false,mapaSelecionada='',mapaDivisao='',mapaRota=false;
+const mapaNorm=x=>String(x??'').trim().toUpperCase();
+const mapaParse=pos=>/^P(\d{1,4})-([CBMA])(\d{2,3})$/.exec(mapaNorm(pos));
+function mapaAviso(msg,erro=false){const e=$('map-feedback');e.className='feedback '+(erro?'error':'success');e.textContent=msg;}
+function mapaLoja(){return $('map-loja').value;}
+function mapaItens(){return mapaDados.filter(x=>String(x.loja)===mapaLoja());}
+function mapaPrateleiras(){return mapaLayout[mapaLoja()]||[];}
+function mapaGerar(){
+ const atuais=mapaPrateleiras(),existentes=new Set(atuais.map(x=>x.id));
+ const codigos=[...new Set(mapaItens().map(x=>mapaParse(x.posicao)?.[1]).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+ for(const n of codigos){const id='P'+n.padStart(2,'0');if(!existentes.has(id)){const i=atuais.length;atuais.push({id,x:30+(i%6)*145,y:35+Math.floor(i/6)*95,rotacao:0,divisoes:5});existentes.add(id);}}
+ mapaLayout[mapaLoja()]=atuais;
+}
+async function carregarMapa(){
+ if(!tokenSessao)return;
+ try{
+  const [dados,layout]=await Promise.all([requisicaoAPI('/api/mapa/dados'),requisicaoAPI('/api/mapa/layout')]);
+  mapaDados=dados.itens||[];mapaLayout=layout.layout||{};mapaCarregado=true;
+  const lojas=[...new Set(mapaDados.map(x=>String(x.loja)).filter(Boolean).concat(Object.keys(mapaLayout)))].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true}));
+  const antigo=mapaLoja();$('map-loja').replaceChildren();
+  for(const loja of lojas){const o=new Option('Estoque '+loja,loja);$('map-loja').add(o);}
+  if(lojas.includes(antigo))$('map-loja').value=antigo;
+  mapaGerar();mapaDesenhar();
+ }catch(e){mapaAviso('Falha ao carregar mapa: '+e.message,true);}
+}
+function mapaDesenhar(){
+ const board=$('map-board');board.replaceChildren();const busca=mapaNorm($('map-busca').value);
+ const itens=mapaItens();const matches=itens.filter(x=>[x.ean,x.ref,x.descricao,x.posicao,x.marca].some(v=>mapaNorm(v).includes(busca)));
+ const codigosBusca=new Set(matches.map(x=>mapaParse(x.posicao)?.[1]).filter(Boolean));
+ const pendencias=pendentesCache.filter(p=>p.quantidade>0);
+ const codigosPendentes=new Set(itens.filter(x=>pendencias.some(p=>mapaNorm(p.ref)===mapaNorm(x.ref)&&mapaNorm(p.cor)===mapaNorm(x.cor)&&mapaNorm(p.tamanho)===mapaNorm(x.tamanho))).map(x=>mapaParse(x.posicao)?.[1]).filter(Boolean));
+ for(const p of mapaPrateleiras()){
+  if(busca&&!codigosBusca.has(String(Number(p.id.slice(1)))))continue;
+  const b=document.createElement('button');b.type='button';b.className='map-shelf'+(p.rotacao===90?' vertical':'')+(p.id===mapaSelecionada?' selected':'')+(mapaRota&&codigosPendentes.has(String(Number(p.id.slice(1))))?' route':'')+(mapaEditando?' editing':'');b.textContent=p.id;b.style.left=p.x+'px';b.style.top=p.y+'px';b.title=p.id+' · Estoque '+mapaLoja();
+  if(mapaEditando){let origem=null; b.addEventListener('pointerdown',e=>{origem={x:e.clientX,y:e.clientY,px:p.x,py:p.y,moved:false};b.setPointerCapture(e.pointerId);});b.addEventListener('pointermove',e=>{if(!origem)return;const dx=e.clientX-origem.x,dy=e.clientY-origem.y;if(Math.abs(dx)+Math.abs(dy)>4)origem.moved=true;p.x=Math.max(0,Math.min(4900,Math.round(origem.px+dx)));p.y=Math.max(0,Math.min(4900,Math.round(origem.py+dy)));b.style.left=p.x+'px';b.style.top=p.y+'px';});b.addEventListener('pointerup',()=>{const move=origem?.moved;origem=null;if(!move){mapaSelecionada=p.id;mapaDivisao='';mapaDetalhes();mapaDesenhar();}});}
+  else b.addEventListener('click',()=>{mapaSelecionada=p.id;mapaDivisao='';mapaDetalhes();mapaDesenhar();});
+  board.appendChild(b);
+ }
+ $('map-status').textContent=mapaPrateleiras().length+' prateleira(s) · '+itens.length+' registro(s) no estoque '+mapaLoja()+(mapaRota?' · Amarelo: há produto pendente nesta prateleira':'');
+ mapaDetalhes();
+}
+function mapaDetalhes(){
+ const d=$('map-detalhes');d.replaceChildren();const p=mapaPrateleiras().find(x=>x.id===mapaSelecionada);
+ if(!p){d.textContent='Clique em uma prateleira para abrir suas linhas e divisões.';return;}
+ const h=document.createElement('h2');h.textContent=p.id+' · Estoque '+mapaLoja();d.append(h);
+ if(mapaEditando){
+  const girar=document.createElement('button');girar.className='secondary';girar.textContent='↻ Girar';girar.onclick=()=>{p.rotacao=p.rotacao===90?0:90;mapaDesenhar()};
+  const qtd=document.createElement('input');qtd.type='number';qtd.min=1;qtd.max=100;qtd.value=p.divisoes;qtd.onchange=()=>{p.divisoes=Math.max(1,Math.min(100,Number(qtd.value)||5));mapaDetalhes()};
+  const apagar=document.createElement('button');apagar.className='btn-se';apagar.textContent='Remover do mapa';apagar.onclick=()=>{if(!confirm('Remover '+p.id+' somente do mapa? Os produtos não serão apagados.'))return;mapaLayout[mapaLoja()]=mapaPrateleiras().filter(x=>x!==p);mapaSelecionada='';mapaDesenhar()};
+  const label=document.createElement('label');label.textContent='Divisões por linha';d.append(girar,label,qtd,apagar);
+ }
+ const legenda=document.createElement('p');legenda.className='status-line';legenda.textContent='Selecione uma linha e uma divisão:';d.append(legenda);
+ for(const [sig,nome] of [['A','Alto'],['M','Meio'],['B','Baixo'],['C','Chão']]){
+  const row=document.createElement('div');row.className='map-level';row.style.setProperty('--divs',p.divisoes);
+  const lab=document.createElement('strong');lab.textContent=sig+' · '+nome;row.append(lab);
+  for(let i=1;i<=p.divisoes;i++){const div=sig+String(i).padStart(2,'0');const b=document.createElement('button');b.type='button';b.className='map-cell'+(mapaDivisao===div?' active':'');b.textContent=String(i).padStart(2,'0');b.onclick=()=>{mapaDivisao=div;mapaDetalhes()};row.append(b);}d.append(row);
+ }
+ if(!mapaDivisao)return;
+ const pos=p.id+'-'+mapaDivisao;const registros=mapaItens().filter(x=>mapaNorm(x.posicao)===pos);
+ const bloco=document.createElement('div');bloco.className='map-products';const t=document.createElement('h3');t.textContent=pos+' · '+registros.length+' produto(s)';bloco.append(t);
+ for(const x of registros){const linha=document.createElement('p');linha.textContent=[x.marca,x.descricao,x.ref,x.cor,x.tamanho,'EAN '+x.ean,'Saldo '+x.quantidade].filter(Boolean).join(' · ');bloco.append(linha);}
+ if(!registros.length){const vazio=document.createElement('p');vazio.textContent='Nenhum produto cadastrado nesta divisão.';bloco.append(vazio);}
+ const botao=document.createElement('button');botao.className='primary';botao.textContent='+ Adicionar produto';botao.onclick=()=>mapaFormulario(bloco,pos);bloco.append(botao);d.append(bloco);
+}
+function mapaFormulario(bloco,pos){
+ bloco.querySelector('form')?.remove();const form=document.createElement('form');
+ const campos=[['ean','EAN','text'],['ref','Referência','text'],['descricao','Descrição','text'],['marca','Marca','text'],['cor','Cor','text'],['tamanho','Tamanho','text'],['quantidade','Quantidade','number']];
+ const els={};for(const [key,nome,tipo] of campos){const label=document.createElement('label');label.textContent=nome;const input=document.createElement('input');input.type=tipo;input.required=['ean','ref','quantidade'].includes(key);if(tipo==='number'){input.min=0;input.step=1;}els[key]=input;form.append(label,input);}
+ const salvar=document.createElement('button');salvar.type='submit';salvar.className='primary';salvar.textContent='Salvar na planilha';form.append(salvar);
+ form.onsubmit=async e=>{e.preventDefault();salvar.disabled=true;try{const item={loja:mapaLoja(),posicao:pos};for(const k of Object.keys(els))item[k]=k==='quantidade'?Number(els[k].value):els[k].value.trim();await requisicaoAPI('/api/mapa/cadastrar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item})});mapaAviso('Produto cadastrado na planilha. Atualize o CSV do R2 para manter a consulta de estoque sincronizada.');await carregarMapa();mapaSelecionada=pos.split('-')[0];mapaDivisao=pos.split('-')[1];mapaDesenhar();}catch(err){mapaAviso(err.message,true);}finally{salvar.disabled=false;}};bloco.append(form);
+}
+$('map-loja').addEventListener('change',()=>{mapaSelecionada='';mapaDivisao='';mapaGerar();mapaDesenhar()});
+$('map-busca').addEventListener('input',()=>{if(mapaCarregado)mapaDesenhar()});
+$('map-atualizar').onclick=carregarMapa;
+$('map-editar').onclick=()=>{mapaEditando=!mapaEditando;$('map-ferramentas').classList.toggle('hidden',!mapaEditando);$('map-editar').textContent=mapaEditando?'Concluir edição':'✎ Editar mapa';mapaDesenhar()};
+$('map-adicionar').onclick=()=>{const id=prompt('Código da prateleira (ex.: P11)');if(!id)return;const code=mapaNorm(id);if(!/^P\d{1,4}$/.test(code)){mapaAviso('Código inválido. Exemplo: P11',true);return;}if(mapaPrateleiras().some(p=>p.id===code)){mapaAviso('Esta prateleira já está no mapa.',true);return;}mapaPrateleiras().push({id:code,x:30,y:30,rotacao:0,divisoes:5});mapaSelecionada=code;mapaDesenhar()};
+$('map-salvar').onclick=async()=>{try{await requisicaoAPI('/api/mapa/layout',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({layout:mapaLayout})});mapaAviso('Mapa salvo no Cloudflare R2.');}catch(e){mapaAviso(e.message,true)}};
+$('map-rota').onclick=()=>{mapaRota=!mapaRota;$('map-rota').textContent=mapaRota?'Ocultar rota':'↗ Rota de abastecimento';mapaDesenhar();if(mapaRota){const pend=pendentesCache.filter(x=>x.quantidade>0);const locais=mapaItens().filter(x=>pend.some(p=>mapaNorm(p.ref)===mapaNorm(x.ref)&&mapaNorm(p.cor)===mapaNorm(x.cor)&&mapaNorm(p.tamanho)===mapaNorm(x.tamanho)));const rota=mapaPrateleiras().filter(p=>locais.some(x=>mapaParse(x.posicao)?.[1]===String(Number(p.id.slice(1))))).sort((a,b)=>a.y-b.y||a.x-b.x).map(x=>x.id);mapaAviso('Sequência sugerida (aproximada): '+(rota.join(' → ')||'Nenhuma posição encontrada')+'. Não considera obstáculos nem distância real.');}};
+
 </script>
 </body>
 </html>
