@@ -781,10 +781,65 @@ button:focus-visible,input:focus-visible,select:focus-visible { outline:2px soli
 .hist-pasta .hist-unverified {color:#fbbf24;}
 @media(max-width:650px) {.hist-pasta {padding:14px;}.hist-pasta small {font-size:11px;}}
 @media(prefers-reduced-motion:reduce) {*,*::before,*::after {animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}
+
+/* AXION 3.3 | design system e carregamento */
+:root {color-scheme:dark;--ax-glow:rgba(56,189,248,.16);}
+.sidebar [data-page] {position:relative;display:flex;align-items:center;gap:9px;border-radius:11px;transition:background .2s,transform .2s,border-color .2s;}
+.sidebar [data-page]:hover {transform:translateX(3px);background:#20364f;}
+.sidebar [data-page].active {box-shadow:inset 3px 0 #38bdf8,0 3px 16px #0002;}
+button.primary,button.secondary,.toolbar button,.est-filtro-acoes button,.est-filtro-ordenar button {
+  border-radius:11px;letter-spacing:.1px;font-weight:650;
+  transition:transform .18s ease,background .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+button:not(:disabled):hover {filter:brightness(1.12);}
+button:disabled {opacity:.55;cursor:not-allowed;}
+.toolbar input,.toolbar select,.est-filtro-pop input,.est-filtro-pop select {
+  border-radius:11px;border:1px solid #334b64;background:#101c2e;
+  transition:border-color .18s,box-shadow .18s;
+}
+.toolbar input:focus,.toolbar select:focus,.est-filtro-pop input:focus {
+  border-color:#38bdf8;box-shadow:0 0 0 3px var(--ax-glow);outline:none;
+}
+select {cursor:pointer;accent-color:#38bdf8;}
+input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
+.est-filtro-btn {border:1px solid transparent;border-radius:8px;min-width:31px;min-height:31px;}
+.est-filtro-btn:hover,.est-filtro-btn.ativo {border-color:#396784;background:#1b3c55;}
+.est-filtro-pop {border-radius:16px;box-shadow:0 20px 65px #0009;animation:axionPop .16s ease-out;}
+@keyframes axionPop {from {opacity:.5;transform:translateY(-5px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.data-table tbody tr {transition:background-color .15s;}
+.data-table tbody tr:hover {background:rgba(56,189,248,.055);}
+#axion-loading {position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  background:rgba(7,14,26,.65);backdrop-filter:blur(5px);opacity:0;visibility:hidden;
+  transition:opacity .2s,visibility .2s;pointer-events:none;}
+#axion-loading.visivel {opacity:1;visibility:visible;pointer-events:auto;}
+.ax-loading-card {display:flex;flex-direction:column;align-items:center;gap:14px;
+  width:min(310px,calc(100vw - 32px));padding:30px 24px;border:1px solid #35546e;
+  border-radius:22px;background:linear-gradient(145deg,#1b3048,#101d30);
+  box-shadow:0 24px 90px #0008;}
+.ax-loading-mark {position:relative;width:70px;height:70px;display:grid;place-items:center;}
+.ax-loading-mark:before {content:"";position:absolute;inset:0;border:3px solid #31516c;
+  border-top-color:#39c6f4;border-right-color:#39c6f4;border-radius:50%;animation:axSpin .85s linear infinite;}
+.ax-loading-mark span {font-size:19px;letter-spacing:2px;font-weight:850;color:#f4faff;}
+.ax-loading-card strong {font-size:15px;color:#f1f8ff;}
+.ax-loading-card small {font-size:12px;color:#a7bbce;text-align:center;}
+.ax-loading-bar {height:4px;width:100%;border-radius:8px;overflow:hidden;background:#29435b;}
+.ax-loading-bar:after {content:"";display:block;width:38%;height:100%;border-radius:8px;background:#38bdf8;animation:axBar 1.3s ease-in-out infinite;}
+@keyframes axSpin {to{transform:rotate(360deg)}}
+@keyframes axBar {0%{transform:translateX(-110%)}100%{transform:translateX(290%)}}
+@media(prefers-reduced-motion:reduce){.ax-loading-mark:before,.ax-loading-bar:after{animation:none!important}#axion-loading{transition:none}}
 </style>
 </head>
 
 <body>
+<div id="axion-loading" role="status" aria-live="polite" aria-label="Carregando dados">
+  <div class="ax-loading-card">
+    <div class="ax-loading-mark"><span>AX</span></div>
+    <strong>Sincronizando AXION</strong>
+    <small>Consultando os dados com segurança...</small>
+    <div class="ax-loading-bar"></div>
+  </div>
+</div>
+
 
 <!-- LOGIN -->
 
@@ -867,7 +922,7 @@ button:focus-visible,input:focus-visible,select:focus-visible { outline:2px soli
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v3.2</span>
+      <span>AXION WEB · v3.3</span>
     </header>
 
     <div class="content">
@@ -1503,7 +1558,28 @@ function mostrarLogin() {
   $("loginView").classList.remove("hidden");
 }
 
+let axionRequisicoesAtivas=0;
+let axionLoadingTimer=null;
+function axionMostrarCarregamento() {
+  axionRequisicoesAtivas++;
+  if(axionLoadingTimer===null) axionLoadingTimer=setTimeout(()=>{
+    axionLoadingTimer=null;
+    if(axionRequisicoesAtivas>0) document.getElementById('axion-loading')?.classList.add('visivel');
+  },350);
+}
+function axionOcultarCarregamento() {
+  axionRequisicoesAtivas=Math.max(0,axionRequisicoesAtivas-1);
+  if(!axionRequisicoesAtivas) {
+    if(axionLoadingTimer!==null){clearTimeout(axionLoadingTimer);axionLoadingTimer=null;}
+    document.getElementById('axion-loading')?.classList.remove('visivel');
+  }
+}
 async function requisicaoAPI(caminho, opcoes = {}) {
+  axionMostrarCarregamento();
+  try {return await requisicaoAPIInterna(caminho,opcoes);}
+  finally {axionOcultarCarregamento();}
+}
+async function requisicaoAPIInterna(caminho, opcoes = {}) {
   const token = tokenSessao;
 
   if (!token) {
