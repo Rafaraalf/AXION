@@ -901,6 +901,41 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 #page-estoque .est-filtro-btn{flex-shrink:0}
 #page-estoque .status-line{line-height:1.5}
 @media(max-width:680px){#page-estoque .toolbar button{flex:1 1 auto}}
+
+/* AXION 3.7: alinhamento consistente do estoque */
+#page-estoque .panel {padding:22px;min-width:0}
+#page-estoque .est-header-row {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:15px}
+#page-estoque .est-header-row h2 {margin:0;font-size:17px;line-height:1.4}
+#page-estoque .est-header-row .toolbar {margin:0;display:flex;flex:0 0 auto}
+#page-estoque .est-actions-row {display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+#page-estoque .est-actions-row .status-line {margin:0;line-height:1.4}
+#page-estoque #est-filtros-mobile {display:none!important}
+#page-estoque .est-count-row {margin:0 0 12px;font-size:12px}
+#page-estoque .est-table-wrap {width:100%;max-height:none!important;overflow-x:auto;overflow-y:visible;border-radius:12px;border:1px solid #30475f}
+#page-estoque .est-stock-table {width:100%;min-width:1120px;table-layout:fixed;border-spacing:0;border-collapse:separate}
+#page-estoque .est-stock-table th,#page-estoque .est-stock-table td {box-sizing:border-box;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:10px 10px;line-height:1.35}
+#page-estoque .est-stock-table th:nth-child(1){width:8%}
+#page-estoque .est-stock-table th:nth-child(2){width:13%}
+#page-estoque .est-stock-table th:nth-child(3){width:9%}
+#page-estoque .est-stock-table th:nth-child(4){width:23%}
+#page-estoque .est-stock-table th:nth-child(5){width:10%}
+#page-estoque .est-stock-table th:nth-child(6){width:19%}
+#page-estoque .est-stock-table th:nth-child(7){width:7%}
+#page-estoque .est-stock-table th:nth-child(8){width:6%}
+#page-estoque .est-stock-table th:nth-child(9){width:5%}
+#page-estoque .est-stock-table .est-cabecalho {width:100%;display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0}
+#page-estoque .est-stock-table .est-cabecalho>span {min-width:0;overflow:hidden;text-overflow:ellipsis}
+#page-estoque .est-stock-table .est-filtro-btn {width:26px;min-width:26px;height:27px;min-height:27px;flex:0 0 26px}
+#page-estoque .est-stock-table .est-filtro-btn svg {width:15px;height:15px}
+#page-estoque .est-stock-table thead th {position:sticky;top:0;z-index:3;background:#192f46}
+#page-estoque .est-stock-table tbody tr {height:38px}
+@media(max-width:760px){
+ #page-estoque .panel{padding:14px}
+ #page-estoque .est-header-row{align-items:flex-start;flex-wrap:wrap}
+ #page-estoque .est-header-row .toolbar{margin-left:auto}
+ #page-estoque #est-filtros-mobile{display:inline-flex!important}
+ #page-estoque .est-table-wrap{overflow-x:auto;overflow-y:visible}
+}
 </style>
 </head>
 
@@ -996,7 +1031,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v3.6</span>
+      <span>AXION WEB · v3.7</span>
     </header>
 
     <div class="content">
@@ -1184,11 +1219,10 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <div class="feedback hidden" id="est-mensagem" role="status"></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
-          <h2>Consultar estoque</h2>
-<div class="toolbar"><button class="secondary" id="est-recarregar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar consulta</span></button></div>
-          <div class="toolbar"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
-          <p class="status-line" id="est-resultados">Carregando...</p>
-          <div class="table-wrap"><table class="data-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
+          <div class="est-header-row"><h2>Consultar estoque</h2><div class="toolbar est-refresh-row"><button class="secondary" id="est-recarregar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar consulta</span></button></div></div>
+          <div class="toolbar est-actions-row"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
+          <p class="status-line est-count-row" id="est-resultados">Carregando...</p>
+          <div class="table-wrap est-table-wrap"><table class="data-table est-stock-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
         </div>
         <div class="panel"><h2>Histórico de backups</h2><p class="status-line">As três versões mais recentes ficam disponíveis para download e recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
       </section>
