@@ -827,6 +827,40 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 @keyframes axSpin {to{transform:rotate(360deg)}}
 @keyframes axBar {0%{transform:translateX(-110%)}100%{transform:translateX(290%)}}
 @media(prefers-reduced-motion:reduce){.ax-loading-mark:before,.ax-loading-bar:after{animation:none!important}#axion-loading{transition:none}}
+
+ /* AXION 3.4 | Estoque: controles funcionais e acessíveis */
+ #page-estoque .panel{padding:24px;border:1px solid #2b3e55;background:linear-gradient(155deg,#19273c,#152236);border-radius:18px}
+ #page-estoque .panel h2{font-size:17px;letter-spacing:-.2px;margin-bottom:13px}
+ #page-estoque .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+ #page-estoque .toolbar button,#page-estoque .ax-file-picker{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:43px;padding:10px 15px;border-radius:11px;font-size:13px;font-weight:650;white-space:nowrap}
+ #page-estoque .toolbar button svg,#page-estoque .ax-file-picker svg,.est-filtro-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+ #page-estoque .toolbar button.primary{background:#176e9e;color:#f6fcff;border:1px solid #298ac1}
+ #page-estoque .toolbar button.primary:hover{background:#1689c8;box-shadow:0 5px 20px #1689c833}
+ #page-estoque .toolbar button.secondary{background:#1a364e;border:1px solid #31536e;color:#b7e7ff}
+ #page-estoque .toolbar button.secondary:hover{background:#234a68;border-color:#58bde8}
+ #page-estoque #est-busca{flex:1 1 340px;min-width:180px;min-height:45px;padding:12px 16px;background:#0d192a;border:1px solid #314860;border-radius:11px;color:#f1f6ff}
+ #page-estoque .ax-file-picker{cursor:pointer;flex:1 1 240px;min-width:200px;justify-content:flex-start;overflow:hidden;background:#0d192a;border:1px dashed #426782;color:#c3d9e8}
+ #page-estoque .ax-file-picker:hover,#page-estoque .ax-file-picker:focus-within{background:#1b354b;border-color:#67c7f1}
+ #page-estoque .ax-file-picker span{overflow:hidden;text-overflow:ellipsis}
+ #page-estoque .ax-file-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+ #page-estoque .ax-file-picker:has(+ .ax-file-hidden:focus-visible){outline:2px solid #67d5ff;outline-offset:3px}
+ #page-estoque #est-filtros-ativos{font-size:12px}
+ #page-estoque .table-wrap{border:1px solid #2b4059;border-radius:13px;overflow:auto}
+ #page-estoque .data-table{border-collapse:separate;border-spacing:0;min-width:920px}
+ #page-estoque .data-table thead th{position:sticky;top:0;z-index:2;background:#172a40}
+ #page-estoque .data-table tbody tr:nth-child(even){background:rgba(50,83,114,.12)}
+ #page-estoque .data-table tbody tr:hover{background:#23405a}
+ .est-cabecalho{display:flex;align-items:center;justify-content:space-between;gap:6px}
+ .est-filtro-btn{display:grid;place-items:center;width:30px;height:30px;padding:0!important;border:1px solid transparent!important;background:transparent;color:#9eb7ce}
+ .est-filtro-btn:hover,.est-filtro-btn.ativo{color:#61d2ff;background:#1e4561;border-color:#3c7799!important}
+ .est-filtro-pop{z-index:10020;max-height:min(75vh,560px);overflow-y:auto;overscroll-behavior:contain;border:1px solid #3c5972;background:#182c42;box-shadow:0 20px 60px #0009}
+ .est-filtro-pop input{min-height:36px;border-radius:9px}
+ .est-filtro-opcoes{max-height:240px;overflow:auto}
+ .est-filtro-opcoes label{border-radius:7px;cursor:pointer}
+ .est-filtro-opcoes label:hover{background:#25445d}
+ #est-versoes button{margin:5px;padding:10px 12px;border-radius:9px;border:1px solid #31536e;background:#1a364e;color:#c2eaff;cursor:pointer}
+ #est-versoes button:hover{background:#28506b}
+ @media(max-width:680px){#page-estoque .panel{padding:15px}#page-estoque .toolbar button{flex:1 1 auto}#page-estoque .ax-file-picker{flex-basis:100%}}
 </style>
 </head>
 
@@ -922,7 +956,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v3.3</span>
+      <span>AXION WEB · v3.4</span>
     </header>
 
     <div class="content">
@@ -1101,17 +1135,18 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <h2>Importar cadastro</h2>
           <p class="status-line">Exporte a aba DADOS/POSIÇÕES como CSV e selecione o arquivo. O upload substitui apenas a cópia do AXION e preserva versões anteriores.</p>
           <div class="toolbar">
-            <input id="est-arquivo" type="file" accept=".csv,text/csv" aria-label="Selecionar CSV de estoque">
-            <button class="primary" id="est-enviar" type="button">↑ Importar novo cadastro</button>
-            <button class="secondary" id="est-baixar" type="button">↓ Baixar backup atual</button>
+            <label class="ax-file-picker" for="est-arquivo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 16v4h16v-4"/></svg><span id="est-arquivo-nome">Selecionar arquivo CSV</span></label>
+            <input id="est-arquivo" class="ax-file-hidden" type="file" accept=".csv,text/csv" aria-label="Selecionar CSV de estoque">
+            <button class="primary" id="est-enviar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 16v4h16v-4"/></svg><span>Importar cadastro</span></button>
+            <button class="secondary" id="est-baixar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13m0 0 5-5m-5 5-5-5M4 17v4h16v-4"/></svg><span>Baixar backup</span></button>
           </div>
           <p class="status-line" id="est-atualizacao">Nenhum backup consultado.</p>
           <div class="feedback hidden" id="est-mensagem" role="status"></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
           <h2>Pesquisar produtos</h2>
-          <div class="toolbar"><input id="est-busca" type="search" placeholder="EAN, REF, descrição, marca, cor, tamanho, posição ou loja..."><button class="secondary" id="est-recarregar" type="button">↻ Atualizar consulta</button></div>
-          <div class="toolbar"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false">☷ Filtros por coluna</button><button class="secondary" type="button" id="est-limpar-filtros">Limpar filtros</button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
+          <div class="toolbar"><input id="est-busca" type="search" placeholder="EAN, REF, descrição, marca, cor, tamanho, posição ou loja..."><button class="secondary" id="est-recarregar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar consulta</span></button></div>
+          <div class="toolbar"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
           <p class="status-line" id="est-resultados">Carregando...</p>
           <div class="table-wrap"><table class="data-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
         </div>
@@ -1416,7 +1451,7 @@ function iniciarCabecalhosEstoque(){
   th.replaceChildren();
   const cab=document.createElement('div');cab.className='est-cabecalho';
   const titulo=document.createElement('span');titulo.textContent=EST_NOMES[col];
-  const btn=document.createElement('button');btn.type='button';btn.className='est-filtro-btn';btn.textContent='☷';btn.title='Filtrar e ordenar '+EST_NOMES[col];
+  const btn=document.createElement('button');btn.type='button';btn.className='est-filtro-btn';btn.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg>';btn.title='Filtrar e ordenar '+EST_NOMES[col];
   btn.setAttribute('aria-label',btn.title);btn.dataset.estBotao=col;
   btn.addEventListener('click',e=>{e.stopPropagation();abrirFiltroEstoque(col,btn);});
   cab.append(titulo,btn);th.appendChild(cab);
@@ -1493,6 +1528,10 @@ function abrirFiltroEstoque(col,botao){
 document.addEventListener('click',e=>{if(estPopup&&!estPopup.contains(e.target)&&!e.target.closest('[data-est-botao], [data-mobile-col]'))fecharFiltroEstoque();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharFiltroEstoque();});
 $('est-limpar-filtros').addEventListener('click',()=>{for(const k of Object.keys(estFiltros))delete estFiltros[k];estOrdem={coluna:null,direcao:1};$('est-busca').value='';fecharFiltroEstoque();renderizarEstoque();});
+$('est-arquivo').addEventListener('change',()=>{
+ const f=$('est-arquivo').files?.[0];
+ $('est-arquivo-nome').textContent=f?f.name:'Selecionar arquivo CSV';
+});
 iniciarCabecalhosEstoque();
 async function carregarEstoque(){
  if(!tokenSessao||estoqueOcupado)return;
