@@ -886,6 +886,21 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 #axion-loading .ax-loading-bar {grid-column:1/3;grid-row:3;margin-top:7px;}
 @media(max-width:600px){#axion-loading {right:12px;bottom:12px;width:min(300px,calc(100vw - 24px));}}
 @media(prefers-reduced-motion:reduce){#axion-loading{transition:none;transform:none;}}
+
+/* AXION 3.6: estoque alinhado, sem busca geral e sem paginação */
+#page-estoque .panel {border-radius:16px;border:1px solid #2c4660}
+#page-estoque .panel h2{margin-bottom:12px}
+#page-estoque .toolbar {display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+#page-estoque .toolbar:first-of-type{justify-content:flex-end}
+#page-estoque .toolbar button{min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+#page-estoque .table-wrap{overflow:auto;max-height:min(75vh,850px);border-radius:12px;border:1px solid #30475f;scrollbar-color:#3b7297 #132237}
+#page-estoque .data-table{min-width:1040px;width:100%;border-collapse:separate;border-spacing:0}
+#page-estoque .data-table thead th{position:sticky;top:0;z-index:3;background:#182e46;box-shadow:0 1px #34516d}
+#page-estoque .data-table th,#page-estoque .data-table td{padding:10px 9px;vertical-align:middle}
+#page-estoque .data-table tbody tr:hover{background:#22415c}
+#page-estoque .est-filtro-btn{flex-shrink:0}
+#page-estoque .status-line{line-height:1.5}
+@media(max-width:680px){#page-estoque .toolbar button{flex:1 1 auto}}
 </style>
 </head>
 
@@ -981,7 +996,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v3.5</span>
+      <span>AXION WEB · v3.6</span>
     </header>
 
     <div class="content">
@@ -1169,8 +1184,8 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <div class="feedback hidden" id="est-mensagem" role="status"></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
-          <h2>Pesquisar produtos</h2>
-          <div class="toolbar"><input id="est-busca" type="search" placeholder="EAN, REF, descrição, marca, cor, tamanho, posição ou loja..."><button class="secondary" id="est-recarregar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar consulta</span></button></div>
+          <h2>Consultar estoque</h2>
+<div class="toolbar"><button class="secondary" id="est-recarregar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar consulta</span></button></div>
           <div class="toolbar"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
           <p class="status-line" id="est-resultados">Carregando...</p>
           <div class="table-wrap"><table class="data-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
@@ -1495,18 +1510,46 @@ function estAtende(x,col,f){
  if(f.tipo==='texto')return estNorm(valor).includes(estNorm(f.busca));
  return f.valores.includes(valor);
 }
+let estRenderVersao=0;
 function renderizarEstoque(){
- const busca=estNorm($('est-busca').value);
- const itens=estoqueCache.filter(x=>(!busca||Object.values(x).some(v=>estNorm(v).includes(busca)))&&Object.entries(estFiltros).every(([col,f])=>estAtende(x,col,f)));
- if(estOrdem.coluna){const {coluna,direcao}=estOrdem;itens.sort((a,b)=>{if(coluna==='quantidade')return (estNumero(a[coluna])-estNumero(b[coluna]))*direcao;return estTexto(a[coluna]).localeCompare(estTexto(b[coluna]),'pt-BR',{numeric:true,sensitivity:'base'})*direcao;});}
- const corpo=$('est-lista');corpo.replaceChildren();
- $('est-resultados').textContent=`${itens.length.toLocaleString('pt-BR')} registro(s) encontrado(s).`;
- if(!itens.length){const td=corpo.insertRow().insertCell();td.colSpan=9;td.textContent='Nenhum item encontrado.';atualizarIndicadoresEstoque();return;}
- const frag=document.createDocumentFragment();
- for(const x of itens.slice(0,500)){const linha=document.createElement('tr');for(const k of EST_COLUNAS){const td=document.createElement('td');td.textContent=estTexto(x[k]);linha.appendChild(td);}frag.appendChild(linha);}
- corpo.appendChild(frag);
- if(itens.length>500)$('est-resultados').textContent+=' Exibindo os primeiros 500. Refine a busca.';
+ const versao=++estRenderVersao;
+ const itens=estoqueCache.filter(x=>Object.entries(estFiltros).every(([col,f])=>estAtende(x,col,f)));
+ if(estOrdem.coluna){
+  const {coluna,direcao}=estOrdem;
+  itens.sort((a,b)=>coluna==='quantidade'
+   ?(estNumero(a[coluna])-estNumero(b[coluna]))*direcao
+   :estTexto(a[coluna]).localeCompare(estTexto(b[coluna]),'pt-BR',{numeric:true,sensitivity:'base'})*direcao);
+ }
+ const corpo=$('est-lista');
+ corpo.replaceChildren();
+ const total=itens.length;
+ $('est-resultados').textContent=`${total.toLocaleString('pt-BR')} registro(s) encontrado(s). Lista completa, sem paginação.`;
  atualizarIndicadoresEstoque();
+ if(!total){
+  const td=corpo.insertRow().insertCell();td.colSpan=9;
+  td.textContent='Nenhum item encontrado. Ajuste ou limpe os filtros.';
+  return;
+ }
+ let indice=0;
+ const lote=150;
+ function adicionarLote(){
+  if(versao!==estRenderVersao)return;
+  const frag=document.createDocumentFragment();
+  const fim=Math.min(indice+lote,total);
+  for(;indice<fim;indice++){
+   const x=itens[indice];
+   const linha=document.createElement('tr');
+   for(const k of EST_COLUNAS){
+    const td=document.createElement('td');
+    td.textContent=estTexto(x[k]);
+    linha.appendChild(td);
+   }
+   frag.appendChild(linha);
+  }
+  corpo.appendChild(frag);
+  if(indice<total)requestAnimationFrame(adicionarLote);
+ }
+ requestAnimationFrame(adicionarLote);
 }
 function abrirFiltroEstoque(col,botao){
  if(estPopup?.dataset.col===col){fecharFiltroEstoque();return;}
@@ -1552,7 +1595,7 @@ function abrirFiltroEstoque(col,botao){
 }
 document.addEventListener('click',e=>{if(estPopup&&!estPopup.contains(e.target)&&!e.target.closest('[data-est-botao], [data-mobile-col]'))fecharFiltroEstoque();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharFiltroEstoque();});
-$('est-limpar-filtros').addEventListener('click',()=>{for(const k of Object.keys(estFiltros))delete estFiltros[k];estOrdem={coluna:null,direcao:1};$('est-busca').value='';fecharFiltroEstoque();renderizarEstoque();});
+$('est-limpar-filtros').addEventListener('click',()=>{for(const k of Object.keys(estFiltros))delete estFiltros[k];estOrdem={coluna:null,direcao:1};fecharFiltroEstoque();renderizarEstoque();});
 $('est-arquivo').addEventListener('change',()=>{
  const f=$('est-arquivo').files?.[0];
  $('est-arquivo-nome').textContent=f?f.name:'Selecionar arquivo CSV';
@@ -1588,7 +1631,6 @@ async function carregarVersoesEstoque(){
   for(const v of d.versoes){const b=document.createElement('button');b.type='button';b.textContent='↓ '+formatarEstoqueData(v.data)+' · '+Math.ceil(v.bytes/1024)+' KB';b.addEventListener('click',()=>baixarEstoque(v.id));destino.appendChild(b);}
  }catch(e){destino.textContent='Não foi possível listar versões: '+e.message;}
 }
-$('est-busca').addEventListener('input',renderizarEstoque);
 $('est-recarregar').addEventListener('click',carregarEstoque);
 $('est-baixar').addEventListener('click',()=>baixarEstoque());
 $('est-enviar').addEventListener('click',async()=>{
