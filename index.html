@@ -1178,6 +1178,8 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
             </button>
           </div>
 
+          <div id="resultadoCatalogo" class="feedback hidden" role="status" aria-live="polite"></div>
+
           <div
             id="feedbackAbastecimento"
             class="feedback hidden"
@@ -1860,6 +1862,63 @@ function eansDoItem(item) {
       local => String(local.ean ?? "")
     )
   ].map(x => x.trim()).filter(Boolean))];
+}
+
+// Consulta por EAN/código interno: Enter no campo de busca executa a pesquisa remota.
+function renderizarResultadoCatalogo(dados) {
+  const box = $('resultadoCatalogo');
+  box.replaceChildren();
+  box.className = 'feedback success';
+
+  const titulo = document.createElement('strong');
+  titulo.textContent = `${dados.produto?.descricao || 'Produto identificado'} · Código ${dados.produto?.codigo || '—'}`;
+  box.appendChild(titulo);
+
+  const aliases = document.createElement('p');
+  aliases.style.margin = '6px 0';
+  aliases.textContent = `Código bipado: ${dados.codigoBipado} · Códigos equivalentes: ${(dados.codigosEquivalentes || []).join(', ')}`;
+  box.appendChild(aliases);
+
+  const locais = Array.isArray(dados.localizacoes) ? dados.localizacoes : [];
+  if (!locais.length) {
+    const aviso = document.createElement('p');
+    aviso.style.margin = '6px 0 0';
+    aviso.textContent = 'Produto encontrado no catálogo, mas nenhum dos códigos equivalentes foi localizado em DADOS/POSIÇÕES.';
+    box.appendChild(aviso);
+    return;
+  }
+
+  const resumo = document.createElement('p');
+  resumo.style.margin = '6px 0';
+  resumo.textContent = `${locais.length} localização(ões) encontrada(s) nas lojas: ${(dados.lojasEncontradas || []).join(', ')}`;
+  box.appendChild(resumo);
+
+  const lista = document.createElement('ul');
+  lista.style.margin = '6px 0 0 20px';
+  for (const local of locais) {
+    const li = document.createElement('li');
+    li.textContent = `Loja ${local.loja || '—'} · ${local.posicao || 'Sem posição'} · REF ${local.ref || '—'} · ${local.cor || '—'} · Tam. ${local.tamanho || '—'} · Saldo ${Number(local.quantidade) || 0} · Código cadastrado ${local.codigoEncontrado || '—'}`;
+    lista.appendChild(li);
+  }
+  box.appendChild(lista);
+}
+
+async function consultarCatalogoPorCodigo() {
+  const codigo = $('buscaPendentes').value.trim();
+  // Os códigos usados no coletor são numéricos; texto comum continua filtrando a lista local.
+  if (!/^\d{1,80}$/.test(codigo)) return;
+
+  const box = $('resultadoCatalogo');
+  box.className = 'feedback';
+  box.textContent = `Consultando EAN/código ${codigo} no catálogo...`;
+
+  try {
+    const dados = await requisicaoAPI(`/api/catalogo/buscar?codigo=${encodeURIComponent(codigo)}`);
+    renderizarResultadoCatalogo(dados);
+  } catch (erro) {
+    box.className = 'feedback error';
+    box.textContent = erro.message || 'Não foi possível localizar o código.';
+  }
 }
 
 function posicoesDoItem(item) {
@@ -2741,6 +2800,13 @@ $("buscaPendentes").addEventListener(
   "input",
   renderizarPendentes
 );
+
+$("buscaPendentes").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    consultarCatalogoPorCodigo();
+  }
+});
 
 $("atualizarPendentes").addEventListener(
   "click",
