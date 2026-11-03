@@ -1906,7 +1906,7 @@ function renderizarResultadoCatalogo(dados) {
 async function consultarCatalogoPorCodigo() {
   const codigo = $('buscaPendentes').value.trim();
   // Os códigos usados no coletor são numéricos; texto comum continua filtrando a lista local.
-  if (!/^\d{1,80}$/.test(codigo)) return;
+  if (!/^\d{4,80}$/.test(codigo)) return;
 
   const box = $('resultadoCatalogo');
   box.className = 'feedback';
