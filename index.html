@@ -739,12 +739,25 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 }
 
 
-/* Histórico: botão de edição visível também nos cartões mobile */
+/* Histórico: edição, exclusão e limpeza com confirmação */
+.hist-cabecalho{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hist-cabecalho h2{margin-bottom:8px}
+.hist-cabecalho .status-line{margin-bottom:0}
+.hist-btn-perigo{border:1px solid #7f343b;border-radius:9px;background:#401d28;color:#fecaca;padding:11px 14px;font-weight:700;white-space:nowrap}
+.hist-btn-perigo:hover{background:#57232e;border-color:#f87171}
+.hist-acoes{display:flex;gap:7px;align-items:center}
+.hist-acoes button{min-height:36px;padding:8px 11px}
+.hist-btn-excluir{border:1px solid #71343b;border-radius:8px;background:#351d27;color:#fecaca}
+#hist-limpar-dia{margin-left:auto}
 #page-historico .data-table td:last-child button { min-height:38px; white-space:nowrap; }
 @media(max-width:760px){
   #page-historico .data-table tbody td:nth-child(13){grid-column:1/-1}
   #page-historico .data-table tbody td:nth-child(13)::before{content:'Ações'}
   #page-historico .data-table tbody td:nth-child(13) button{width:100%}
+  .hist-cabecalho{align-items:stretch}
+  .hist-btn-perigo{width:100%;white-space:normal}
+  .hist-acoes{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  #hist-limpar-dia{margin-left:0}
 }
 
 
@@ -1111,7 +1124,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v3.8</span>
+      <span>AXION WEB · v3.9</span>
     </header>
 
     <div class="content">
@@ -1358,10 +1371,15 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
         <div class="panel">
 
-          <h2>Arquivo de abastecimentos por data</h2>
-          <p class="status-line">Escolha uma pasta para ver vendas, OK, S/E e pendências daquele dia.</p>
+          <div class="hist-cabecalho">
+            <div>
+              <h2>Arquivo de abastecimentos por data</h2>
+              <p class="status-line">Escolha uma pasta para ver vendas, OK, S/E e pendências daquele dia.</p>
+            </div>
+            <button type="button" class="hist-btn-perigo" id="hist-limpar-tudo">🗑 Limpar todo o histórico</button>
+          </div>
           <div id="hist-pastas" class="hist-pastas"></div>
-          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn">← Voltar às datas</button><strong id="hist-dia-titulo"></strong></div>
+          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn">← Voltar às datas</button><strong id="hist-dia-titulo"></strong><button type="button" class="hist-btn-perigo" id="hist-limpar-dia">🗑 Limpar movimentações deste dia</button></div>
           <div class="stats" id="hist-resumo-vendas" style="margin:14px 0;display:none"><div class="stat"><div class="label">Unidades vendidas</div><div class="value blue" id="hist-vendido">0</div></div><div class="stat"><div class="label">Pendentes</div><div class="value orange" id="hist-pendente">0</div></div></div>
           <div id="hist-vendas-bloco" style="display:none"><h3>Vendas do dia</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Loja</th><th>Marca</th><th>Descrição</th><th>REF</th><th>Cor</th><th>Tamanho</th><th>Vendido</th><th>OK</th><th>S/E</th><th>Pendente</th></tr></thead><tbody id="hist-vendas-lista"></tbody></table></div><h3 style="margin:18px 0 10px">Movimentações do dia</h3></div>
           <div id="hist-detalhes" style="display:none">
@@ -2704,7 +2722,21 @@ function atualizarFiltroLojasHistorico() {
 }
 
 
-// AXION 2.1: edição segura com confirmação e trilha de auditoria no Sheets.
+// AXION 3.2: edição, exclusão e limpeza do histórico.
+async function atualizarDepoisDeAlterarHistorico(dataSelecionada = historicoDiaSelecionado) {
+  historicoCarregado = false;
+  await consultarHistorico(true);
+  historicoDiaSelecionado = dataSelecionada && (
+    historicoCache.some(x => x.dataISO === dataSelecionada) ||
+    historicoVendasCache.some(x => x.dataISO === dataSelecionada)
+  ) ? dataSelecionada : "";
+  $("hist-data").value = historicoDiaSelecionado;
+  atualizarFiltroLojasHistorico();
+  renderizarHistorico();
+  renderizarAtividadeRecente();
+  await Promise.all([carregarPendentes(), carregarDashboard()]);
+}
+
 async function editarMovimentoHistorico(item) {
   if (!item.id) { alert("Movimentação sem identificador. Não é possível editar."); return; }
   const tipo = prompt("Novo status: OK ou S/E",item.tipo);
@@ -2729,14 +2761,44 @@ async function editarMovimentoHistorico(item) {
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({id:item.id,tipo:novoTipo,quantidade,motivo:motivo.trim()})
     });
-    if (!resposta.ok) throw new Error(resposta.erro || "Falha na edição.");
-    historicoCarregado = false;
-    await consultarHistorico(true);
-    atualizarFiltroLojasHistorico();
-    renderizarHistorico();
-    renderizarAtividadeRecente();
-    alert(resposta.alterado ? "Movimentação corrigida e pendências recalculadas." : "Nenhuma alteração necessária.");
+    await atualizarDepoisDeAlterarHistorico(historicoDiaSelecionado);
+    alert(resposta.alterado ? "Movimentação corrigida. Pendências, Dashboard e atividade foram atualizados." : "Nenhuma alteração necessária.");
   } catch (erro) { alert("Não foi possível salvar: " + erro.message); }
+}
+
+async function excluirMovimentoHistorico(item) {
+  if (!item.id) { alert("Movimentação sem identificador. Não é possível excluir."); return; }
+  const motivo = prompt("Motivo da exclusão (opcional):", "Lançamento realizado por engano");
+  if (motivo === null) return;
+  if (motivo.trim().length > 500) { alert("O motivo deve ter no máximo 500 caracteres."); return; }
+  const descricao = `${item.tipo} · ${item.ref} · Loja ${item.loja} · ${item.quantidade} unidade(s)`;
+  if (!confirm(`Excluir definitivamente esta movimentação?\n\n${descricao}\n\nA cópia ficará registrada na auditoria.`)) return;
+  try {
+    const resposta = await requisicaoAPI("/api/historico/excluir", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id:item.id,motivo:motivo.trim() || "Exclusão solicitada pelo AXION Web"})
+    });
+    await atualizarDepoisDeAlterarHistorico(historicoDiaSelecionado);
+    alert(`Movimentação excluída. ${Number(resposta.excluidos || 0)} registro(s) removido(s). Pendências recalculadas.`);
+  } catch (erro) { alert("Não foi possível excluir: " + erro.message); }
+}
+
+async function limparHistorico(data) {
+  const limparTudo = !data;
+  const frase = limparTudo ? "APAGAR HISTORICO" : `APAGAR DIA ${data}`;
+  const escopo = limparTudo ? "TODO O HISTÓRICO DE MOVIMENTAÇÕES OK/S/E" : `AS MOVIMENTAÇÕES DO DIA ${data.split("-").reverse().join("/")}`;
+  if (!confirm(`ATENÇÃO: esta ação excluirá ${escopo}.\n\nVendas arquivadas e dados de estoque serão preservados. As exclusões ficarão registradas na auditoria.`)) return;
+  const digitado = prompt(`Para confirmar, digite exatamente:\n${frase}`);
+  if (digitado === null) return;
+  if (digitado.trim().toUpperCase() !== frase) { alert("Confirmação incorreta. Nada foi apagado."); return; }
+  try {
+    const resposta = await requisicaoAPI("/api/historico/limpar", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({data:limparTudo ? "TODOS" : data,confirmacao:frase})
+    });
+    await atualizarDepoisDeAlterarHistorico(limparTudo ? "" : data);
+    alert(`${Number(resposta.excluidos || 0)} movimentação(ões) removida(s). Vendas e estoque foram preservados.`);
+  } catch (erro) { alert("Não foi possível limpar o histórico: " + erro.message); }
 }
 
 function axionHistChave(item){return [item.loja,item.ref,item.cor,item.tamanho].map(x=>String(x??'').trim().toUpperCase()).join('|');}
@@ -2872,12 +2934,20 @@ function renderizarHistorico() {
       }
     });
     const acao = linha.insertCell();
-    const botao = document.createElement("button");
-    botao.type = "button";
-    botao.className = "secondary";
-    botao.textContent = "✎ Editar";
-    botao.addEventListener("click", () => editarMovimentoHistorico(item));
-    acao.appendChild(botao);
+    const grupoAcoes = document.createElement("div");
+    grupoAcoes.className = "hist-acoes";
+    const botaoEditar = document.createElement("button");
+    botaoEditar.type = "button";
+    botaoEditar.className = "secondary";
+    botaoEditar.textContent = "✎ Editar";
+    botaoEditar.addEventListener("click", () => editarMovimentoHistorico(item));
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.type = "button";
+    botaoExcluir.className = "hist-btn-excluir";
+    botaoExcluir.textContent = "🗑 Excluir";
+    botaoExcluir.addEventListener("click", () => excluirMovimentoHistorico(item));
+    grupoAcoes.append(botaoEditar, botaoExcluir);
+    acao.appendChild(grupoAcoes);
   }
 
   $("hist-estado").textContent =
@@ -2941,6 +3011,11 @@ $("hist-atualizar").addEventListener(
   "click",
   () => carregarHistorico(true)
 );
+$("hist-limpar-dia").addEventListener("click", () => {
+  if (historicoDiaSelecionado) limparHistorico(historicoDiaSelecionado);
+});
+
+$("hist-limpar-tudo").addEventListener("click", () => limparHistorico(""));
 
 $("atualizarAtividade").addEventListener(
   "click",
