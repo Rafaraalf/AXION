@@ -1133,6 +1133,73 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
   }
 }
 
+
+
+/* AXION 3.12 | Seleção múltipla no abastecimento */
+#page-abastecimento .abast-selecao-toolbar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  margin:0 0 14px;padding:11px 13px;
+  border:1px solid #30475f;border-radius:11px;background:#101c2e;
+}
+#page-abastecimento .abast-selecionar-visiveis{
+  display:inline-flex;align-items:center;gap:8px;
+  color:#dce9f5;font-size:12px;cursor:pointer;white-space:nowrap;
+}
+#page-abastecimento .abast-selecionar-visiveis input,
+#page-abastecimento .abast-check-item{
+  width:16px;height:16px;margin:0;accent-color:#38bdf8;cursor:pointer;
+}
+#page-abastecimento .abast-contador-selecao{
+  color:#9fb2c7;font-size:12px;white-space:nowrap;
+}
+#page-abastecimento .abast-acoes-lote{
+  display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;
+}
+#page-abastecimento .abast-acoes-lote button{
+  min-height:36px;padding:8px 11px;font-size:11px;
+}
+#page-abastecimento .abast-acoes-lote button:disabled{
+  opacity:.38;cursor:not-allowed;filter:none;transform:none;
+}
+#page-abastecimento .abast-celula-selecao{
+  text-align:center!important;vertical-align:middle!important;
+}
+#page-abastecimento .abast-celula-selecao input{display:inline-block}
+@media(min-width:1101px){
+  #page-abastecimento .data-table th:nth-child(1),
+  #page-abastecimento .data-table td:nth-child(1){width:4.3%}
+  #page-abastecimento .data-table th:nth-child(2),
+  #page-abastecimento .data-table td:nth-child(2){width:7.5%}
+  #page-abastecimento .data-table th:nth-child(3),
+  #page-abastecimento .data-table td:nth-child(3){width:13%}
+  #page-abastecimento .data-table th:nth-child(4),
+  #page-abastecimento .data-table td:nth-child(4){width:7.5%}
+  #page-abastecimento .data-table th:nth-child(5),
+  #page-abastecimento .data-table td:nth-child(5){width:11%}
+  #page-abastecimento .data-table th:nth-child(6),
+  #page-abastecimento .data-table td:nth-child(6){width:4.5%}
+  #page-abastecimento .data-table th:nth-child(7),
+  #page-abastecimento .data-table td:nth-child(7){width:9%}
+  #page-abastecimento .data-table th:nth-child(8),
+  #page-abastecimento .data-table td:nth-child(8){width:12%}
+  #page-abastecimento .data-table th:nth-child(9),
+  #page-abastecimento .data-table td:nth-child(9){width:4.5%}
+  #page-abastecimento .data-table th:nth-child(10),
+  #page-abastecimento .data-table td:nth-child(10){width:4.5%}
+  #page-abastecimento .data-table th:nth-child(11),
+  #page-abastecimento .data-table td:nth-child(11){width:16.2%}
+  #page-abastecimento .data-table th:nth-child(12),
+  #page-abastecimento .data-table td:nth-child(12){width:6%}
+}
+@media(max-width:760px){
+  #page-abastecimento .abast-selecao-toolbar{align-items:stretch;gap:10px}
+  #page-abastecimento .abast-acoes-lote{display:grid;grid-template-columns:1fr 1fr;width:100%;margin:0}
+  #page-abastecimento .abast-acoes-lote button{white-space:normal;min-height:42px}
+  #page-abastecimento .data-table tbody td:nth-child(12){grid-column:1/-1}
+  #page-abastecimento .data-table tbody td:nth-child(12)::before{content:'Selecionar'}
+  #page-abastecimento .data-table tbody td:nth-child(12) input{width:19px;height:19px}
+}
+
 </style>
 </head>
 
@@ -1344,6 +1411,18 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
             </button>
           </div>
 
+          <div class="abast-selecao-toolbar">
+            <label class="abast-selecionar-visiveis">
+              <input type="checkbox" id="abast-selecionar-visiveis">
+              <span>Selecionar produtos visíveis</span>
+            </label>
+            <span id="abast-contador-selecao" class="abast-contador-selecao">0 selecionado(s)</span>
+            <div class="abast-acoes-lote">
+              <button type="button" id="abast-lote-ok" class="btn-ok" disabled>✓ Marcar selecionados como OK</button>
+              <button type="button" id="abast-lote-se" class="btn-se" disabled>Marcar selecionados como S/E</button>
+            </div>
+          </div>
+
           <div id="resultadoCatalogo" class="feedback hidden" role="status" aria-live="polite"></div>
 
           <div
@@ -1376,12 +1455,13 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
                   <th>Saldo*</th>
                   <th>Pendente</th>
                   <th>Ações</th>
+                  <th>Selecionar</th>
                 </tr>
               </thead>
 
               <tbody id="listaPendentes">
                 <tr>
-                  <td colspan="11">Carregando...</td>
+                  <td colspan="12">Carregando...</td>
                 </tr>
               </tbody>
 
@@ -1695,6 +1775,7 @@ async function axionRestaurarSessao() {
 
 let pendentesCache = [];
 let pendentesCarregados = false;
+const pendentesSelecionados = new Set();
 
 let movimentoAtual = null;
 let enviandoMovimento = false;
@@ -2218,6 +2299,177 @@ function posicoesDoItem(item) {
   ].map(x => String(x ?? "").trim()).filter(Boolean))];
 }
 
+
+// =====================================================
+// SELEÇÃO MÚLTIPLA E ABASTECIMENTO EM LOTE
+// =====================================================
+
+function chavePendente(item) {
+  return JSON.stringify([
+    String(item.loja ?? ""),
+    String(item.ref ?? ""),
+    String(item.cor ?? ""),
+    String(item.tamanho ?? "")
+  ]);
+}
+
+function itensSelecionadosPendentes() {
+  const chaves = pendentesSelecionados;
+  return pendentesCache.filter(item => chaves.has(chavePendente(item)));
+}
+
+function atualizarControlesSelecaoPendentes(filtrados = null) {
+  const selecionados = itensSelecionadosPendentes();
+  const quantidade = selecionados.length;
+  const contador = $("abast-contador-selecao");
+  const botaoOK = $("abast-lote-ok");
+  const botaoSE = $("abast-lote-se");
+  const selecionarVisiveis = $("abast-selecionar-visiveis");
+
+  if (contador) contador.textContent = `${quantidade} selecionado(s)`;
+  if (botaoOK) botaoOK.disabled = enviandoMovimento || quantidade === 0;
+  if (botaoSE) botaoSE.disabled = enviandoMovimento || quantidade === 0;
+
+  if (selecionarVisiveis && filtrados) {
+    const visiveis = filtrados.map(chavePendente);
+    const marcados = visiveis.filter(chave => pendentesSelecionados.has(chave)).length;
+    selecionarVisiveis.checked = visiveis.length > 0 && marcados === visiveis.length;
+    selecionarVisiveis.indeterminate = marcados > 0 && marcados < visiveis.length;
+    selecionarVisiveis.disabled = enviandoMovimento || visiveis.length === 0;
+  }
+}
+
+function selecionarPendentesVisiveis(marcar) {
+  const busca = $("buscaPendentes").value.trim().toLowerCase();
+  const visiveis = pendentesCache.filter(item => {
+    const campos = [
+      item.loja, item.marca, item.descricao, item.ref,
+      item.cor, item.tamanho, ...eansDoItem(item), ...posicoesDoItem(item)
+    ];
+    return campos.some(valor => String(valor ?? "").toLowerCase().includes(busca));
+  });
+
+  for (const item of visiveis) {
+    const chave = chavePendente(item);
+    if (marcar) pendentesSelecionados.add(chave);
+    else pendentesSelecionados.delete(chave);
+  }
+  renderizarPendentes();
+}
+
+async function registrarPendentesEmLote(tipo) {
+  if (enviandoMovimento || movimentoAtual) return;
+
+  const selecionados = itensSelecionadosPendentes();
+  if (!selecionados.length) {
+    mostrarFeedback("Selecione pelo menos um produto.", "error");
+    return;
+  }
+
+  const unidades = selecionados.reduce(
+    (total, item) => total + (Number(item.quantidade) || 0), 0
+  );
+
+  const confirmacao = tipo === "OK"
+    ? `Registrar como OK ${selecionados.length} produto(s), totalizando ${unidades} unidade(s)?`
+    : `Registrar como S/E ${selecionados.length} produto(s), totalizando ${unidades} unidade(s)?`;
+
+  if (!window.confirm(confirmacao + "\n\nCada produto será registrado com sua quantidade pendente integral.")) {
+    return;
+  }
+
+  enviandoMovimento = true;
+  renderizarPendentes();
+  const token = tokenSessao;
+  const concluidos = [];
+  const falhas = [];
+
+  const botaoLoteOK = $("abast-lote-ok");
+  const botaoLoteSE = $("abast-lote-se");
+  if (botaoLoteOK) botaoLoteOK.textContent = "Registrando...";
+  if (botaoLoteSE) botaoLoteSE.textContent = "Aguarde...";
+
+  try {
+    for (let indice = 0; indice < selecionados.length; indice++) {
+      if (token !== tokenSessao) return;
+
+      const item = selecionados[indice];
+      const quantidade = Number(item.quantidade);
+      const descricao = item.descricao || item.ref || "Produto";
+
+      if (!Number.isSafeInteger(quantidade) || quantidade < 1) {
+        falhas.push(`${descricao}: quantidade pendente inválida`);
+        continue;
+      }
+
+      const movimento = {
+        id_movimento: crypto.randomUUID().replaceAll("-", ""),
+        loja: String(item.loja),
+        ref: String(item.ref),
+        cor: String(item.cor ?? ""),
+        tamanho: String(item.tamanho ?? ""),
+        ean: eansDoItem(item)[0] || "",
+        tipo,
+        quantidade,
+        observacao: "Registrado em lote pelo AXION Web"
+      };
+
+      try {
+        await requisicaoAPI("/api/abastecer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ movimento })
+        });
+        concluidos.push(item);
+        mostrarFeedback(
+          `Processando ${indice + 1} de ${selecionados.length}: ${descricao}`,
+          ""
+        );
+      } catch (erro) {
+        falhas.push(`${descricao} (REF ${item.ref}): ${erro.message}`);
+      }
+    }
+
+    if (token !== tokenSessao) return;
+
+    for (const item of concluidos) {
+      pendentesSelecionados.delete(chavePendente(item));
+    }
+
+    historicoCarregado = false;
+    await Promise.allSettled([
+      carregarPendentes(),
+      carregarDashboard(),
+      carregarAtividadeRecente(true)
+    ]);
+
+    if (falhas.length) {
+      const resumoFalhas = falhas.slice(0, 5).join(" | ");
+      mostrarFeedback(
+        `${tipo}: ${concluidos.length} produto(s) registrado(s). ` +
+        `${falhas.length} falha(s): ${resumoFalhas}` +
+        (falhas.length > 5 ? ` | e mais ${falhas.length - 5}.` : ""),
+        "error"
+      );
+    } else {
+      mostrarFeedback(
+        `${tipo} registrado com sucesso para ${concluidos.length} produto(s), ` +
+        totalUnidadesLote(concluidos).toLocaleString("pt-BR") + " unidade(s).",
+        "success"
+      );
+    }
+  } finally {
+    enviandoMovimento = false;
+    if (botaoLoteOK) botaoLoteOK.textContent = "✓ Marcar selecionados como OK";
+    if (botaoLoteSE) botaoLoteSE.textContent = "Marcar selecionados como S/E";
+    renderizarPendentes();
+  }
+}
+
+function totalUnidadesLote(itens) {
+  return itens.reduce((total, item) => total + (Number(item.quantidade) || 0), 0);
+}
+
 // =====================================================
 // LISTA DE ABASTECIMENTO
 // =====================================================
@@ -2251,7 +2503,7 @@ function renderizarPendentes() {
     const linha = corpo.insertRow();
     const celula = linha.insertCell();
 
-    celula.colSpan = 11;
+    celula.colSpan = 12;
     celula.textContent = busca
       ? "Nenhum produto encontrado."
       : "Nenhum abastecimento pendente.";
@@ -2380,7 +2632,29 @@ function renderizarPendentes() {
 
     acoes.append(botaoOK, botaoSE);
     celulaAcoes.appendChild(acoes);
+
+    // SELEÇÃO PARA OPERAÇÕES EM LOTE
+    const celulaSelecao = linha.insertCell();
+    celulaSelecao.className = "abast-celula-selecao";
+    const checkSelecao = document.createElement("input");
+    checkSelecao.type = "checkbox";
+    checkSelecao.className = "abast-check-item";
+    checkSelecao.checked = pendentesSelecionados.has(chavePendente(item));
+    checkSelecao.disabled = enviandoMovimento;
+    checkSelecao.setAttribute(
+      "aria-label",
+      `Selecionar ${item.descricao || item.ref || "produto"}`
+    );
+    checkSelecao.addEventListener("change", () => {
+      const chave = chavePendente(item);
+      if (checkSelecao.checked) pendentesSelecionados.add(chave);
+      else pendentesSelecionados.delete(chave);
+      atualizarControlesSelecaoPendentes(filtrados);
+    });
+    celulaSelecao.appendChild(checkSelecao);
   }
+
+  atualizarControlesSelecaoPendentes(filtrados);
 
   const unidades = filtrados.reduce(
     (total, item) =>
@@ -3129,6 +3403,20 @@ $("atualizarAtividade").addEventListener(
 // =====================================================
 // EVENTOS DO ABASTECIMENTO
 // =====================================================
+
+$("abast-selecionar-visiveis").addEventListener("change", event => {
+  selecionarPendentesVisiveis(event.target.checked);
+});
+
+$("abast-lote-ok").addEventListener("click", () => {
+  registrarPendentesEmLote("OK");
+});
+
+$("abast-lote-se").addEventListener("click", () => {
+  registrarPendentesEmLote("S/E");
+});
+
+
 
 $("formAbastecimento").addEventListener(
   "submit",
