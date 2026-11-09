@@ -596,9 +596,6 @@ button:disabled { opacity:.55;cursor:wait; }
 .est-painel-grade button.ativo{border-color:var(--accent);color:#fff}
 @media(max-width:760px){#est-filtros-mobile{display:block}.est-painel-grade{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Estoque v1.6 */
-#est-arquivo{max-width:100%;min-width:200px;color:var(--text);padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}
-#est-versoes{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-#est-versoes button{border:1px solid var(--border);border-radius:8px;background:#16324a;color:var(--accent);padding:10px}
 
 
 /* AXION Web v1.8 - cartões responsivos para celular */
@@ -716,7 +713,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 @media (hover:hover) and (min-width:761px) {
   .stat:hover { border-color:#3b607e; transform:translateY(-2px); }
 }
-#est-versoes button:hover { border-color:var(--accent); }
 @keyframes axionPageIn {
   from { opacity:0; transform:translateY(8px); }
   to { opacity:1; transform:translateY(0); }
@@ -872,8 +868,6 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
  .est-filtro-opcoes{max-height:240px;overflow:auto}
  .est-filtro-opcoes label{border-radius:7px;cursor:pointer}
  .est-filtro-opcoes label:hover{background:#25445d}
- #est-versoes button{margin:5px;padding:10px 12px;border-radius:9px;border:1px solid #31536e;background:#1a364e;color:#c2eaff;cursor:pointer}
- #est-versoes button:hover{background:#28506b}
  @media(max-width:680px){#page-estoque .panel{padding:15px}#page-estoque .toolbar button{flex:1 1 auto}#page-estoque .ax-file-picker{flex-basis:100%}}
 
 /* AXION 3.5 | carregamento discreto, sem bloquear a interface */
@@ -1295,7 +1289,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v3.9</span>
+      <span>AXION WEB · v4.0 D1</span>
     </header>
 
     <div class="content">
@@ -1478,7 +1472,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
       <!-- ESTOQUE V1.6 -->
       <section class="page" id="page-estoque">
-        <div class="heading"><h1>Estoque e backups</h1><p>Consulte produtos e mantenha cópias de segurança independentes do Google Sheets.</p></div>
+        <div class="heading"><h1>Estoque</h1><p>Consulta das posições físicas armazenadas no banco D1. O layout do mapa continua salvo separadamente no R2.</p></div>
         <div class="stats" style="margin-bottom:20px">
           <div class="stat"><div class="label">Linhas cadastradas</div><div class="value blue" id="est-linhas">—</div></div>
           <div class="stat"><div class="label">Produtos</div><div class="value" id="est-produtos">—</div></div>
@@ -1486,15 +1480,9 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <div class="stat"><div class="label">Posições</div><div class="value orange" id="est-posicoes">—</div></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
-          <h2>Importar cadastro</h2>
-          <p class="status-line">Exporte a aba DADOS/POSIÇÕES como CSV e selecione o arquivo. O upload substitui apenas a cópia do AXION e preserva versões anteriores.</p>
-          <div class="toolbar">
-            <label class="ax-file-picker" for="est-arquivo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 16v4h16v-4"/></svg><span id="est-arquivo-nome">Selecionar arquivo CSV</span></label>
-            <input id="est-arquivo" class="ax-file-hidden" type="file" accept=".csv,text/csv" aria-label="Selecionar CSV de estoque">
-            <button class="primary" id="est-enviar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 16v4h16v-4"/></svg><span>Importar cadastro</span></button>
-            <button class="secondary" id="est-baixar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13m0 0 5-5m-5 5-5-5M4 17v4h16v-4"/></svg><span>Baixar backup</span></button>
-          </div>
-          <p class="status-line" id="est-atualizacao">Nenhum backup consultado.</p>
+          <h2>Base de estoque</h2>
+          <p class="status-line">Fonte: D1 · Tabela posicoes_estoque. Atualização inicial feita a partir da aba DADOSPOSIÇÕES do arquivo de implantação. Os backups de estoque no R2 foram desativados; o R2 permanece ativo para o layout do mapa.</p>
+          <p class="status-line" id="est-atualizacao">Consultando base D1...</p>
           <div class="feedback hidden" id="est-mensagem" role="status"></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
@@ -1520,8 +1508,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <div class="toolbar est-actions-row"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
           <p class="status-line est-count-row" id="est-resultados">Carregando...</p>
           <div class="table-wrap est-table-wrap"><table class="data-table est-stock-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
-        </div>
-        <div class="panel"><h2>Histórico de backups</h2><p class="status-line">As três versões mais recentes ficam disponíveis para download e recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
+        </div></div>
       </section>
 <!-- HISTÓRICO -->
 
@@ -1663,17 +1650,27 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <p>Informações do sistema.</p>
         </div>
 
+        <div class="panel" style="margin-bottom:20px">
+          <h2>Lojas autorizadas a descontar estoque</h2>
+          <p class="status-line">Somente as lojas marcadas poderão registrar abastecimentos que geram desconto. A validação também acontece no Worker, então não depende apenas desta tela.</p>
+          <div id="cfg-desconto-lojas" style="display:grid;gap:12px;margin:18px 0">
+            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="66" checked> Loja 66</label>
+            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="67"> Loja 67</label>
+            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="68"> Loja 68</label>
+          </div>
+          <div class="toolbar"><button class="primary" id="cfg-salvar-desconto" type="button">Salvar permissões</button></div>
+          <div class="feedback hidden" id="cfg-desconto-msg" role="status"></div>
+        </div>
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 1.9</p>
-
+          <p>Versão da interface: 4.0 · D1</p>
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
             Interface: GitHub Pages<br>
-            Dados: Google Sheets<br>
+            Catálogo e posições: Cloudflare D1<br>
+            Layout do mapa: Cloudflare R2<br>
             Abastecimento: OK / S/E<br>
-            Histórico: Ativo<br>
-            Atividade recente: Ativa
+            Histórico: Ativo
           </p>
         </div>
 
@@ -1933,10 +1930,6 @@ function abrirFiltroEstoque(col,botao){
 document.addEventListener('click',e=>{if(estPopup&&!estPopup.contains(e.target)&&!e.target.closest('[data-est-botao], [data-mobile-col]'))fecharFiltroEstoque();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharFiltroEstoque();});
 $('est-limpar-filtros').addEventListener('click',()=>{for(const k of Object.keys(estFiltros))delete estFiltros[k];estOrdem={coluna:null,direcao:1};fecharFiltroEstoque();renderizarEstoque();});
-$('est-arquivo').addEventListener('change',()=>{
- const f=$('est-arquivo').files?.[0];
- $('est-arquivo-nome').textContent=f?f.name:'Selecionar arquivo CSV';
-});
 iniciarCabecalhosEstoque();
 async function carregarEstoque(){
  if(!tokenSessao||estoqueOcupado)return;
@@ -1949,24 +1942,9 @@ async function carregarEstoque(){
   $('est-eans').textContent=(d.eans||0).toLocaleString('pt-BR');
   $('est-posicoes').textContent=(d.posicoes||0).toLocaleString('pt-BR');
   $('est-atualizacao').textContent=d.existe?'Última atualização: '+formatarEstoqueData(d.atualizadoEm):'Nenhum arquivo importado. Faça o primeiro upload.';
-  renderizarEstoque();await carregarVersoesEstoque();
+  renderizarEstoque();
  }catch(e){estoqueMensagem('Erro ao consultar estoque: '+e.message,true);}
  finally{estoqueOcupado=false;$('est-recarregar').disabled=false;}
-}
-async function baixarEstoque(versao='atual'){
- try{
-  const resposta=await fetch(API+'/api/estoque/backup?versao='+encodeURIComponent(versao),{headers:{Authorization:'Bearer '+tokenSessao},cache:'no-store'});
-  if(!resposta.ok){const erro=await resposta.json().catch(()=>({}));throw new Error(erro.erro||'Download indisponível');}
-  const blob=await resposta.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=versao==='atual'?'AXION_estoque_atual.csv':versao;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
- }catch(e){estoqueMensagem('Erro no download: '+e.message,true);}
-}
-async function carregarVersoesEstoque(){
- const destino=$('est-versoes');destino.replaceChildren();
- try{
-  const d=await requisicaoAPI('/api/estoque/backups');
-  if(!d.versoes?.length){destino.textContent='Nenhum backup salvo.';return;}
-  for(const v of d.versoes){const b=document.createElement('button');b.type='button';b.textContent='↓ '+formatarEstoqueData(v.data)+' · '+Math.ceil(v.bytes/1024)+' KB';b.addEventListener('click',()=>baixarEstoque(v.id));destino.appendChild(b);}
- }catch(e){destino.textContent='Não foi possível listar versões: '+e.message;}
 }
 $('est-recarregar').addEventListener('click',carregarEstoque);
 $('est-catalogo-buscar').addEventListener('click',consultarCatalogoEstoque);
@@ -1979,19 +1957,30 @@ $('est-catalogo-limpar').addEventListener('click',()=>{
  const box=$('est-catalogo-resultado');box.replaceChildren();box.className='feedback hidden';
  $('est-catalogo-codigo').focus();
 });
-$('est-baixar').addEventListener('click',()=>baixarEstoque());
-$('est-enviar').addEventListener('click',async()=>{
- const arquivo=$('est-arquivo').files[0];if(!arquivo){estoqueMensagem('Selecione um arquivo CSV.',true);return;}
- if(arquivo.size>3*1024*1024){estoqueMensagem('O CSV deve ter até 3 MB.',true);return;}
- if(!confirm('Importar '+arquivo.name+'? A cópia atual será substituída e o backup anterior ficará disponível.'))return;
- const botao=$('est-enviar');botao.disabled=true;
- try{
-  const texto=await arquivo.text();
-  const d=await requisicaoAPI('/api/estoque/importar',{method:'POST',headers:{'Content-Type':'text/csv; charset=utf-8'},body:texto});
-  estoqueMensagem('Backup salvo com sucesso! '+d.total+' registros importados.');
-  $('est-arquivo').value='';await carregarEstoque();
- }catch(e){estoqueMensagem('Importação não concluída: '+e.message,true);}
- finally{botao.disabled=false;}
+
+
+
+// CONFIGURAÇÃO DE PERMISSÕES DE DESCONTO
+async function carregarConfigDesconto(){
+  const box=$("cfg-desconto-lojas");
+  if(!box || !tokenSessao) return;
+  try{
+    const d=await requisicaoAPI("/api/config/desconto");
+    box.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=(d.lojas||["66"]).includes(c.value));
+  }catch(e){
+    const msg=$("cfg-desconto-msg");msg.textContent="Falha ao carregar permissões: "+e.message;msg.className="feedback error";
+  }
+}
+$("cfg-salvar-desconto").addEventListener("click",async()=>{
+  const botao=$("cfg-salvar-desconto"),msg=$("cfg-desconto-msg");
+  const lojas=[...$("cfg-desconto-lojas").querySelectorAll('input:checked')].map(x=>x.value);
+  if(!lojas.length){msg.textContent="Selecione pelo menos uma loja autorizada.";msg.className="feedback error";return;}
+  botao.disabled=true;
+  try{
+    const d=await requisicaoAPI("/api/config/desconto",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({lojas})});
+    msg.textContent="Permissões salvas. Lojas autorizadas: "+d.lojas.join(", ");msg.className="feedback success";
+  }catch(e){msg.textContent="Não foi possível salvar: "+e.message;msg.className="feedback error";}
+  finally{botao.disabled=false;}
 });
 
 // =====================================================
@@ -3493,6 +3482,9 @@ document.querySelectorAll("[data-page]").forEach(botao => {
 
     if (pagina === "dashboard") {
       carregarAtividadeRecente();
+    }
+    if (pagina === "configuracoes") {
+      carregarConfigDesconto();
     }
   });
 });
