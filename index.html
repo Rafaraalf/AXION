@@ -1825,7 +1825,7 @@ body { overflow-x:hidden; }
 <script>
 
 // =====================================================
-// AXION WEB v1.5
+// AXION WEB v1.6 · D1
 // =====================================================
 
 const API = "https://axion-api.rafa-losneto.workers.dev";
@@ -2545,6 +2545,7 @@ function posicoesDoItem(item) {
 function chavePendente(item) {
   return JSON.stringify([
     String(item.loja ?? ""),
+    String(item.marca ?? ""),
     String(item.ref ?? ""),
     String(item.cor ?? ""),
     String(item.tamanho ?? "")
@@ -2643,6 +2644,7 @@ async function registrarPendentesEmLote(tipo) {
       const movimento = {
         id_movimento: crypto.randomUUID().replaceAll("-", ""),
         loja: String(item.loja),
+        marca: String(item.marca ?? ""),
         ref: String(item.ref),
         cor: String(item.cor ?? ""),
         tamanho: String(item.tamanho ?? ""),
@@ -3047,6 +3049,7 @@ async function confirmarMovimento(evento) {
   const movimento = {
     id_movimento: atual.id,
     loja: String(atual.item.loja),
+    marca: String(atual.item.marca ?? ""),
     ref: String(atual.item.ref),
     cor: String(atual.item.cor ?? ""),
     tamanho: String(atual.item.tamanho ?? ""),
