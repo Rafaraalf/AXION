@@ -2808,7 +2808,7 @@ function renderizarPendentes() {
       }
 
     } else {
-      celulaPosicao.textContent = "Não localizado";
+      celulaPosicao.textContent = "SEM POSIÇÃO CADASTRADA";
       celulaPosicao.className = "not-found";
     }
 
@@ -2915,7 +2915,7 @@ async function carregarPendentes() {
   if (!token) return;
 
   $("estadoPendentes").textContent =
-    "Consultando pendências no Google Sheets...";
+    "Consultando abastecimento no D1...";
 
   $("atualizarPendentes").disabled = true;
 
@@ -2940,7 +2940,7 @@ async function carregarPendentes() {
       "Erro ao carregar pendências: " + erro.message;
 
     $("resumoPendentes").textContent =
-      "Não foi possível consultar as pendências.";
+      "Não foi possível consultar o abastecimento no D1.";
 
   } finally {
     if (token === tokenSessao) {
