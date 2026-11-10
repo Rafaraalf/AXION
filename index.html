@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -596,9 +595,6 @@ button:disabled { opacity:.55;cursor:wait; }
 .est-painel-grade button.ativo{border-color:var(--accent);color:#fff}
 @media(max-width:760px){#est-filtros-mobile{display:block}.est-painel-grade{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Estoque v1.6 */
-#est-arquivo{max-width:100%;min-width:200px;color:var(--text);padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg)}
-#est-versoes{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-#est-versoes button{border:1px solid var(--border);border-radius:8px;background:#16324a;color:var(--accent);padding:10px}
 
 
 /* AXION Web v1.8 - cartões responsivos para celular */
@@ -716,7 +712,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 @media (hover:hover) and (min-width:761px) {
   .stat:hover { border-color:#3b607e; transform:translateY(-2px); }
 }
-#est-versoes button:hover { border-color:var(--accent); }
 @keyframes axionPageIn {
   from { opacity:0; transform:translateY(8px); }
   to { opacity:1; transform:translateY(0); }
@@ -739,12 +734,25 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 }
 
 
-/* Histórico: botão de edição visível também nos cartões mobile */
+/* Histórico: edição, exclusão e limpeza com confirmação */
+.hist-cabecalho{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hist-cabecalho h2{margin-bottom:8px}
+.hist-cabecalho .status-line{margin-bottom:0}
+.hist-btn-perigo{border:1px solid #7f343b;border-radius:9px;background:#401d28;color:#fecaca;padding:11px 14px;font-weight:700;white-space:nowrap}
+.hist-btn-perigo:hover{background:#57232e;border-color:#f87171}
+.hist-acoes{display:flex;gap:7px;align-items:center}
+.hist-acoes button{min-height:36px;padding:8px 11px}
+.hist-btn-excluir{border:1px solid #71343b;border-radius:8px;background:#351d27;color:#fecaca}
+#hist-limpar-dia{margin-left:auto}
 #page-historico .data-table td:last-child button { min-height:38px; white-space:nowrap; }
 @media(max-width:760px){
   #page-historico .data-table tbody td:nth-child(13){grid-column:1/-1}
   #page-historico .data-table tbody td:nth-child(13)::before{content:'Ações'}
   #page-historico .data-table tbody td:nth-child(13) button{width:100%}
+  .hist-cabecalho{align-items:stretch}
+  .hist-btn-perigo{width:100%;white-space:normal}
+  .hist-acoes{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  #hist-limpar-dia{margin-left:0}
 }
 
 
@@ -859,8 +867,6 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
  .est-filtro-opcoes{max-height:240px;overflow:auto}
  .est-filtro-opcoes label{border-radius:7px;cursor:pointer}
  .est-filtro-opcoes label:hover{background:#25445d}
- #est-versoes button{margin:5px;padding:10px 12px;border-radius:9px;border:1px solid #31536e;background:#1a364e;color:#c2eaff;cursor:pointer}
- #est-versoes button:hover{background:#28506b}
  @media(max-width:680px){#page-estoque .panel{padding:15px}#page-estoque .toolbar button{flex:1 1 auto}#page-estoque .ax-file-picker{flex-basis:100%}}
 
 /* AXION 3.5 | carregamento discreto, sem bloquear a interface */
@@ -967,6 +973,226 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
  #page-estoque .est-header-row .toolbar{margin-left:0}
  #page-estoque #est-filtros-mobile{display:inline-flex!important}
 }
+
+
+/* AXION 3.10 | Busca de catálogo DADOS USE na tela Consultar estoque */
+#page-estoque .est-catalogo-search{
+  margin:0 0 18px;padding:17px;border:1px solid #31536e;border-radius:13px;
+  background:linear-gradient(135deg,#142b42,#132238);display:grid;gap:12px;min-width:0
+}
+#page-estoque .est-catalogo-copy{display:grid;gap:4px}
+#page-estoque .est-catalogo-copy strong{font-size:14px;color:#e7f5ff}
+#page-estoque .est-catalogo-copy span{font-size:12px;color:#a9bdd0;line-height:1.5}
+#page-estoque .est-catalogo-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0}
+#page-estoque #est-catalogo-codigo{
+  flex:1 1 320px;min-width:190px;min-height:44px;padding:11px 14px;
+  border:1px solid #3a5873;border-radius:10px;background:#0b1828;color:#f1f7ff;
+  outline:none;font:inherit;font-size:14px
+}
+#page-estoque #est-catalogo-codigo:focus{border-color:#42c5f5;box-shadow:0 0 0 3px #42c5f522}
+#page-estoque #est-catalogo-loja{
+  flex:0 1 155px;min-width:135px;min-height:44px;padding:10px 12px;
+  border:1px solid #3a5873;border-radius:10px;background:#0b1828;color:#e5f3ff;font:inherit
+}
+#page-estoque .est-catalogo-controls button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+#page-estoque .est-catalogo-controls button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.est-catalogo-result{margin:0;padding:15px;background:#102b27;border:1px solid #28634f;color:#d5f8e8;min-width:0}
+.est-catalogo-result.error{background:#451a1a;border-color:#793434;color:#fecaca}
+.est-cat-result-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.est-cat-result-title{font-size:15px;font-weight:750;color:#effff7}
+.est-cat-result-code{font-size:12px;color:#b9dfd0;overflow-wrap:anywhere}
+.est-cat-result-meta{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 12px}
+.est-cat-chip{display:inline-flex;align-items:center;padding:5px 9px;border-radius:7px;background:#174237;border:1px solid #2c735b;color:#d9fff0;font-size:11px;overflow-wrap:anywhere}
+.est-cat-locations-title{font-size:12px;font-weight:700;color:#dcfff1;margin:10px 0 8px}
+.est-cat-location-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:9px}
+.est-cat-location{padding:11px;border:1px solid #326451;border-radius:10px;background:#102a25;min-width:0}
+.est-cat-location-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.est-cat-location-top strong{font-size:12px;color:#eafff4}
+.est-cat-position{padding:4px 8px;border-radius:7px;background:#164a3c;color:#a7f3d0;font-size:12px;font-weight:800;white-space:nowrap}
+.est-cat-location-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 10px}
+.est-cat-field{display:grid;gap:2px;min-width:0}
+.est-cat-field small{font-size:10px;color:#9fc7b5}
+.est-cat-field span{font-size:12px;color:#e1f5eb;overflow-wrap:anywhere}
+.est-cat-empty{margin:8px 0 0;padding:10px;border-radius:8px;background:#3b2a14;color:#ffe3ad;font-size:12px}
+@media(max-width:680px){
+  #page-estoque .est-catalogo-search{padding:13px}
+  #page-estoque .est-catalogo-controls{display:grid;grid-template-columns:1fr 1fr}
+  #page-estoque #est-catalogo-codigo,#page-estoque #est-catalogo-loja{grid-column:1/-1;width:100%;min-width:0}
+  #page-estoque .est-catalogo-controls button{width:100%}
+  .est-cat-location-list{grid-template-columns:1fr}
+}
+
+
+
+/* AXION 3.11 | Abastecimento: tabela ajustada à largura disponível */
+@media (min-width:1101px) {
+  #page-abastecimento .table-wrap {
+    width:100%;
+    min-width:0;
+    overflow-x:hidden;
+    border-radius:12px;
+  }
+
+  #page-abastecimento .data-table {
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    table-layout:fixed;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:12px;
+  }
+
+  #page-abastecimento .data-table th,
+  #page-abastecimento .data-table td {
+    padding:10px 6px;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:normal;
+    vertical-align:middle;
+  }
+
+  #page-abastecimento .data-table th:nth-child(1),
+  #page-abastecimento .data-table td:nth-child(1) { width:4.5%; }
+
+  #page-abastecimento .data-table th:nth-child(2),
+  #page-abastecimento .data-table td:nth-child(2) { width:8%; }
+
+  #page-abastecimento .data-table th:nth-child(3),
+  #page-abastecimento .data-table td:nth-child(3) { width:14%; }
+
+  #page-abastecimento .data-table th:nth-child(4),
+  #page-abastecimento .data-table td:nth-child(4) { width:8%; }
+
+  #page-abastecimento .data-table th:nth-child(5),
+  #page-abastecimento .data-table td:nth-child(5) { width:12%; }
+
+  #page-abastecimento .data-table th:nth-child(6),
+  #page-abastecimento .data-table td:nth-child(6) { width:5%; }
+
+  #page-abastecimento .data-table th:nth-child(7),
+  #page-abastecimento .data-table td:nth-child(7) { width:10%; }
+
+  #page-abastecimento .data-table th:nth-child(8),
+  #page-abastecimento .data-table td:nth-child(8) { width:13%; }
+
+  #page-abastecimento .data-table th:nth-child(9),
+  #page-abastecimento .data-table td:nth-child(9) { width:5%; }
+
+  #page-abastecimento .data-table th:nth-child(10),
+  #page-abastecimento .data-table td:nth-child(10) { width:5%; }
+
+  #page-abastecimento .data-table th:nth-child(11),
+  #page-abastecimento .data-table td:nth-child(11) { width:15.5%; }
+
+  #page-abastecimento .data-table th {
+    font-size:11px;
+    line-height:1.3;
+  }
+
+  #page-abastecimento .data-table td {
+    line-height:1.4;
+  }
+
+  #page-abastecimento .data-table td:nth-child(3),
+  #page-abastecimento .data-table td:nth-child(5),
+  #page-abastecimento .data-table td:nth-child(8) {
+    overflow-wrap:anywhere;
+  }
+
+  #page-abastecimento .data-table .position-pill {
+    margin:2px 2px 2px 0;
+    padding:4px 6px;
+    font-size:10px;
+    white-space:normal;
+  }
+
+  #page-abastecimento .data-table .positions-detail {
+    font-size:10px;
+    overflow-wrap:anywhere;
+  }
+
+  #page-abastecimento .actions {
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+  }
+
+  #page-abastecimento .btn-ok,
+  #page-abastecimento .btn-se {
+    padding:8px 9px;
+    font-size:11px;
+    min-width:0;
+  }
+}
+
+
+
+/* AXION 3.12 | Seleção múltipla no abastecimento */
+#page-abastecimento .abast-selecao-toolbar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  margin:0 0 14px;padding:11px 13px;
+  border:1px solid #30475f;border-radius:11px;background:#101c2e;
+}
+#page-abastecimento .abast-selecionar-visiveis{
+  display:inline-flex;align-items:center;gap:8px;
+  color:#dce9f5;font-size:12px;cursor:pointer;white-space:nowrap;
+}
+#page-abastecimento .abast-selecionar-visiveis input,
+#page-abastecimento .abast-check-item{
+  width:16px;height:16px;margin:0;accent-color:#38bdf8;cursor:pointer;
+}
+#page-abastecimento .abast-contador-selecao{
+  color:#9fb2c7;font-size:12px;white-space:nowrap;
+}
+#page-abastecimento .abast-acoes-lote{
+  display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;
+}
+#page-abastecimento .abast-acoes-lote button{
+  min-height:36px;padding:8px 11px;font-size:11px;
+}
+#page-abastecimento .abast-acoes-lote button:disabled{
+  opacity:.38;cursor:not-allowed;filter:none;transform:none;
+}
+#page-abastecimento .abast-celula-selecao{
+  text-align:center!important;vertical-align:middle!important;
+}
+#page-abastecimento .abast-celula-selecao input{display:inline-block}
+@media(min-width:1101px){
+  #page-abastecimento .data-table th:nth-child(1),
+  #page-abastecimento .data-table td:nth-child(1){width:4.3%}
+  #page-abastecimento .data-table th:nth-child(2),
+  #page-abastecimento .data-table td:nth-child(2){width:7.5%}
+  #page-abastecimento .data-table th:nth-child(3),
+  #page-abastecimento .data-table td:nth-child(3){width:13%}
+  #page-abastecimento .data-table th:nth-child(4),
+  #page-abastecimento .data-table td:nth-child(4){width:7.5%}
+  #page-abastecimento .data-table th:nth-child(5),
+  #page-abastecimento .data-table td:nth-child(5){width:11%}
+  #page-abastecimento .data-table th:nth-child(6),
+  #page-abastecimento .data-table td:nth-child(6){width:4.5%}
+  #page-abastecimento .data-table th:nth-child(7),
+  #page-abastecimento .data-table td:nth-child(7){width:9%}
+  #page-abastecimento .data-table th:nth-child(8),
+  #page-abastecimento .data-table td:nth-child(8){width:12%}
+  #page-abastecimento .data-table th:nth-child(9),
+  #page-abastecimento .data-table td:nth-child(9){width:4.5%}
+  #page-abastecimento .data-table th:nth-child(10),
+  #page-abastecimento .data-table td:nth-child(10){width:4.5%}
+  #page-abastecimento .data-table th:nth-child(11),
+  #page-abastecimento .data-table td:nth-child(11){width:16.2%}
+  #page-abastecimento .data-table th:nth-child(12),
+  #page-abastecimento .data-table td:nth-child(12){width:6%}
+}
+@media(max-width:760px){
+  #page-abastecimento .abast-selecao-toolbar{align-items:stretch;gap:10px}
+  #page-abastecimento .abast-acoes-lote{display:grid;grid-template-columns:1fr 1fr;width:100%;margin:0}
+  #page-abastecimento .abast-acoes-lote button{white-space:normal;min-height:42px}
+  #page-abastecimento .data-table tbody td:nth-child(12){grid-column:1/-1}
+  #page-abastecimento .data-table tbody td:nth-child(12)::before{content:'Selecionar'}
+  #page-abastecimento .data-table tbody td:nth-child(12) input{width:19px;height:19px}
+}
+
 </style>
 </head>
 
@@ -1062,7 +1288,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
     <header class="topbar">
       <strong id="tituloPagina">Dashboard</strong>
-      <span>AXION WEB · v3.8</span>
+      <span>AXION WEB · v4.0 D1</span>
     </header>
 
     <div class="content">
@@ -1140,39 +1366,6 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
         </div>
 
-        <div class="panel" id="painel-use-d1" style="margin-top:18px">
-          <div class="atividade-cabecalho">
-            <div>
-              <h2>Sincronização USE · D1</h2>
-              <p class="detail">Resumo dos snapshots ativos armazenados no banco D1.</p>
-            </div>
-            <button class="secondary" type="button" id="use-atualizar">↻ Atualizar</button>
-          </div>
-          <div class="stats" style="margin-top:14px">
-            <div class="stat"><div class="label">Registros ativos</div><div class="value blue" id="use-registros">—</div></div>
-            <div class="stat"><div class="label">Quantidade total</div><div class="value green" id="use-quantidade">—</div></div>
-            <div class="stat"><div class="label">Lojas no snapshot</div><div class="value" id="use-lojas">—</div></div>
-            <div class="stat"><div class="label">Última atualização</div><div class="value" id="use-atualizado" style="font-size:16px">—</div></div>
-          </div>
-          <div id="use-status" class="empty" role="status">Aguardando consulta ao D1...</div>
-          <div style="overflow-x:auto;margin-top:12px">
-            <table style="width:100%">
-              <thead><tr><th>Data</th><th>Loja</th><th>Registros</th><th>Quantidade</th><th>Atualizado em</th></tr></thead>
-              <tbody id="use-tabela"><tr><td colspan="5">Nenhum dado carregado.</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="panel" id="painel-cloudflare" style="margin-top:18px">
-          <h2>Cloudflare · Monitoramento</h2>
-          <p class="detail">Painel reservado para consumo e custos da infraestrutura AXION.</p>
-          <div class="notice" style="margin-top:12px">
-            <strong>Integração de métricas pendente.</strong>
-            <p>O Worker atual não possui credenciais de leitura da conta Cloudflare. Para exibir consumo real, será necessário configurar um API Token somente leitura e o Account ID como secrets/variáveis no Worker. Este painel não estima nem inventa valores de cobrança.</p>
-          </div>
-          <div id="cloudflare-status" class="empty">Métricas reais ainda não conectadas.</div>
-        </div>
-
         <div class="notice">
           <span id="estadoDashboard">
             Conectando ao Google Sheets...
@@ -1211,6 +1404,20 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
             </button>
           </div>
 
+          <div class="abast-selecao-toolbar">
+            <label class="abast-selecionar-visiveis">
+              <input type="checkbox" id="abast-selecionar-visiveis">
+              <span>Selecionar produtos visíveis</span>
+            </label>
+            <span id="abast-contador-selecao" class="abast-contador-selecao">0 selecionado(s)</span>
+            <div class="abast-acoes-lote">
+              <button type="button" id="abast-lote-ok" class="btn-ok" disabled>✓ Marcar selecionados como OK</button>
+              <button type="button" id="abast-lote-se" class="btn-se" disabled>Marcar selecionados como S/E</button>
+            </div>
+          </div>
+
+          <div id="resultadoCatalogo" class="feedback hidden" role="status" aria-live="polite"></div>
+
           <div
             id="feedbackAbastecimento"
             class="feedback hidden"
@@ -1241,12 +1448,13 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
                   <th>Saldo*</th>
                   <th>Pendente</th>
                   <th>Ações</th>
+                  <th>Selecionar</th>
                 </tr>
               </thead>
 
               <tbody id="listaPendentes">
                 <tr>
-                  <td colspan="11">Carregando...</td>
+                  <td colspan="12">Carregando...</td>
                 </tr>
               </tbody>
 
@@ -1263,7 +1471,7 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
       <!-- ESTOQUE V1.6 -->
       <section class="page" id="page-estoque">
-        <div class="heading"><h1>Estoque e backups</h1><p>Consulte produtos e mantenha cópias de segurança independentes do Google Sheets.</p></div>
+        <div class="heading"><h1>Estoque</h1><p>Consulta das posições físicas armazenadas no banco D1. O layout do mapa continua salvo separadamente no R2.</p></div>
         <div class="stats" style="margin-bottom:20px">
           <div class="stat"><div class="label">Linhas cadastradas</div><div class="value blue" id="est-linhas">—</div></div>
           <div class="stat"><div class="label">Produtos</div><div class="value" id="est-produtos">—</div></div>
@@ -1271,24 +1479,35 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <div class="stat"><div class="label">Posições</div><div class="value orange" id="est-posicoes">—</div></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
-          <h2>Importar cadastro</h2>
-          <p class="status-line">Exporte a aba DADOS/POSIÇÕES como CSV e selecione o arquivo. O upload substitui apenas a cópia do AXION e preserva versões anteriores.</p>
-          <div class="toolbar">
-            <label class="ax-file-picker" for="est-arquivo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 16v4h16v-4"/></svg><span id="est-arquivo-nome">Selecionar arquivo CSV</span></label>
-            <input id="est-arquivo" class="ax-file-hidden" type="file" accept=".csv,text/csv" aria-label="Selecionar CSV de estoque">
-            <button class="primary" id="est-enviar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 16v4h16v-4"/></svg><span>Importar cadastro</span></button>
-            <button class="secondary" id="est-baixar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13m0 0 5-5m-5 5-5-5M4 17v4h16v-4"/></svg><span>Baixar backup</span></button>
-          </div>
-          <p class="status-line" id="est-atualizacao">Nenhum backup consultado.</p>
+          <h2>Base de estoque</h2>
+          <p class="status-line">Fonte: D1 · Tabela posicoes_estoque. Atualização inicial feita a partir da aba DADOSPOSIÇÕES do arquivo de implantação. Os backups de estoque no R2 foram desativados; o R2 permanece ativo para o layout do mapa.</p>
+          <p class="status-line" id="est-atualizacao">Consultando base D1...</p>
           <div class="feedback hidden" id="est-mensagem" role="status"></div>
         </div>
         <div class="panel" style="margin-bottom:20px">
           <div class="est-header-row"><h2>Consultar estoque</h2><div class="toolbar est-refresh-row"><button class="secondary" id="est-recarregar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar consulta</span></button></div></div>
+          <div class="est-catalogo-search" aria-label="Busca de produto no catálogo DADOS USE">
+            <div class="est-catalogo-copy">
+              <strong>Buscar por EAN ou código interno</strong>
+              <span>Bipe ou digite o código para localizar o produto no catálogo USE e consultar suas posições físicas.</span>
+            </div>
+            <div class="est-catalogo-controls">
+              <input id="est-catalogo-codigo" type="search" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="Bipe ou digite o EAN / código interno" aria-label="EAN ou código interno">
+              <select id="est-catalogo-loja" aria-label="Filtrar por loja física">
+                <option value="">Todas as lojas</option>
+                <option value="66">Loja 66</option>
+                <option value="67">Loja 67</option>
+                <option value="68">Loja 68</option>
+              </select>
+              <button class="primary" id="est-catalogo-buscar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Pesquisar</span></button>
+              <button class="secondary" id="est-catalogo-limpar" type="button">Limpar</button>
+            </div>
+            <div id="est-catalogo-resultado" class="feedback hidden" role="status" aria-live="polite"></div>
+          </div>
           <div class="toolbar est-actions-row"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
           <p class="status-line est-count-row" id="est-resultados">Carregando...</p>
           <div class="table-wrap est-table-wrap"><table class="data-table est-stock-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
-        </div>
-        <div class="panel"><h2>Histórico de backups</h2><p class="status-line">As três versões mais recentes ficam disponíveis para download e recuperação.</p><div id="est-versoes" class="status-line">Nenhuma versão encontrada.</div></div>
+        </div></div>
       </section>
 <!-- HISTÓRICO -->
 
@@ -1322,10 +1541,15 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 
         <div class="panel">
 
-          <h2>Arquivo de abastecimentos por data</h2>
-          <p class="status-line">Escolha uma pasta para ver vendas, OK, S/E e pendências daquele dia.</p>
+          <div class="hist-cabecalho">
+            <div>
+              <h2>Arquivo de abastecimentos por data</h2>
+              <p class="status-line">Escolha uma pasta para ver vendas, OK, S/E e pendências daquele dia.</p>
+            </div>
+            <button type="button" class="hist-btn-perigo" id="hist-limpar-tudo">🗑 Limpar todo o histórico</button>
+          </div>
           <div id="hist-pastas" class="hist-pastas"></div>
-          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn">← Voltar às datas</button><strong id="hist-dia-titulo"></strong></div>
+          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn">← Voltar às datas</button><strong id="hist-dia-titulo"></strong><button type="button" class="hist-btn-perigo" id="hist-limpar-dia">🗑 Limpar movimentações deste dia</button></div>
           <div class="stats" id="hist-resumo-vendas" style="margin:14px 0;display:none"><div class="stat"><div class="label">Unidades vendidas</div><div class="value blue" id="hist-vendido">0</div></div><div class="stat"><div class="label">Pendentes</div><div class="value orange" id="hist-pendente">0</div></div></div>
           <div id="hist-vendas-bloco" style="display:none"><h3>Vendas do dia</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Loja</th><th>Marca</th><th>Descrição</th><th>REF</th><th>Cor</th><th>Tamanho</th><th>Vendido</th><th>OK</th><th>S/E</th><th>Pendente</th></tr></thead><tbody id="hist-vendas-lista"></tbody></table></div><h3 style="margin:18px 0 10px">Movimentações do dia</h3></div>
           <div id="hist-detalhes" style="display:none">
@@ -1425,17 +1649,27 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
           <p>Informações do sistema.</p>
         </div>
 
+        <div class="panel" style="margin-bottom:20px">
+          <h2>Lojas autorizadas a descontar estoque</h2>
+          <p class="status-line">Somente as lojas marcadas poderão registrar abastecimentos que geram desconto. A validação também acontece no Worker, então não depende apenas desta tela.</p>
+          <div id="cfg-desconto-lojas" style="display:grid;gap:12px;margin:18px 0">
+            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="66" checked> Loja 66</label>
+            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="67"> Loja 67</label>
+            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="68"> Loja 68</label>
+          </div>
+          <div class="toolbar"><button class="primary" id="cfg-salvar-desconto" type="button">Salvar permissões</button></div>
+          <div class="feedback hidden" id="cfg-desconto-msg" role="status"></div>
+        </div>
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 1.9</p>
-
+          <p>Versão da interface: 4.0 · D1</p>
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
             Interface: GitHub Pages<br>
-            Dados: Google Sheets<br>
+            Catálogo e posições: Cloudflare D1<br>
+            Layout do mapa: Cloudflare R2<br>
             Abastecimento: OK / S/E<br>
-            Histórico: Ativo<br>
-            Atividade recente: Ativa
+            Histórico: Ativo
           </p>
         </div>
 
@@ -1518,48 +1752,6 @@ function axionSalvarSessao(token, usuario, expira) {
 function axionLimparSessao() {
   try { localStorage.removeItem(AXION_SESSAO_KEY); } catch(e) {}
 }
-// =====================================================
-// DASHBOARD USE - DADOS DO D1
-// =====================================================
-
-function formatarDataAxion(valor) {
-  if (!valor) return "—";
-  const data = new Date(valor);
-  return Number.isNaN(data.getTime()) ? String(valor) : data.toLocaleString("pt-BR");
-}
-
-async function carregarUseDashboard() {
-  const status = $("use-status");
-  if (!status) return;
-  status.textContent = "Consultando snapshots USE no D1...";
-  try {
-    const resposta = await requisicaoAPI("/api/use/dashboard");
-    if (!resposta || resposta.ok !== true) throw new Error(resposta?.erro || "Resposta inválida do D1");
-
-    $("use-registros").textContent = Number(resposta.totalRegistros || 0).toLocaleString("pt-BR");
-    $("use-quantidade").textContent = Number(resposta.totalQuantidade || 0).toLocaleString("pt-BR");
-    $("use-lojas").textContent = (resposta.lojas || []).join(", ") || "—";
-    $("use-atualizado").textContent = formatarDataAxion(resposta.ultimaAtualizacao);
-
-    const corpo = $("use-tabela");
-    const linhas = Array.isArray(resposta.dados) ? resposta.dados : [];
-    corpo.innerHTML = linhas.length ? linhas.map(item => `
-      <tr>
-        <td>${String(item.data ?? "—").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}</td>
-        <td>${String(item.loja ?? "—").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}</td>
-        <td>${Number(item.registros || 0).toLocaleString("pt-BR")}</td>
-        <td>${Number(item.quantidade || 0).toLocaleString("pt-BR")}</td>
-        <td>${formatarDataAxion(item.atualizado_em).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}</td>
-      </tr>`).join("") : '<tr><td colspan="5">Nenhum snapshot ativo encontrado no D1.</td></tr>';
-    status.textContent = `Origem: D1 · ${linhas.length} agrupamento(s) encontrado(s).`;
-  } catch (erro) {
-    status.textContent = "Erro ao consultar USE no D1: " + erro.message;
-  }
-}
-
-
-$("use-atualizar")?.addEventListener("click", carregarUseDashboard);
-
 async function axionRestaurarSessao() {
   let sessao;
   try { sessao=JSON.parse(localStorage.getItem(AXION_SESSAO_KEY)||'null'); } catch(e) { axionLimparSessao();return; }
@@ -1579,6 +1771,7 @@ async function axionRestaurarSessao() {
 
 let pendentesCache = [];
 let pendentesCarregados = false;
+const pendentesSelecionados = new Set();
 
 let movimentoAtual = null;
 let enviandoMovimento = false;
@@ -1736,10 +1929,6 @@ function abrirFiltroEstoque(col,botao){
 document.addEventListener('click',e=>{if(estPopup&&!estPopup.contains(e.target)&&!e.target.closest('[data-est-botao], [data-mobile-col]'))fecharFiltroEstoque();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharFiltroEstoque();});
 $('est-limpar-filtros').addEventListener('click',()=>{for(const k of Object.keys(estFiltros))delete estFiltros[k];estOrdem={coluna:null,direcao:1};fecharFiltroEstoque();renderizarEstoque();});
-$('est-arquivo').addEventListener('change',()=>{
- const f=$('est-arquivo').files?.[0];
- $('est-arquivo-nome').textContent=f?f.name:'Selecionar arquivo CSV';
-});
 iniciarCabecalhosEstoque();
 async function carregarEstoque(){
  if(!tokenSessao||estoqueOcupado)return;
@@ -1752,39 +1941,45 @@ async function carregarEstoque(){
   $('est-eans').textContent=(d.eans||0).toLocaleString('pt-BR');
   $('est-posicoes').textContent=(d.posicoes||0).toLocaleString('pt-BR');
   $('est-atualizacao').textContent=d.existe?'Última atualização: '+formatarEstoqueData(d.atualizadoEm):'Nenhum arquivo importado. Faça o primeiro upload.';
-  renderizarEstoque();await carregarVersoesEstoque();
+  renderizarEstoque();
  }catch(e){estoqueMensagem('Erro ao consultar estoque: '+e.message,true);}
  finally{estoqueOcupado=false;$('est-recarregar').disabled=false;}
 }
-async function baixarEstoque(versao='atual'){
- try{
-  const resposta=await fetch(API+'/api/estoque/backup?versao='+encodeURIComponent(versao),{headers:{Authorization:'Bearer '+tokenSessao},cache:'no-store'});
-  if(!resposta.ok){const erro=await resposta.json().catch(()=>({}));throw new Error(erro.erro||'Download indisponível');}
-  const blob=await resposta.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=versao==='atual'?'AXION_estoque_atual.csv':versao;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
- }catch(e){estoqueMensagem('Erro no download: '+e.message,true);}
-}
-async function carregarVersoesEstoque(){
- const destino=$('est-versoes');destino.replaceChildren();
- try{
-  const d=await requisicaoAPI('/api/estoque/backups');
-  if(!d.versoes?.length){destino.textContent='Nenhum backup salvo.';return;}
-  for(const v of d.versoes){const b=document.createElement('button');b.type='button';b.textContent='↓ '+formatarEstoqueData(v.data)+' · '+Math.ceil(v.bytes/1024)+' KB';b.addEventListener('click',()=>baixarEstoque(v.id));destino.appendChild(b);}
- }catch(e){destino.textContent='Não foi possível listar versões: '+e.message;}
-}
 $('est-recarregar').addEventListener('click',carregarEstoque);
-$('est-baixar').addEventListener('click',()=>baixarEstoque());
-$('est-enviar').addEventListener('click',async()=>{
- const arquivo=$('est-arquivo').files[0];if(!arquivo){estoqueMensagem('Selecione um arquivo CSV.',true);return;}
- if(arquivo.size>3*1024*1024){estoqueMensagem('O CSV deve ter até 3 MB.',true);return;}
- if(!confirm('Importar '+arquivo.name+'? A cópia atual será substituída e o backup anterior ficará disponível.'))return;
- const botao=$('est-enviar');botao.disabled=true;
- try{
-  const texto=await arquivo.text();
-  const d=await requisicaoAPI('/api/estoque/importar',{method:'POST',headers:{'Content-Type':'text/csv; charset=utf-8'},body:texto});
-  estoqueMensagem('Backup salvo com sucesso! '+d.total+' registros importados.');
-  $('est-arquivo').value='';await carregarEstoque();
- }catch(e){estoqueMensagem('Importação não concluída: '+e.message,true);}
- finally{botao.disabled=false;}
+$('est-catalogo-buscar').addEventListener('click',consultarCatalogoEstoque);
+$('est-catalogo-codigo').addEventListener('keydown',event=>{
+ if(event.key==='Enter'){event.preventDefault();consultarCatalogoEstoque();}
+});
+$('est-catalogo-limpar').addEventListener('click',()=>{
+ $('est-catalogo-codigo').value='';
+ $('est-catalogo-loja').value='';
+ const box=$('est-catalogo-resultado');box.replaceChildren();box.className='feedback hidden';
+ $('est-catalogo-codigo').focus();
+});
+
+
+
+// CONFIGURAÇÃO DE PERMISSÕES DE DESCONTO
+async function carregarConfigDesconto(){
+  const box=$("cfg-desconto-lojas");
+  if(!box || !tokenSessao) return;
+  try{
+    const d=await requisicaoAPI("/api/config/desconto");
+    box.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=(d.lojas||["66"]).includes(c.value));
+  }catch(e){
+    const msg=$("cfg-desconto-msg");msg.textContent="Falha ao carregar permissões: "+e.message;msg.className="feedback error";
+  }
+}
+$("cfg-salvar-desconto").addEventListener("click",async()=>{
+  const botao=$("cfg-salvar-desconto"),msg=$("cfg-desconto-msg");
+  const lojas=[...$("cfg-desconto-lojas").querySelectorAll('input:checked')].map(x=>x.value);
+  if(!lojas.length){msg.textContent="Selecione pelo menos uma loja autorizada.";msg.className="feedback error";return;}
+  botao.disabled=true;
+  try{
+    const d=await requisicaoAPI("/api/config/desconto",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({lojas})});
+    msg.textContent="Permissões salvas. Lojas autorizadas: "+d.lojas.join(", ");msg.className="feedback success";
+  }catch(e){msg.textContent="Não foi possível salvar: "+e.message;msg.className="feedback error";}
+  finally{botao.disabled=false;}
 });
 
 // =====================================================
@@ -1898,7 +2093,6 @@ async function carregarDashboard() {
     $("estadoDashboard").textContent =
       "Erro ao carregar Dashboard: " + erro.message;
   }
-  carregarUseDashboard();
 }
 
 // =====================================================
@@ -1938,6 +2132,151 @@ function eansDoItem(item) {
   ].map(x => x.trim()).filter(Boolean))];
 }
 
+// Consulta por EAN/código interno: Enter no campo de busca executa a pesquisa remota.
+function renderizarResultadoCatalogo(dados, destinoId = 'resultadoCatalogo') {
+  const box = $(destinoId);
+  if (!box) return;
+  box.replaceChildren();
+  box.className = 'feedback success est-catalogo-result';
+
+  const head = document.createElement('div');
+  head.className = 'est-cat-result-head';
+  const titulo = document.createElement('strong');
+  titulo.className = 'est-cat-result-title';
+  titulo.textContent = dados.produto?.descricao || 'Produto identificado';
+  const codigoItem = document.createElement('span');
+  codigoItem.className = 'est-cat-result-code';
+  codigoItem.textContent = `Código do item: ${dados.produto?.codigo || '—'}`;
+  head.append(titulo, codigoItem);
+  box.appendChild(head);
+
+  const meta = document.createElement('div');
+  meta.className = 'est-cat-result-meta';
+  const chips = [
+    `Código pesquisado: ${dados.codigoBipado || '—'}`,
+    `Códigos equivalentes: ${(dados.codigosEquivalentes || []).join(', ') || '—'}`,
+    `Lojas no catálogo: ${(dados.produto?.lojaCatalogo || []).join(', ') || '—'}`
+  ];
+  for (const texto of chips) {
+    const chip = document.createElement('span');
+    chip.className = 'est-cat-chip';
+    chip.textContent = texto;
+    meta.appendChild(chip);
+  }
+  box.appendChild(meta);
+
+  const locais = Array.isArray(dados.localizacoes) ? dados.localizacoes : [];
+  const resumo = document.createElement('div');
+  resumo.className = 'est-cat-locations-title';
+  resumo.textContent = `${locais.length.toLocaleString('pt-BR')} localização(ões) encontrada(s)` +
+    (dados.lojasEncontradas?.length ? ` · Lojas físicas: ${dados.lojasEncontradas.join(', ')}` : '');
+  box.appendChild(resumo);
+
+  if (!locais.length) {
+    const aviso = document.createElement('p');
+    aviso.className = 'est-cat-empty';
+    aviso.textContent = 'Produto encontrado no catálogo, mas nenhum dos códigos equivalentes foi localizado em DADOS/POSIÇÕES. Confira os códigos cadastrados nas colunas B/J e a loja física na coluna K.';
+    box.appendChild(aviso);
+    return;
+  }
+
+  const lista = document.createElement('div');
+  lista.className = 'est-cat-location-list';
+  for (const local of locais) {
+    const card = document.createElement('article');
+    card.className = 'est-cat-location';
+    const topo = document.createElement('div');
+    topo.className = 'est-cat-location-top';
+    const loja = document.createElement('strong');
+    loja.textContent = `Loja física ${local.loja || '—'}`;
+    const posicao = document.createElement('span');
+    posicao.className = 'est-cat-position';
+    posicao.textContent = local.posicao || 'Sem posição';
+    topo.append(loja, posicao);
+    card.appendChild(topo);
+
+    const grade = document.createElement('div');
+    grade.className = 'est-cat-location-grid';
+    const campos = [
+      ['REF', local.ref], ['Cor', local.cor], ['Tamanho', local.tamanho],
+      ['Saldo cadastrado', Number(local.quantidade || 0).toLocaleString('pt-BR')],
+      ['Código encontrado', local.codigoEncontrado], ['EAN da posição', local.ean]
+    ];
+    for (const [rotulo, valor] of campos) {
+      const campo = document.createElement('div');
+      campo.className = 'est-cat-field';
+      const small = document.createElement('small');
+      small.textContent = rotulo;
+      const span = document.createElement('span');
+      span.textContent = valor == null || valor === '' ? '—' : String(valor);
+      campo.append(small, span);
+      grade.appendChild(campo);
+    }
+    card.appendChild(grade);
+    if (local.descricao) {
+      const descricao = document.createElement('p');
+      descricao.style.cssText = 'margin:9px 0 0;font-size:11px;color:#b9dfd0';
+      descricao.textContent = local.descricao;
+      card.appendChild(descricao);
+    }
+    lista.appendChild(card);
+  }
+  box.appendChild(lista);
+}
+
+// Consulta compartilhada pelo Abastecimento e pela tela Consultar estoque.
+async function consultarCatalogoPorCodigo(codigoInformado, destinoId = 'resultadoCatalogo', loja = '') {
+  const codigo = String(codigoInformado ?? $('buscaPendentes')?.value ?? '').trim();
+  const box = $(destinoId);
+  if (!box) return false;
+  if (!/^\d{1,80}$/.test(codigo)) {
+    if (destinoId !== 'resultadoCatalogo') {
+      box.className = 'feedback error est-catalogo-result';
+      box.textContent = 'Digite ou bipe um EAN ou código interno numérico válido.';
+    }
+    return false;
+  }
+
+  box.className = 'feedback est-catalogo-result';
+  box.textContent = `Consultando EAN/código ${codigo} no catálogo USE...`;
+  try {
+    const params = new URLSearchParams({ codigo });
+    if (loja) params.set('loja', loja);
+    const dados = await requisicaoAPI(`/api/catalogo/buscar?${params.toString()}`);
+    renderizarResultadoCatalogo(dados, destinoId);
+    return true;
+  } catch (erro) {
+    box.className = 'feedback error est-catalogo-result';
+    box.textContent = erro.message || 'Não foi possível localizar o código.';
+    return false;
+  }
+}
+
+let estCatalogoOcupado = false;
+async function consultarCatalogoEstoque() {
+  if (estCatalogoOcupado) return;
+  const codigo = $('est-catalogo-codigo').value.trim();
+  const loja = $('est-catalogo-loja').value;
+  const botao = $('est-catalogo-buscar');
+  const box = $('est-catalogo-resultado');
+  if (!/^\d{1,80}$/.test(codigo)) {
+    box.className = 'feedback error est-catalogo-result';
+    box.textContent = 'Digite ou bipe um EAN ou código interno numérico válido.';
+    $('est-catalogo-codigo').focus();
+    return;
+  }
+  estCatalogoOcupado = true;
+  botao.disabled = true;
+  botao.querySelector('span').textContent = 'Pesquisando...';
+  try {
+    await consultarCatalogoPorCodigo(codigo, 'est-catalogo-resultado', loja);
+  } finally {
+    estCatalogoOcupado = false;
+    botao.disabled = false;
+    botao.querySelector('span').textContent = 'Pesquisar';
+  }
+}
+
 function posicoesDoItem(item) {
   return [...new Set([
     ...(Array.isArray(item.posicoes) ? item.posicoes : []),
@@ -1946,6 +2285,177 @@ function posicoesDoItem(item) {
     ),
     item.posicao
   ].map(x => String(x ?? "").trim()).filter(Boolean))];
+}
+
+
+// =====================================================
+// SELEÇÃO MÚLTIPLA E ABASTECIMENTO EM LOTE
+// =====================================================
+
+function chavePendente(item) {
+  return JSON.stringify([
+    String(item.loja ?? ""),
+    String(item.ref ?? ""),
+    String(item.cor ?? ""),
+    String(item.tamanho ?? "")
+  ]);
+}
+
+function itensSelecionadosPendentes() {
+  const chaves = pendentesSelecionados;
+  return pendentesCache.filter(item => chaves.has(chavePendente(item)));
+}
+
+function atualizarControlesSelecaoPendentes(filtrados = null) {
+  const selecionados = itensSelecionadosPendentes();
+  const quantidade = selecionados.length;
+  const contador = $("abast-contador-selecao");
+  const botaoOK = $("abast-lote-ok");
+  const botaoSE = $("abast-lote-se");
+  const selecionarVisiveis = $("abast-selecionar-visiveis");
+
+  if (contador) contador.textContent = `${quantidade} selecionado(s)`;
+  if (botaoOK) botaoOK.disabled = enviandoMovimento || quantidade === 0;
+  if (botaoSE) botaoSE.disabled = enviandoMovimento || quantidade === 0;
+
+  if (selecionarVisiveis && filtrados) {
+    const visiveis = filtrados.map(chavePendente);
+    const marcados = visiveis.filter(chave => pendentesSelecionados.has(chave)).length;
+    selecionarVisiveis.checked = visiveis.length > 0 && marcados === visiveis.length;
+    selecionarVisiveis.indeterminate = marcados > 0 && marcados < visiveis.length;
+    selecionarVisiveis.disabled = enviandoMovimento || visiveis.length === 0;
+  }
+}
+
+function selecionarPendentesVisiveis(marcar) {
+  const busca = $("buscaPendentes").value.trim().toLowerCase();
+  const visiveis = pendentesCache.filter(item => {
+    const campos = [
+      item.loja, item.marca, item.descricao, item.ref,
+      item.cor, item.tamanho, ...eansDoItem(item), ...posicoesDoItem(item)
+    ];
+    return campos.some(valor => String(valor ?? "").toLowerCase().includes(busca));
+  });
+
+  for (const item of visiveis) {
+    const chave = chavePendente(item);
+    if (marcar) pendentesSelecionados.add(chave);
+    else pendentesSelecionados.delete(chave);
+  }
+  renderizarPendentes();
+}
+
+async function registrarPendentesEmLote(tipo) {
+  if (enviandoMovimento || movimentoAtual) return;
+
+  const selecionados = itensSelecionadosPendentes();
+  if (!selecionados.length) {
+    mostrarFeedback("Selecione pelo menos um produto.", "error");
+    return;
+  }
+
+  const unidades = selecionados.reduce(
+    (total, item) => total + (Number(item.quantidade) || 0), 0
+  );
+
+  const confirmacao = tipo === "OK"
+    ? `Registrar como OK ${selecionados.length} produto(s), totalizando ${unidades} unidade(s)?`
+    : `Registrar como S/E ${selecionados.length} produto(s), totalizando ${unidades} unidade(s)?`;
+
+  if (!window.confirm(confirmacao + "\n\nCada produto será registrado com sua quantidade pendente integral.")) {
+    return;
+  }
+
+  enviandoMovimento = true;
+  renderizarPendentes();
+  const token = tokenSessao;
+  const concluidos = [];
+  const falhas = [];
+
+  const botaoLoteOK = $("abast-lote-ok");
+  const botaoLoteSE = $("abast-lote-se");
+  if (botaoLoteOK) botaoLoteOK.textContent = "Registrando...";
+  if (botaoLoteSE) botaoLoteSE.textContent = "Aguarde...";
+
+  try {
+    for (let indice = 0; indice < selecionados.length; indice++) {
+      if (token !== tokenSessao) return;
+
+      const item = selecionados[indice];
+      const quantidade = Number(item.quantidade);
+      const descricao = item.descricao || item.ref || "Produto";
+
+      if (!Number.isSafeInteger(quantidade) || quantidade < 1) {
+        falhas.push(`${descricao}: quantidade pendente inválida`);
+        continue;
+      }
+
+      const movimento = {
+        id_movimento: crypto.randomUUID().replaceAll("-", ""),
+        loja: String(item.loja),
+        ref: String(item.ref),
+        cor: String(item.cor ?? ""),
+        tamanho: String(item.tamanho ?? ""),
+        ean: eansDoItem(item)[0] || "",
+        tipo,
+        quantidade,
+        observacao: "Registrado em lote pelo AXION Web"
+      };
+
+      try {
+        await requisicaoAPI("/api/abastecer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ movimento })
+        });
+        concluidos.push(item);
+        mostrarFeedback(
+          `Processando ${indice + 1} de ${selecionados.length}: ${descricao}`,
+          ""
+        );
+      } catch (erro) {
+        falhas.push(`${descricao} (REF ${item.ref}): ${erro.message}`);
+      }
+    }
+
+    if (token !== tokenSessao) return;
+
+    for (const item of concluidos) {
+      pendentesSelecionados.delete(chavePendente(item));
+    }
+
+    historicoCarregado = false;
+    await Promise.allSettled([
+      carregarPendentes(),
+      carregarDashboard(),
+      carregarAtividadeRecente(true)
+    ]);
+
+    if (falhas.length) {
+      const resumoFalhas = falhas.slice(0, 5).join(" | ");
+      mostrarFeedback(
+        `${tipo}: ${concluidos.length} produto(s) registrado(s). ` +
+        `${falhas.length} falha(s): ${resumoFalhas}` +
+        (falhas.length > 5 ? ` | e mais ${falhas.length - 5}.` : ""),
+        "error"
+      );
+    } else {
+      mostrarFeedback(
+        `${tipo} registrado com sucesso para ${concluidos.length} produto(s), ` +
+        totalUnidadesLote(concluidos).toLocaleString("pt-BR") + " unidade(s).",
+        "success"
+      );
+    }
+  } finally {
+    enviandoMovimento = false;
+    if (botaoLoteOK) botaoLoteOK.textContent = "✓ Marcar selecionados como OK";
+    if (botaoLoteSE) botaoLoteSE.textContent = "Marcar selecionados como S/E";
+    renderizarPendentes();
+  }
+}
+
+function totalUnidadesLote(itens) {
+  return itens.reduce((total, item) => total + (Number(item.quantidade) || 0), 0);
 }
 
 // =====================================================
@@ -1981,7 +2491,7 @@ function renderizarPendentes() {
     const linha = corpo.insertRow();
     const celula = linha.insertCell();
 
-    celula.colSpan = 11;
+    celula.colSpan = 12;
     celula.textContent = busca
       ? "Nenhum produto encontrado."
       : "Nenhum abastecimento pendente.";
@@ -2110,7 +2620,29 @@ function renderizarPendentes() {
 
     acoes.append(botaoOK, botaoSE);
     celulaAcoes.appendChild(acoes);
+
+    // SELEÇÃO PARA OPERAÇÕES EM LOTE
+    const celulaSelecao = linha.insertCell();
+    celulaSelecao.className = "abast-celula-selecao";
+    const checkSelecao = document.createElement("input");
+    checkSelecao.type = "checkbox";
+    checkSelecao.className = "abast-check-item";
+    checkSelecao.checked = pendentesSelecionados.has(chavePendente(item));
+    checkSelecao.disabled = enviandoMovimento;
+    checkSelecao.setAttribute(
+      "aria-label",
+      `Selecionar ${item.descricao || item.ref || "produto"}`
+    );
+    checkSelecao.addEventListener("change", () => {
+      const chave = chavePendente(item);
+      if (checkSelecao.checked) pendentesSelecionados.add(chave);
+      else pendentesSelecionados.delete(chave);
+      atualizarControlesSelecaoPendentes(filtrados);
+    });
+    celulaSelecao.appendChild(checkSelecao);
   }
+
+  atualizarControlesSelecaoPendentes(filtrados);
 
   const unidades = filtrados.reduce(
     (total, item) =>
@@ -2556,7 +3088,21 @@ function atualizarFiltroLojasHistorico() {
 }
 
 
-// AXION 2.1: edição segura com confirmação e trilha de auditoria no Sheets.
+// AXION 3.2: edição, exclusão e limpeza do histórico.
+async function atualizarDepoisDeAlterarHistorico(dataSelecionada = historicoDiaSelecionado) {
+  historicoCarregado = false;
+  await consultarHistorico(true);
+  historicoDiaSelecionado = dataSelecionada && (
+    historicoCache.some(x => x.dataISO === dataSelecionada) ||
+    historicoVendasCache.some(x => x.dataISO === dataSelecionada)
+  ) ? dataSelecionada : "";
+  $("hist-data").value = historicoDiaSelecionado;
+  atualizarFiltroLojasHistorico();
+  renderizarHistorico();
+  renderizarAtividadeRecente();
+  await Promise.all([carregarPendentes(), carregarDashboard()]);
+}
+
 async function editarMovimentoHistorico(item) {
   if (!item.id) { alert("Movimentação sem identificador. Não é possível editar."); return; }
   const tipo = prompt("Novo status: OK ou S/E",item.tipo);
@@ -2581,14 +3127,44 @@ async function editarMovimentoHistorico(item) {
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({id:item.id,tipo:novoTipo,quantidade,motivo:motivo.trim()})
     });
-    if (!resposta.ok) throw new Error(resposta.erro || "Falha na edição.");
-    historicoCarregado = false;
-    await consultarHistorico(true);
-    atualizarFiltroLojasHistorico();
-    renderizarHistorico();
-    renderizarAtividadeRecente();
-    alert(resposta.alterado ? "Movimentação corrigida e pendências recalculadas." : "Nenhuma alteração necessária.");
+    await atualizarDepoisDeAlterarHistorico(historicoDiaSelecionado);
+    alert(resposta.alterado ? "Movimentação corrigida. Pendências, Dashboard e atividade foram atualizados." : "Nenhuma alteração necessária.");
   } catch (erro) { alert("Não foi possível salvar: " + erro.message); }
+}
+
+async function excluirMovimentoHistorico(item) {
+  if (!item.id) { alert("Movimentação sem identificador. Não é possível excluir."); return; }
+  const motivo = prompt("Motivo da exclusão (opcional):", "Lançamento realizado por engano");
+  if (motivo === null) return;
+  if (motivo.trim().length > 500) { alert("O motivo deve ter no máximo 500 caracteres."); return; }
+  const descricao = `${item.tipo} · ${item.ref} · Loja ${item.loja} · ${item.quantidade} unidade(s)`;
+  if (!confirm(`Excluir definitivamente esta movimentação?\n\n${descricao}\n\nA cópia ficará registrada na auditoria.`)) return;
+  try {
+    const resposta = await requisicaoAPI("/api/historico/excluir", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id:item.id,motivo:motivo.trim() || "Exclusão solicitada pelo AXION Web"})
+    });
+    await atualizarDepoisDeAlterarHistorico(historicoDiaSelecionado);
+    alert(`Movimentação excluída. ${Number(resposta.excluidos || 0)} registro(s) removido(s). Pendências recalculadas.`);
+  } catch (erro) { alert("Não foi possível excluir: " + erro.message); }
+}
+
+async function limparHistorico(data) {
+  const limparTudo = !data;
+  const frase = limparTudo ? "APAGAR HISTORICO" : `APAGAR DIA ${data}`;
+  const escopo = limparTudo ? "TODO O HISTÓRICO DE MOVIMENTAÇÕES OK/S/E" : `AS MOVIMENTAÇÕES DO DIA ${data.split("-").reverse().join("/")}`;
+  if (!confirm(`ATENÇÃO: esta ação excluirá ${escopo}.\n\nVendas arquivadas e dados de estoque serão preservados. As exclusões ficarão registradas na auditoria.`)) return;
+  const digitado = prompt(`Para confirmar, digite exatamente:\n${frase}`);
+  if (digitado === null) return;
+  if (digitado.trim().toUpperCase() !== frase) { alert("Confirmação incorreta. Nada foi apagado."); return; }
+  try {
+    const resposta = await requisicaoAPI("/api/historico/limpar", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({data:limparTudo ? "TODOS" : data,confirmacao:frase})
+    });
+    await atualizarDepoisDeAlterarHistorico(limparTudo ? "" : data);
+    alert(`${Number(resposta.excluidos || 0)} movimentação(ões) removida(s). Vendas e estoque foram preservados.`);
+  } catch (erro) { alert("Não foi possível limpar o histórico: " + erro.message); }
 }
 
 function axionHistChave(item){return [item.loja,item.ref,item.cor,item.tamanho].map(x=>String(x??'').trim().toUpperCase()).join('|');}
@@ -2724,12 +3300,20 @@ function renderizarHistorico() {
       }
     });
     const acao = linha.insertCell();
-    const botao = document.createElement("button");
-    botao.type = "button";
-    botao.className = "secondary";
-    botao.textContent = "✎ Editar";
-    botao.addEventListener("click", () => editarMovimentoHistorico(item));
-    acao.appendChild(botao);
+    const grupoAcoes = document.createElement("div");
+    grupoAcoes.className = "hist-acoes";
+    const botaoEditar = document.createElement("button");
+    botaoEditar.type = "button";
+    botaoEditar.className = "secondary";
+    botaoEditar.textContent = "✎ Editar";
+    botaoEditar.addEventListener("click", () => editarMovimentoHistorico(item));
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.type = "button";
+    botaoExcluir.className = "hist-btn-excluir";
+    botaoExcluir.textContent = "🗑 Excluir";
+    botaoExcluir.addEventListener("click", () => excluirMovimentoHistorico(item));
+    grupoAcoes.append(botaoEditar, botaoExcluir);
+    acao.appendChild(grupoAcoes);
   }
 
   $("hist-estado").textContent =
@@ -2793,6 +3377,11 @@ $("hist-atualizar").addEventListener(
   "click",
   () => carregarHistorico(true)
 );
+$("hist-limpar-dia").addEventListener("click", () => {
+  if (historicoDiaSelecionado) limparHistorico(historicoDiaSelecionado);
+});
+
+$("hist-limpar-tudo").addEventListener("click", () => limparHistorico(""));
 
 $("atualizarAtividade").addEventListener(
   "click",
@@ -2802,6 +3391,20 @@ $("atualizarAtividade").addEventListener(
 // =====================================================
 // EVENTOS DO ABASTECIMENTO
 // =====================================================
+
+$("abast-selecionar-visiveis").addEventListener("change", event => {
+  selecionarPendentesVisiveis(event.target.checked);
+});
+
+$("abast-lote-ok").addEventListener("click", () => {
+  registrarPendentesEmLote("OK");
+});
+
+$("abast-lote-se").addEventListener("click", () => {
+  registrarPendentesEmLote("S/E");
+});
+
+
 
 $("formAbastecimento").addEventListener(
   "submit",
@@ -2817,6 +3420,13 @@ $("buscaPendentes").addEventListener(
   "input",
   renderizarPendentes
 );
+
+$("buscaPendentes").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    consultarCatalogoPorCodigo();
+  }
+});
 
 $("atualizarPendentes").addEventListener(
   "click",
@@ -2871,6 +3481,9 @@ document.querySelectorAll("[data-page]").forEach(botao => {
 
     if (pagina === "dashboard") {
       carregarAtividadeRecente();
+    }
+    if (pagina === "configuracoes") {
+      carregarConfigDesconto();
     }
   });
 });
