@@ -1708,6 +1708,195 @@ body { min-width:320px; }
   #appView .content {padding:13px 9px 24px !important}
   #appView .heading h1 {font-size:24px}
 }
+  
+/* AXION V14.5 - RESTAURACAO DO LAYOUT E NAVEGACAO */
+
+html, body {
+  width: 100% !important;
+  min-height: 100% !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+#appView:not(.hidden) {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+#appView .sidebar {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 0 0 250px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  height: 100vh !important;
+  padding: 26px 16px !important;
+  overflow-y: auto !important;
+  z-index: 10 !important;
+}
+
+#appView .sidebar-brand,
+#appView .sidebar-caption,
+#appView .sidebar-bottom {
+  display: block !important;
+  font-size: revert !important;
+}
+
+#appView .sidebar-brand {
+  font-size: 29px !important;
+  letter-spacing: 4px !important;
+}
+
+#appView .nav {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  margin-top: 0 !important;
+}
+
+#appView .nav button {
+  display: block !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 14px !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  color: #cbd5e1 !important;
+}
+
+#appView .nav button.active {
+  background: #16324a !important;
+  color: var(--accent) !important;
+  border-color: #245171 !important;
+}
+
+#appView .main {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+#appView .topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  min-height: 68px !important;
+}
+
+#appView .content {
+  display: block !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: calc(100vh - 68px) !important;
+  padding: 26px clamp(16px, 2.2vw, 36px) 40px !important;
+  overflow: visible !important;
+}
+
+#appView .page:not(.active) {
+  display: none !important;
+}
+
+#appView .page.active {
+  display: block !important;
+  width: 100% !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Desativa o recolhimento que escondia os nomes das abas */
+#appView.sidebar-collapsed .sidebar {
+  flex-basis: 250px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+}
+
+#appView.sidebar-collapsed .main {
+  margin-left: 0 !important;
+}
+
+#appView.sidebar-collapsed .nav button {
+  font-size: 13px !important;
+  justify-content: flex-start !important;
+}
+
+/* CELULAR */
+@media(max-width:760px) {
+  #appView:not(.hidden) {
+    flex-direction: column !important;
+  }
+
+  #appView .sidebar {
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 14px !important;
+  }
+
+  #appView .sidebar-brand {
+    font-size: 24px !important;
+  }
+
+  #appView .sidebar-caption,
+  #appView .sidebar-bottom {
+    display: none !important;
+  }
+
+  #appView .nav {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding-bottom: 5px;
+  }
+
+  #appView .nav button {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-height: 42px !important;
+    white-space: nowrap !important;
+    font-size: 12px !important;
+    padding: 11px !important;
+  }
+
+  #appView .main {
+    width: 100% !important;
+    min-height: 0 !important;
+  }
+
+  #appView .content {
+    min-height: 0 !important;
+    padding: 16px 12px 28px !important;
+  }
+
+  #appView .sidebar-toggle {
+    display: none !important;
+  }
+}
+
 
 </style>
 </head>
