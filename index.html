@@ -1277,6 +1277,64 @@ body { overflow-x:hidden; }
 #painel-cloudflare .cf-usage-line .cf-warn{color:#f4b740}
 #painel-cloudflare .cf-usage-line .cf-ok{color:#75dfad}
 @media(max-width:640px){#painel-cloudflare .cf-stats{grid-template-columns:minmax(0,1fr)}#painel-cloudflare .cf-stat{padding:15px}}
+
+/* AXION V14 | layout com navegação fixa e conteúdo independente */
+html,body {height:100%;min-height:100%;overflow:hidden}
+#appView {height:100dvh;min-height:0;overflow:hidden;align-items:stretch}
+.sidebar {position:relative;z-index:30;height:100dvh;min-height:0;overflow-y:auto;overflow-x:hidden;flex:0 0 250px;width:250px;transition:flex-basis .22s ease,width .22s ease,padding .22s ease}
+.main {height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.topbar {flex:0 0 auto;min-height:68px;padding:12px 26px;gap:16px}
+.topbar-left {display:flex;align-items:center;gap:14px;min-width:0}
+.sidebar-toggle {width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border:1px solid var(--border);border-radius:10px;background:#172b42;color:var(--accent);font-size:20px}
+.content {width:100%;max-width:none;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;margin:0;padding:26px clamp(18px,2.2vw,36px) 40px;scrollbar-gutter:stable}
+.page {width:100%;min-width:0}
+.page.active {display:block;animation:axPageIn .16s ease-out}
+@keyframes axPageIn {from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:none}}
+.heading {margin-bottom:22px}
+.heading h1 {line-height:1.18}
+.panel,.stat {min-width:0}
+.table-wrap {max-width:100%;overscroll-behavior-x:contain}
+.hist-cabecalho {display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.hist-cabecalho>div {min-width:0;flex:1}
+.hist-cabecalho button {flex:0 0 auto}
+#page-historico .panel {overflow:hidden}
+#page-historico .toolbar {display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#page-historico .toolbar input {min-width:180px;max-width:100%}
+#page-historico .data-table {width:100%;table-layout:auto}
+#appView.sidebar-collapsed .sidebar {flex-basis:76px;width:76px;padding:22px 10px}
+#appView.sidebar-collapsed .sidebar-brand {font-size:0;letter-spacing:0;padding:0;text-align:center}
+#appView.sidebar-collapsed .sidebar-brand::after {content:'A';font-size:25px;letter-spacing:0}
+#appView.sidebar-collapsed .sidebar-caption,
+#appView.sidebar-collapsed .sidebar-bottom,
+#appView.sidebar-collapsed .nav button {font-size:0}
+#appView.sidebar-collapsed .nav button {justify-content:center;padding:14px 5px;min-height:46px}
+#appView.sidebar-collapsed .nav button::first-letter {font-size:18px}
+#appView.sidebar-collapsed .nav button {gap:0}
+@media(max-width:760px) {
+  html,body {overflow:auto}
+  #appView {height:100dvh;min-height:0;flex-direction:row;overflow:hidden}
+  .sidebar {height:100dvh;flex:0 0 76px;width:76px;padding:16px 9px}
+  .sidebar-brand {font-size:22px;letter-spacing:0;padding:0;text-align:center}
+  .sidebar-caption,.sidebar-bottom {display:none}
+  .nav {flex-direction:column;gap:8px;margin-top:24px}
+  .nav button {font-size:0;justify-content:center;padding:13px 4px;min-height:46px;white-space:normal}
+  .nav button::first-letter {font-size:18px}
+  .main {height:100dvh;min-height:0;flex:1}
+  .topbar {padding:10px 12px;min-height:58px}
+  .topbar span {font-size:10px}
+  .content {padding:16px 12px 30px}
+  #appView.sidebar-collapsed .sidebar {flex-basis:0;width:0;padding:0;border:0;overflow:hidden}
+  #appView.sidebar-collapsed .sidebar-toggle {display:grid}
+  .hist-cabecalho {display:flex;flex-direction:column;align-items:stretch}
+  .hist-cabecalho button {width:100%}
+}
+@media(max-width:420px) {
+  .topbar-left {gap:8px}
+  .sidebar-toggle {width:34px;height:34px;flex-basis:34px}
+  .content {padding:13px 9px 24px}
+  .heading h1 {font-size:24px}
+}
+
 </style>
 </head>
 
@@ -1375,7 +1433,10 @@ body { overflow-x:hidden; }
   <div class="main">
 
     <header class="topbar">
-      <strong id="tituloPagina">Dashboard</strong>
+      <div class="topbar-left">
+        <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">☰</button>
+        <strong id="tituloPagina">Dashboard</strong>
+      </div>
       <span>AXION WEB · v4.0 D1</span>
     </header>
 
@@ -3926,6 +3987,18 @@ $("atualizarPendentes").addEventListener(
     await carregarPendentes();
   }
 );
+
+// Menu lateral recolhível. A preferência fica apenas nesta sessão.
+const sidebarToggle = document.getElementById("sidebar-toggle");
+if (sidebarToggle) {
+  sidebarToggle.addEventListener("click", () => {
+    const app = document.getElementById("appView");
+    const recolhido = app.classList.toggle("sidebar-collapsed");
+    sidebarToggle.setAttribute("aria-expanded", String(!recolhido));
+    sidebarToggle.setAttribute("aria-label", recolhido ? "Expandir menu" : "Recolher menu");
+    sidebarToggle.title = recolhido ? "Expandir menu" : "Recolher menu";
+  });
+}
 
 // =====================================================
 // NAVEGAÇÃO
