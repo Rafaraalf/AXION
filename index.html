@@ -1227,16 +1227,38 @@ body { overflow-x:hidden; }
 }
 
 
-/* Importação integral de posições */
-.ax-import-panel{max-width:100%;padding:24px;border:1px solid #2b4059;background:linear-gradient(155deg,#19273c,#152236);border-radius:16px}
-.ax-import-drop{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;min-height:150px;margin:18px 0;padding:22px;border:2px dashed #426782;border-radius:14px;background:#102036;color:#d9efff;cursor:pointer;text-align:center}
+/* Importação integral de posições: alinhamento e conclusão */
+#page-importar-posicoes{width:100%;min-width:0}
+#page-importar-posicoes .heading{margin-bottom:24px}
+.ax-import-panel{width:100%;max-width:none;min-width:0;padding:24px;border:1px solid #2b4059;background:linear-gradient(155deg,#19273c,#152236);border-radius:16px;overflow:hidden}
+.ax-import-panel h2{margin:0 0 12px}
+.ax-import-panel>.status-line{line-height:1.55}
+.ax-import-drop{width:100%;display:flex;flex-direction:column;gap:9px;align-items:center;justify-content:center;min-height:138px;margin:18px 0;padding:22px;border:2px dashed #426782;border-radius:14px;background:#102036;color:#d9efff;cursor:pointer;text-align:center}
+.ax-import-drop:hover{border-color:#38bdf8;background:#132b43}
 .ax-import-drop strong{font-size:16px;color:#45c5f5}.ax-import-drop span{font-size:12px;color:#9fb4c9;overflow-wrap:anywhere}
-.ax-import-preview{margin:16px 0;padding:16px;border:1px solid #34516d;border-radius:12px;background:#102036;overflow:auto}
-.ax-import-preview table{width:100%;border-collapse:collapse}.ax-import-preview th,.ax-import-preview td{padding:9px;text-align:left;border-bottom:1px solid #2b4059}.ax-import-preview th{color:#9fb4c9;font-size:12px}
-.ax-import-progress{height:10px;margin:16px 0;background:#0b1727;border-radius:20px;overflow:hidden}.ax-import-progress div{height:100%;width:0;background:#38bdf8;transition:width .15s}
-#page-importar-posicoes .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-#page-importar-posicoes .toolbar button{min-height:44px;padding:10px 16px;border-radius:10px}
-@media(max-width:680px){.ax-import-panel{padding:15px}#page-importar-posicoes .toolbar button{width:100%}}
+.ax-import-preview{width:100%;margin:16px 0;padding:16px;border:1px solid #34516d;border-radius:12px;background:#102036;overflow:hidden}
+.ax-import-preview>strong{display:block;margin-bottom:12px;font-size:15px}
+.ax-import-preview table{width:100%;table-layout:fixed;border-collapse:collapse}
+.ax-import-preview th,.ax-import-preview td{width:50%;padding:10px 12px;text-align:left;border-bottom:1px solid #2b4059}
+.ax-import-preview th{color:#9fb4c9;font-size:12px}
+.ax-import-preview tr:last-child td{border-bottom:0}
+.ax-import-preview .status-line{margin:12px 0 0;overflow-wrap:anywhere}
+.ax-import-progress{height:9px;margin:16px 0 8px;background:#0b1727;border-radius:20px;overflow:hidden}
+.ax-import-progress div{height:100%;width:0;background:linear-gradient(90deg,#0ea5e9,#38bdf8);border-radius:20px;transition:width .2s ease}
+.ax-import-progress-label{display:flex;justify-content:space-between;gap:12px;color:#9fb4c9;font-size:12px;margin-bottom:14px}
+.ax-import-complete{display:flex;align-items:flex-start;gap:14px;margin:18px 0;padding:18px;border:1px solid #23734c;border-radius:13px;background:linear-gradient(120deg,#103b2b,#123528);color:#dcfce7}
+.ax-import-complete-icon{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:#14532d;color:#86efac;font-size:22px;font-weight:800}
+.ax-import-complete-content{min-width:0;flex:1}
+.ax-import-complete h3{margin:1px 0 6px;font-size:17px;color:#bbf7d0}
+.ax-import-complete p{margin:0;color:#d1fae5;line-height:1.5;font-size:13px}
+.ax-import-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.ax-import-metric{padding:13px;border:1px solid #2b4860;border-radius:10px;background:#102036;min-width:0}
+.ax-import-metric strong{display:block;font-size:20px;color:#f8fafc;font-variant-numeric:tabular-nums}
+.ax-import-metric span{display:block;margin-top:4px;color:#9fb4c9;font-size:11px}
+#page-importar-posicoes .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+#page-importar-posicoes .toolbar button{min-height:44px;padding:10px 17px;border-radius:10px}
+#ax-posicoes-feedback{white-space:pre-line;line-height:1.5}
+@media(max-width:680px){.ax-import-panel{padding:15px}.ax-import-metrics{grid-template-columns:1fr}.ax-import-complete{padding:14px}#page-importar-posicoes .toolbar{display:grid;grid-template-columns:1fr}#page-importar-posicoes .toolbar button{width:100%}}
 
 </style>
 </head>
@@ -1570,7 +1592,7 @@ body { overflow-x:hidden; }
           <input id="ax-posicoes-arquivo" type="file" accept=".xlsx,.xls" hidden>
           <div id="ax-posicoes-preview" class="ax-import-preview hidden"></div>
           <div id="ax-posicoes-feedback" class="feedback hidden" role="status" aria-live="polite"></div>
-          <div class="ax-import-progress hidden" id="ax-posicoes-progresso"><div id="ax-posicoes-barra"></div></div>
+          <div class="ax-import-progress hidden" id="ax-posicoes-progresso"><div id="ax-posicoes-barra"></div></div><div class="ax-import-progress-label hidden" id="ax-posicoes-progresso-label"><span id="ax-posicoes-etapa">Aguardando envio</span><strong id="ax-posicoes-percentual">0%</strong></div><div id="ax-posicoes-conclusao" class="hidden"></div>
           <div class="toolbar"><button class="primary" id="ax-posicoes-validar" type="button" disabled>Validar planilha</button><button class="primary" id="ax-posicoes-confirmar" type="button" disabled>Confirmar substituição integral</button></div>
           <p class="status-line">A base anterior será copiada para backup antes da troca. Se a validação ou o envio falhar, a base atual continuará ativa. O catálogo USE não será alterado.</p>
         </div>
@@ -2067,33 +2089,36 @@ function axPosicaoNormalizar(v, linha){
 async function axPosValidarArquivo(file){
   if(!window.XLSX)throw new Error("Biblioteca de leitura XLSX não carregou. Atualize a página e tente novamente.");
   if(!file)throw new Error("Selecione um arquivo XLSX.");
-  // SheetJS precisa receber os bytes do arquivo, não o objeto File diretamente.
+  if(file.size>80*1024*1024)throw new Error("O arquivo ultrapassa 80 MB. Salve uma versão XLSX otimizada e tente novamente.");
   const bytes=await file.arrayBuffer();
-  const wb=XLSX.read(bytes,{type:'array',cellDates:true});
+  const wb=XLSX.read(bytes,{type:'array',cellDates:true,dense:false});
   const nomeAba=wb.SheetNames.find(n=>n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()==='DADOSPOSICOES');
   if(!nomeAba)throw new Error("A aba DADOSPOSIÇÕES não foi encontrada no arquivo.");
   const ws=wb.Sheets[nomeAba];
-  // Algumas planilhas carregam formatação até dezenas de milhares de linhas/colunas vazias.
-  // Descobre a última célula real somente nas 11 colunas usadas e limita a leitura a A:K.
+  if(!ws||!ws['!ref'])throw new Error("A aba DADOSPOSIÇÕES está vazia.");
+  // Usa somente células reais de A:K. Não confia no !ref, que pode incluir
+  // milhões de linhas apenas formatadas e provocar 'Invalid array length'.
   let ultimaLinha=1;
   for(const chave of Object.keys(ws)){
     if(chave[0]==='!')continue;
     const m=/^([A-K])(\d+)$/.exec(chave);
-    if(m){const cel=ws[chave];if(cel&&cel.v!==undefined&&cel.v!==null&&cel.v!=='')ultimaLinha=Math.max(ultimaLinha,Number(m[2]));}
+    if(!m)continue;
+    const cel=ws[chave];
+    if(cel&&cel.v!==undefined&&cel.v!==null&&String(cel.v).trim()!=='')ultimaLinha=Math.max(ultimaLinha,Number(m[2]));
   }
   if(ultimaLinha<2)throw new Error("A planilha não contém registros.");
-  const linhas=XLSX.utils.sheet_to_json(ws,{header:1,range:`A1:K${ultimaLinha}`,defval:'',raw:true,blankrows:false});
-  if(linhas.length<2)throw new Error("A planilha não contém registros.");
-  const cab=(linhas[0]||[]).slice(0,11).map(v=>axPosTxt(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
+  if(ultimaLinha>30001)throw new Error("A planilha ultrapassa o limite de 30.000 registros. Confira as linhas preenchidas.");
+  const ler=(col,linha)=>{const c=ws[`${col}${linha}`];return c?c.v:'';};
+  const cabecalho='ABCDEFGHIJK'.split('').map((col)=>axPosTxt(ler(col,1)).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
   const esperado=['POSICAO','EAN','QUANTIDADE','ATUALIZADO_EM','REF','DESCRICAO','MARCA','COR','TAMANHO','EAN','LOJA'];
-  if(esperado.some((x,i)=>cab[i]!==x))throw new Error("Cabeçalho diferente do padrão esperado. Confira as 11 colunas da aba DADOSPOSIÇÕES.");
-  const itens=[], erros=[], contagem={'66':0,'67':0,'68':0};
-  for(let i=1;i<linhas.length;i++){
-    const r=linhas[i]||[]; if(!r.some(v=>v!==''&&v!==null&&v!==undefined))continue;
-    const linha=i+1;
+  if(esperado.some((x,i)=>cabecalho[i]!==x))throw new Error("Cabeçalho diferente do padrão esperado. Confira as 11 colunas da aba DADOSPOSIÇÕES.");
+  const itens=[],erros=[],contagem={'66':0,'67':0,'68':0};
+  for(let linha=2;linha<=ultimaLinha;linha++){
+    const r='ABCDEFGHIJK'.split('').map(col=>ler(col,linha));
+    if(!r.some(v=>v!==''&&v!==null&&v!==undefined))continue;
     try{
-      const posicao=axPosicaoNormalizar(r[0],linha), ean1=axPosEAN(r[1]), quantidade=axPosNumeroInteiro(r[2],linha);
-      const loja=String(r[10]).trim().replace(/\.0$/,'');
+      const posicao=axPosicaoNormalizar(r[0],linha),ean1=axPosEAN(r[1]),quantidade=axPosNumeroInteiro(r[2],linha);
+      const loja=String(r[10]??'').trim().replace(/\.0$/,'');
       if(!['66','67','68'].includes(loja))throw new Error(`Linha ${linha}: loja inválida (${loja}).`);
       const ean2=axPosEAN(r[9]);
       if(!ean1&&!ean2)throw new Error(`Linha ${linha}: registro sem EAN.`);
@@ -2107,11 +2132,35 @@ async function axPosValidarArquivo(file){
 }
 function axPosMostrarPreview(d){
   const box=$("ax-posicoes-preview");
-  box.innerHTML=`<strong>Prévia validada: ${d.itens.length.toLocaleString('pt-BR')} registros</strong><table><thead><tr><th>Loja</th><th>Registros</th></tr></thead><tbody><tr><td>66</td><td>${d.contagem['66'].toLocaleString('pt-BR')}</td></tr><tr><td>67</td><td>${d.contagem['67'].toLocaleString('pt-BR')}</td></tr><tr><td>68</td><td>${d.contagem['68'].toLocaleString('pt-BR')}</td></tr></tbody></table><p class="status-line">Amostra de posições: ${d.itens.slice(0,8).map(x=>x.posicao).join(' · ')}</p><p class="status-line">Catálogo USE: preservado. Substituição integral das posições: confirmada.</p>`;
-  box.classList.remove('hidden');
+  const amostra=d.itens.slice(0,8).map(x=>x.posicao).join(' · ');
+  box.innerHTML='';
+  const titulo=document.createElement('strong');titulo.textContent=`Prévia validada: ${d.itens.length.toLocaleString('pt-BR')} registros`;
+  const tabela=document.createElement('table');
+  tabela.innerHTML='<thead><tr><th>Loja</th><th>Registros</th></tr></thead><tbody></tbody>';
+  ['66','67','68'].forEach(loja=>{const tr=document.createElement('tr');const a=document.createElement('td'),b=document.createElement('td');a.textContent=loja;b.textContent=d.contagem[loja].toLocaleString('pt-BR');tr.append(a,b);tabela.querySelector('tbody').appendChild(tr);});
+  const amostraEl=document.createElement('p');amostraEl.className='status-line';amostraEl.textContent=`Amostra de posições: ${amostra}`;
+  const nota=document.createElement('p');nota.className='status-line';nota.textContent='Catálogo USE preservado. Substituição integral das posições será feita somente após a conferência final.';
+  box.append(titulo,tabela,amostraEl,nota);box.classList.remove('hidden');
+}
+function axPosAtualizarProgresso(pct,etapa){
+  const bar=$("ax-posicoes-barra"),label=$("ax-posicoes-progresso-label");
+  bar.style.width=`${Math.max(0,Math.min(100,pct))}%`;
+  label.classList.remove('hidden');$("ax-posicoes-percentual").textContent=`${Math.round(pct)}%`;
+  $("ax-posicoes-etapa").textContent=etapa;
+}
+function axPosMostrarConclusao(resultado,d){
+  const box=$("ax-posicoes-conclusao");box.className='ax-import-complete';box.innerHTML='';
+  const ico=document.createElement('div');ico.className='ax-import-complete-icon';ico.textContent='✓';
+  const content=document.createElement('div');content.className='ax-import-complete-content';
+  const h=document.createElement('h3');h.textContent='Atualização concluída com sucesso';
+  const p=document.createElement('p');p.textContent=`${Number(resultado.total||resultado.substituidos||0).toLocaleString('pt-BR')} registros foram substituídos. O backup anterior foi preservado e o catálogo USE permaneceu intacto.`;
+  content.append(h,p);box.append(ico,content);
+  const metrics=document.createElement('div');metrics.className='ax-import-metrics';
+  [['66',d.contagem['66']],['67',d.contagem['67']],['68',d.contagem['68']]].forEach(([loja,qtd])=>{const card=document.createElement('div');card.className='ax-import-metric';const strong=document.createElement('strong');strong.textContent=Number(qtd).toLocaleString('pt-BR');const span=document.createElement('span');span.textContent=`Registros da loja ${loja}`;card.append(strong,span);metrics.append(card);});
+  box.after(metrics);metrics.id='ax-posicoes-resumo-final';
 }
 $("ax-posicoes-arquivo")?.addEventListener('change',e=>{
-  axPosicoesArquivo=e.target.files?.[0]||null; axPosicoesValidadas=null;
+  axPosicoesArquivo=e.target.files?.[0]||null; axPosicoesValidadas=null; $("ax-posicoes-conclusao").className="hidden"; $("ax-posicoes-conclusao").replaceChildren(); $("ax-posicoes-resumo-final")?.remove(); $("ax-posicoes-progresso").classList.add("hidden"); $("ax-posicoes-progresso-label").classList.add("hidden");
   $("ax-posicoes-nome").textContent=axPosicoesArquivo?.name||"Nenhum arquivo selecionado";
   $("ax-posicoes-validar").disabled=!axPosicoesArquivo; $("ax-posicoes-confirmar").disabled=true;
   $("ax-posicoes-preview").classList.add('hidden'); $("ax-posicoes-feedback").className='feedback hidden';
@@ -2125,27 +2174,39 @@ $("ax-posicoes-validar")?.addEventListener('click',async()=>{
   finally{$("ax-posicoes-validar").disabled=!axPosicoesArquivo;}
 });
 $("ax-posicoes-confirmar")?.addEventListener('click',async()=>{
-  if(!axPosicoesValidadas||!confirm(`ATENÇÃO: substituir TODAS as posições atuais pelas ${axPosicoesValidadas.itens.length.toLocaleString('pt-BR')} linhas deste arquivo?\n\nO catálogo USE e os registros de abastecimento/histórico serão preservados.`))return;
-  const btn=$("ax-posicoes-confirmar"),prog=$("ax-posicoes-progresso"),bar=$("ax-posicoes-barra");
-  btn.disabled=true;$("ax-posicoes-validar").disabled=true;prog.classList.remove('hidden');bar.style.width='0%';
+  if(!axPosicoesValidadas||!confirm(`ATENÇÃO: substituir TODAS as posições atuais pelas ${axPosicoesValidadas.itens.length.toLocaleString('pt-BR')} linhas deste arquivo?\n\nO catálogo USE e os registros operacionais serão preservados.`))return;
+  const btn=$("ax-posicoes-confirmar"),validar=$("ax-posicoes-validar"),prog=$("ax-posicoes-progresso"),d=axPosicoesValidadas,total=d.itens.length;
+  btn.disabled=true;validar.disabled=true;prog.classList.remove('hidden');axPosAtualizarProgresso(0,'Preparando importação segura...');
+  $("ax-posicoes-conclusao").className='hidden';$("ax-posicoes-resumo-final")?.remove();
   const uploadId=(crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`);
-  const d=axPosicoesValidadas, total=d.itens.length;
+  let enviados=0;
   try{
     await requisicaoAPI('/api/posicoes/importar/iniciar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadId,total})});
     const lote=100;
     for(let i=0;i<total;i+=lote){
       const itens=d.itens.slice(i,i+lote);
-      await requisicaoAPI('/api/posicoes/importar/lote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadId,itens})});
-      bar.style.width=`${Math.min(95,Math.round(((i+itens.length)/total)*95))}%`;
-      axPosicoesSetFeedback(`Enviando registros: ${(i+itens.length).toLocaleString('pt-BR')} de ${total.toLocaleString('pt-BR')}. A base antiga continua ativa até a conclusão.`);
+      const resposta=await requisicaoAPI('/api/posicoes/importar/lote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadId,itens})});
+      enviados+=Number(resposta.recebidos||0);
+      if(Number(resposta.total)!==enviados)throw new Error(`Conferência do envio divergente: servidor registrou ${resposta.total}, esperado ${enviados}.`);
+      const pct=Math.min(94,(enviados/total)*94);
+      axPosAtualizarProgresso(pct,`Enviando ${enviados.toLocaleString('pt-BR')} de ${total.toLocaleString('pt-BR')} registros`);
+      axPosicoesSetFeedback(`Envio em andamento. A base anterior continua ativa até a conferência final.`);
     }
+    if(enviados!==total)throw new Error(`Envio incompleto: ${enviados} de ${total} registros.`);
+    axPosAtualizarProgresso(97,'Conferindo lojas e preparando substituição integral...');
     const resultado=await requisicaoAPI('/api/posicoes/importar/finalizar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadId,total,lojas:{...d.contagem,total}})});
-    bar.style.width='100%';
-    axPosicoesSetFeedback(`Atualização concluída: ${resultado.total.toLocaleString('pt-BR')} registros substituídos. Backup anterior preservado. Catálogo USE intacto.`);
-    estoqueCarregado=false; await carregarEstoque();
-    axPosicoesValidadas=null; $("ax-posicoes-confirmar").disabled=true;
-  }catch(e){axPosicoesSetFeedback(`Importação não concluída: ${e.message}. A base atual foi mantida.`,true);}
-  finally{btn.disabled=false;$("ax-posicoes-validar").disabled=!axPosicoesArquivo;}
+    if(!resultado.ok||Number(resultado.total)!==total)throw new Error('O servidor não confirmou a quantidade final esperada.');
+    axPosAtualizarProgresso(100,'Substituição concluída e conferida');
+    axPosMostrarConclusao(resultado,d);
+    axPosicoesSetFeedback('Base física atualizada. Catálogo USE e dados operacionais preservados.');
+    estoqueCarregado=false;await carregarEstoque();
+    axPosicoesValidadas=null;btn.disabled=true;btn.textContent='Atualização concluída';
+  }catch(e){
+    axPosicoesSetFeedback(`Importação não concluída: ${e.message}. A base anterior foi mantida se a substituição não chegou à etapa final.`,true);
+    btn.disabled=false;btn.textContent='Confirmar substituição integral';
+  }finally{
+    validar.disabled=!axPosicoesArquivo;
+  }
 });
 
 // CONFIGURAÇÃO DE PERMISSÕES DE DESCONTO
