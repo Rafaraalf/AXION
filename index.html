@@ -1455,20 +1455,116 @@ body { min-width:320px; }
 }
 
 
-/* AXION V14.2 | reset de rolagem entre páginas e contenção do layout */
-html, body { width:100%; height:100%; min-height:0; overflow:hidden; }
-#appView:not(.hidden) { height:100dvh; min-height:0; overflow:hidden; }
-#appView .main { height:100dvh; min-height:0; overflow:hidden; }
-#appView .content {
-  min-height:0;
-  height:0;
-  flex:1 1 auto;
-  overflow-y:auto;
-  overflow-x:hidden;
-  overscroll-behavior:contain;
+/* AXION V14.3 | layout de viewport sem centralização ou salto vertical */
+html, body {
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
 }
-#appView .page.active { margin-top:0; align-self:flex-start; }
-
+#appView:not(.hidden) {
+  display:grid !important;
+  grid-template-columns:250px minmax(0,1fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  width:100% !important;
+  height:100dvh !important;
+  min-height:0 !important;
+  max-height:100dvh !important;
+  overflow:hidden !important;
+  align-items:stretch !important;
+}
+#appView .sidebar {
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  align-self:stretch !important;
+  height:100dvh !important;
+  min-height:0 !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+}
+#appView .main {
+  grid-column:2 !important;
+  grid-row:1 !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  grid-template-rows:68px minmax(0,1fr) !important;
+  align-self:stretch !important;
+  position:relative !important;
+  width:100% !important;
+  height:100dvh !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-height:100dvh !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+#appView .topbar {
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  inset:auto !important;
+  width:100% !important;
+  height:68px !important;
+  min-height:68px !important;
+  max-height:68px !important;
+  margin:0 !important;
+  align-self:stretch !important;
+}
+#appView .content {
+  grid-column:1 !important;
+  grid-row:2 !important;
+  display:block !important;
+  position:relative !important;
+  inset:auto !important;
+  align-self:stretch !important;
+  justify-self:stretch !important;
+  width:100% !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:24px clamp(16px,2.2vw,36px) 40px !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+  overflow-anchor:none !important;
+  scrollbar-gutter:stable;
+}
+#appView .page,
+#appView .page.active {
+  position:relative !important;
+  inset:auto !important;
+  top:0 !important;
+  align-self:flex-start !important;
+  justify-self:stretch !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin-block-start:0 !important;
+  padding-block-start:0 !important;
+  transform:none !important;
+  animation:none !important;
+}
+#appView .page:not(.active) {display:none !important}
+#appView .page.active {display:block !important}
+#appView.sidebar-collapsed {grid-template-columns:76px minmax(0,1fr) !important}
+#appView.sidebar-collapsed .sidebar {grid-column:1 !important}
+#appView.sidebar-collapsed .main {grid-column:2 !important}
+@media(max-width:760px) {
+  #appView:not(.hidden) {grid-template-columns:76px minmax(0,1fr) !important}
+  #appView .main {grid-template-rows:58px minmax(0,1fr) !important}
+  #appView .topbar {height:58px !important;min-height:58px !important;max-height:58px !important}
+  #appView .content {padding:16px 12px 28px !important}
+  #appView.sidebar-collapsed {grid-template-columns:0 minmax(0,1fr) !important}
+  #appView.sidebar-collapsed .sidebar {grid-column:1 !important;width:0 !important}
+  #appView.sidebar-collapsed .main {grid-column:2 !important}
+}
+@media(max-width:420px) {
+  #appView .content {padding:13px 9px 24px !important}
+}
 </style>
 </head>
 
@@ -4142,13 +4238,10 @@ document.querySelectorAll("[data-page]").forEach(botao => {
   botao.addEventListener("click", () => {
     const pagina = botao.dataset.page;
 
-    // Cada aba começa no topo, sem herdar a rolagem da página anterior.
+    // Captura a área de conteúdo. O reset será repetido DEPOIS da troca
+    // de visibilidade para impedir que o scroll anchoring do navegador
+    // empurre a nova página para o meio da tela.
     const areaConteudo = document.querySelector("#appView .content");
-    if (areaConteudo) {
-      areaConteudo.scrollTop = 0;
-      areaConteudo.scrollLeft = 0;
-    }
-    window.scrollTo(0, 0);
 
     document.querySelectorAll("[data-page]").forEach(item => {
       item.classList.toggle(
@@ -4166,6 +4259,20 @@ document.querySelectorAll("[data-page]").forEach(botao => {
 
     $("tituloPagina").textContent =
       botao.textContent.trim();
+
+    const resetarRolagemDaAba = () => {
+      if (areaConteudo) {
+        areaConteudo.scrollTop = 0;
+        areaConteudo.scrollLeft = 0;
+      }
+      window.scrollTo(0, 0);
+    };
+    // Duas passagens após o layout: a primeira aplica display:block;
+    // a segunda neutraliza qualquer ajuste tardio de rolagem do navegador.
+    requestAnimationFrame(() => {
+      resetarRolagemDaAba();
+      requestAnimationFrame(resetarRolagemDaAba);
+    });
 
     if (
       pagina === "abastecimento" &&
