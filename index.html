@@ -1565,6 +1565,150 @@ html, body {
 @media(max-width:420px) {
   #appView .content {padding:13px 9px 24px !important}
 }
+
+
+/* AXION V14.4 | correção estrutural definitiva do espaço vazio e rolagem */
+html, body {
+  width:100% !important;
+  height:auto !important;
+  min-height:100% !important;
+  margin:0 !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+}
+body { min-width:320px; }
+#appView.hidden { display:none !important; }
+#appView:not(.hidden) {
+  display:block !important;
+  position:relative !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:100vh !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
+#appView .sidebar {
+  position:fixed !important;
+  top:0 !important;
+  bottom:0 !important;
+  left:0 !important;
+  z-index:100 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  width:250px !important;
+  min-width:250px !important;
+  max-width:250px !important;
+  height:100vh !important;
+  min-height:0 !important;
+  max-height:100vh !important;
+  margin:0 !important;
+  padding:26px 16px !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  box-sizing:border-box !important;
+}
+#appView .main {
+  display:block !important;
+  position:relative !important;
+  width:auto !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:auto !important;
+  min-height:100vh !important;
+  max-height:none !important;
+  margin:0 0 0 250px !important;
+  padding:0 !important;
+  overflow:visible !important;
+}
+#appView .topbar {
+  position:sticky !important;
+  top:0 !important;
+  left:auto !important;
+  right:auto !important;
+  z-index:50 !important;
+  display:flex !important;
+  width:100% !important;
+  height:68px !important;
+  min-height:68px !important;
+  max-height:68px !important;
+  margin:0 !important;
+  padding:12px clamp(14px,2vw,28px) !important;
+  box-sizing:border-box !important;
+}
+#appView .content {
+  display:block !important;
+  position:static !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  height:auto !important;
+  min-height:calc(100vh - 68px) !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:24px clamp(16px,2.2vw,36px) 40px !important;
+  overflow:visible !important;
+  scrollbar-gutter:auto !important;
+  box-sizing:border-box !important;
+}
+#appView .page,
+#appView .page.active {
+  position:static !important;
+  inset:auto !important;
+  top:auto !important;
+  display:block;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  transform:none !important;
+  animation:none !important;
+}
+#appView .page:not(.active) { display:none !important; }
+#appView .page.active { display:block !important; }
+#appView.sidebar-collapsed .sidebar {
+  width:76px !important;
+  min-width:76px !important;
+  max-width:76px !important;
+  padding:22px 9px !important;
+}
+#appView.sidebar-collapsed .main { margin-left:76px !important; }
+#appView.sidebar-collapsed .sidebar-brand {
+  font-size:0 !important; letter-spacing:0 !important; padding:0 !important; text-align:center !important;
+}
+#appView.sidebar-collapsed .sidebar-brand::after { content:'A';font-size:25px;letter-spacing:0; }
+#appView.sidebar-collapsed .sidebar-caption,
+#appView.sidebar-collapsed .sidebar-bottom { display:none !important; }
+#appView.sidebar-collapsed .nav { gap:8px; }
+#appView.sidebar-collapsed .nav button {
+  display:flex !important; align-items:center; justify-content:center !important;
+  width:100% !important; min-height:46px !important; padding:10px 4px !important;
+  font-size:0 !important; white-space:nowrap; overflow:hidden;
+}
+#appView.sidebar-collapsed .nav button::first-letter { font-size:19px; }
+@media(max-width:760px) {
+  #appView .sidebar {
+    width:76px !important; min-width:76px !important; max-width:76px !important;
+    padding:16px 8px !important;
+  }
+  #appView .sidebar-brand {font-size:21px !important;letter-spacing:0;padding:0;text-align:center}
+  #appView .sidebar-caption,#appView .sidebar-bottom {display:none !important}
+  #appView .nav {display:flex;flex-direction:column;gap:8px;margin-top:20px}
+  #appView .nav button {display:flex;justify-content:center;min-height:45px;padding:10px 3px;font-size:0;white-space:nowrap;overflow:hidden}
+  #appView .nav button::first-letter {font-size:18px}
+  #appView .main {margin-left:76px !important;min-height:100vh !important;height:auto !important;overflow:visible !important}
+  #appView .topbar {height:58px !important;min-height:58px !important;max-height:58px !important;padding:8px 10px !important}
+  #appView .content {min-height:calc(100vh - 58px) !important;padding:16px 12px 28px !important;overflow:visible !important}
+  #appView.sidebar-collapsed .sidebar {width:0 !important;min-width:0 !important;max-width:0 !important;padding:0 !important;border:0 !important;overflow:hidden !important}
+  #appView.sidebar-collapsed .main {margin-left:0 !important}
+}
+@media(max-width:420px) {
+  #appView .topbar-left {gap:7px}
+  #appView .sidebar-toggle {width:34px;height:34px;flex-basis:34px}
+  #appView .content {padding:13px 9px 24px !important}
+  #appView .heading h1 {font-size:24px}
+}
+
 </style>
 </head>
 
@@ -2224,6 +2368,8 @@ html, body {
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
 
 // =====================================================
 // AXION WEB v1.6 · D1
@@ -4238,10 +4384,9 @@ document.querySelectorAll("[data-page]").forEach(botao => {
   botao.addEventListener("click", () => {
     const pagina = botao.dataset.page;
 
-    // Captura a área de conteúdo. O reset será repetido DEPOIS da troca
-    // de visibilidade para impedir que o scroll anchoring do navegador
-    // empurre a nova página para o meio da tela.
-    const areaConteudo = document.querySelector("#appView .content");
+    // A V14.4 usa somente a rolagem da página (window).
+    // Isso evita scroll interno preservado entre abas e elimina o salto vertical.
+    const appConteudo = document.querySelector("#appView .content");
 
     document.querySelectorAll("[data-page]").forEach(item => {
       item.classList.toggle(
@@ -4261,18 +4406,21 @@ document.querySelectorAll("[data-page]").forEach(botao => {
       botao.textContent.trim();
 
     const resetarRolagemDaAba = () => {
-      if (areaConteudo) {
-        areaConteudo.scrollTop = 0;
-        areaConteudo.scrollLeft = 0;
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      if (appConteudo) {
+        appConteudo.scrollTop = 0;
+        appConteudo.scrollLeft = 0;
       }
-      window.scrollTo(0, 0);
     };
-    // Duas passagens após o layout: a primeira aplica display:block;
-    // a segunda neutraliza qualquer ajuste tardio de rolagem do navegador.
+    // Reaplica depois do cálculo de layout e após a restauração de foco do navegador.
+    resetarRolagemDaAba();
     requestAnimationFrame(() => {
       resetarRolagemDaAba();
       requestAnimationFrame(resetarRolagemDaAba);
     });
+    setTimeout(resetarRolagemDaAba, 80);
 
     if (
       pagina === "abastecimento" &&
