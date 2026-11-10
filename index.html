@@ -1984,10 +1984,10 @@ html, body {
   animation: none !important;
   box-sizing: border-box !important;
 }
-#appView .content > section.page:not(.active) {
+#appView .content section.page:not(.active) {
   display: none !important;
 }
-#appView .content > section.page.active {
+#appView .content section.page.active {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
@@ -2496,7 +2496,7 @@ html, body {
           <div class="toolbar est-actions-row"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
           <p class="status-line est-count-row" id="est-resultados">Carregando...</p>
           <div class="table-wrap est-table-wrap"><table class="data-table est-stock-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
-        </div></div>
+        </div>
       </section>
 <!-- HISTÓRICO -->
 
@@ -2667,7 +2667,7 @@ html, body {
         </div>
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 4.0 · D1</p>
+          <p>Versão da interface: 4.1 · D1</p>
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
             Interface: GitHub Pages<br>
@@ -3157,7 +3157,7 @@ $("cfg-salvar-desconto").addEventListener("click",async()=>{
 // =====================================================
 
 function axionAtivarPagina(pagina) {
-  const paginas = document.querySelectorAll("#appView .content > section.page");
+  const paginas = document.querySelectorAll("#appView .content section.page");
   const botoes = document.querySelectorAll("#appView [data-page]");
   let encontrada = false;
 
