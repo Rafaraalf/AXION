@@ -2064,12 +2064,25 @@ function axPosicaoNormalizar(v, linha){
   if(!s)throw new Error(`Linha ${linha}: posição vazia.`);
   return s;
 }
-function axPosValidarArquivo(file){
+async function axPosValidarArquivo(file){
   if(!window.XLSX)throw new Error("Biblioteca de leitura XLSX não carregou. Atualize a página e tente novamente.");
-  const wb=XLSX.read(file,{type:'array',cellDates:true});
+  if(!file)throw new Error("Selecione um arquivo XLSX.");
+  // SheetJS precisa receber os bytes do arquivo, não o objeto File diretamente.
+  const bytes=await file.arrayBuffer();
+  const wb=XLSX.read(bytes,{type:'array',cellDates:true});
   const nomeAba=wb.SheetNames.find(n=>n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()==='DADOSPOSICOES');
   if(!nomeAba)throw new Error("A aba DADOSPOSIÇÕES não foi encontrada no arquivo.");
-  const linhas=XLSX.utils.sheet_to_json(wb.Sheets[nomeAba],{header:1,defval:'',raw:true,blankrows:false});
+  const ws=wb.Sheets[nomeAba];
+  // Algumas planilhas carregam formatação até dezenas de milhares de linhas/colunas vazias.
+  // Descobre a última célula real somente nas 11 colunas usadas e limita a leitura a A:K.
+  let ultimaLinha=1;
+  for(const chave of Object.keys(ws)){
+    if(chave[0]==='!')continue;
+    const m=/^([A-K])(\d+)$/.exec(chave);
+    if(m){const cel=ws[chave];if(cel&&cel.v!==undefined&&cel.v!==null&&cel.v!=='')ultimaLinha=Math.max(ultimaLinha,Number(m[2]));}
+  }
+  if(ultimaLinha<2)throw new Error("A planilha não contém registros.");
+  const linhas=XLSX.utils.sheet_to_json(ws,{header:1,range:`A1:K${ultimaLinha}`,defval:'',raw:true,blankrows:false});
   if(linhas.length<2)throw new Error("A planilha não contém registros.");
   const cab=(linhas[0]||[]).slice(0,11).map(v=>axPosTxt(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
   const esperado=['POSICAO','EAN','QUANTIDADE','ATUALIZADO_EM','REF','DESCRICAO','MARCA','COR','TAMANHO','EAN','LOJA'];
@@ -2103,11 +2116,13 @@ $("ax-posicoes-arquivo")?.addEventListener('change',e=>{
   $("ax-posicoes-validar").disabled=!axPosicoesArquivo; $("ax-posicoes-confirmar").disabled=true;
   $("ax-posicoes-preview").classList.add('hidden'); $("ax-posicoes-feedback").className='feedback hidden';
 });
-$("ax-posicoes-validar")?.addEventListener('click',()=>{
+$("ax-posicoes-validar")?.addEventListener('click',async()=>{
   try{
-    axPosicoesValidadas=axPosValidarArquivo(axPosicoesArquivo); axPosMostrarPreview(axPosicoesValidadas);
+    const botao=$("ax-posicoes-validar");botao.disabled=true;
+    axPosicoesValidadas=await axPosValidarArquivo(axPosicoesArquivo); axPosMostrarPreview(axPosicoesValidadas);
     axPosicoesSetFeedback("Planilha validada. Nenhuma alteração foi feita no banco."); $("ax-posicoes-confirmar").disabled=false;
   }catch(e){axPosicoesSetFeedback(e.message,true);$("ax-posicoes-confirmar").disabled=true;}
+  finally{$("ax-posicoes-validar").disabled=!axPosicoesArquivo;}
 });
 $("ax-posicoes-confirmar")?.addEventListener('click',async()=>{
   if(!axPosicoesValidadas||!confirm(`ATENÇÃO: substituir TODAS as posições atuais pelas ${axPosicoesValidadas.itens.length.toLocaleString('pt-BR')} linhas deste arquivo?\n\nO catálogo USE e os registros de abastecimento/histórico serão preservados.`))return;
