@@ -1454,6 +1454,21 @@ body { min-width:320px; }
   #appView .heading h1 {font-size:24px}
 }
 
+
+/* AXION V14.2 | reset de rolagem entre páginas e contenção do layout */
+html, body { width:100%; height:100%; min-height:0; overflow:hidden; }
+#appView:not(.hidden) { height:100dvh; min-height:0; overflow:hidden; }
+#appView .main { height:100dvh; min-height:0; overflow:hidden; }
+#appView .content {
+  min-height:0;
+  height:0;
+  flex:1 1 auto;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+}
+#appView .page.active { margin-top:0; align-self:flex-start; }
+
 </style>
 </head>
 
@@ -4126,6 +4141,14 @@ if (sidebarToggle) {
 document.querySelectorAll("[data-page]").forEach(botao => {
   botao.addEventListener("click", () => {
     const pagina = botao.dataset.page;
+
+    // Cada aba começa no topo, sem herdar a rolagem da página anterior.
+    const areaConteudo = document.querySelector("#appView .content");
+    if (areaConteudo) {
+      areaConteudo.scrollTop = 0;
+      areaConteudo.scrollLeft = 0;
+    }
+    window.scrollTo(0, 0);
 
     document.querySelectorAll("[data-page]").forEach(item => {
       item.classList.toggle(
