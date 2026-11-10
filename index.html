@@ -1335,6 +1335,125 @@ html,body {height:100%;min-height:100%;overflow:hidden}
   .heading h1 {font-size:24px}
 }
 
+
+
+/* AXION V14.1 | layout corrigido: menu estável e área central independente */
+html, body {
+  width:100%; height:100%; min-height:100%; margin:0;
+  overflow:hidden !important;
+}
+body { min-width:320px; }
+#appView.hidden { display:none !important; }
+#appView:not(.hidden) {
+  display:grid !important;
+  grid-template-columns:250px minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr);
+  width:100%; height:100dvh; min-height:0;
+  overflow:hidden; align-items:stretch;
+}
+#appView .sidebar {
+  grid-column:1; grid-row:1;
+  position:relative; inset:auto;
+  display:flex; flex-direction:column;
+  width:auto !important; min-width:0; min-height:0; height:100dvh;
+  flex:none !important; box-sizing:border-box;
+  padding:26px 16px;
+  overflow-x:hidden; overflow-y:auto;
+  overscroll-behavior:contain;
+  z-index:5;
+}
+#appView .main {
+  grid-column:2; grid-row:1;
+  display:flex; flex-direction:column;
+  width:100%; max-width:none; min-width:0; min-height:0;
+  height:100dvh; margin:0; overflow:hidden;
+}
+#appView .topbar {
+  position:relative; z-index:2;
+  display:flex; flex:0 0 auto;
+  width:100%; min-width:0; box-sizing:border-box;
+  min-height:68px; padding:12px clamp(14px,2vw,28px);
+  gap:14px;
+}
+#appView .topbar-left {display:flex;align-items:center;gap:12px;min-width:0}
+#appView .topbar-left strong {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#appView .sidebar-toggle {
+  display:grid; place-items:center; flex:0 0 40px;
+  width:40px;height:40px;padding:0;
+  border:1px solid var(--border);border-radius:10px;
+  background:#172b42;color:var(--accent);font-size:19px;cursor:pointer;
+}
+#appView .content {
+  display:block; flex:1 1 auto;
+  width:100%; max-width:none; min-width:0; min-height:0;
+  height:auto; box-sizing:border-box; margin:0;
+  padding:26px clamp(16px,2.2vw,36px) 40px;
+  overflow-x:hidden; overflow-y:auto;
+  overscroll-behavior-y:contain;
+  scrollbar-gutter:stable;
+}
+#appView .page {width:100%;max-width:none;min-width:0;box-sizing:border-box}
+#appView .page.active {display:block}
+#appView .panel, #appView .stat {min-width:0;max-width:100%;box-sizing:border-box}
+#appView .table-wrap {width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain}
+#appView.sidebar-collapsed {grid-template-columns:76px minmax(0,1fr)}
+#appView.sidebar-collapsed .sidebar {width:auto !important;padding:22px 9px}
+#appView.sidebar-collapsed .sidebar-brand {font-size:0;letter-spacing:0;padding:0;text-align:center}
+#appView.sidebar-collapsed .sidebar-brand::after {content:'A';font-size:25px;letter-spacing:0}
+#appView.sidebar-collapsed .sidebar-caption,
+#appView.sidebar-collapsed .sidebar-bottom {display:none !important}
+#appView.sidebar-collapsed .nav {gap:8px}
+#appView.sidebar-collapsed .nav button {
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:46px;padding:10px 4px;
+  font-size:0;white-space:nowrap;overflow:hidden;
+}
+#appView.sidebar-collapsed .nav button::first-letter {font-size:19px}
+
+/* Histórico: mantém os comandos dentro do painel e evita colisões */
+#page-historico {min-width:0}
+#page-historico .heading {margin-bottom:22px}
+#page-historico .panel {width:100%;min-width:0;overflow:hidden}
+#page-historico .hist-cabecalho {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px 18px;flex-wrap:wrap;width:100%;min-width:0;
+}
+#page-historico .hist-cabecalho > div {min-width:0;flex:1 1 260px}
+#page-historico .hist-cabecalho button {max-width:100%;white-space:normal}
+#page-historico .toolbar {display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+#page-historico .toolbar button {max-width:100%}
+#page-historico .data-table {width:100%;min-width:760px;table-layout:auto}
+
+@media(max-width:760px) {
+  #appView:not(.hidden) {grid-template-columns:76px minmax(0,1fr)}
+  #appView .sidebar {width:auto !important;padding:16px 8px}
+  #appView .sidebar-brand {font-size:21px;letter-spacing:0;padding:0;text-align:center}
+  #appView .sidebar-caption,#appView .sidebar-bottom {display:none !important}
+  #appView .nav {display:flex;flex-direction:column;gap:8px;margin-top:20px}
+  #appView .nav button {
+    display:flex;align-items:center;justify-content:center;
+    min-height:45px;padding:10px 3px;font-size:0;white-space:nowrap;overflow:hidden;
+  }
+  #appView .nav button::first-letter {font-size:18px}
+  #appView .main {height:100dvh;min-height:0}
+  #appView .topbar {min-height:58px;padding:8px 10px;gap:8px}
+  #appView .topbar span {font-size:10px;white-space:nowrap}
+  #appView .content {padding:16px 12px 28px}
+  #appView.sidebar-collapsed {grid-template-columns:0 minmax(0,1fr)}
+  #appView.sidebar-collapsed .sidebar {width:0 !important;padding:0;border:0;overflow:hidden}
+  #appView.sidebar-collapsed .sidebar-toggle {display:grid}
+  #page-historico .hist-cabecalho {align-items:stretch;flex-direction:column}
+  #page-historico .hist-cabecalho > div {flex-basis:auto}
+  #page-historico .hist-cabecalho button {width:100%}
+  #page-historico .data-table {min-width:760px}
+}
+@media(max-width:420px) {
+  #appView .topbar-left {gap:7px}
+  #appView .sidebar-toggle {width:34px;height:34px;flex-basis:34px}
+  #appView .content {padding:13px 9px 22px}
+  #appView .heading h1 {font-size:24px}
+}
+
 </style>
 </head>
 
@@ -1437,7 +1556,7 @@ html,body {height:100%;min-height:100%;overflow:hidden}
         <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">☰</button>
         <strong id="tituloPagina">Dashboard</strong>
       </div>
-      <span>AXION WEB · v4.0 D1</span>
+      <span>AXION WEB · v4.1 D1</span>
     </header>
 
     <div class="content">
