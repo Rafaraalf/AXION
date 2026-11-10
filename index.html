@@ -1401,6 +1401,26 @@ body { overflow-x:hidden; }
 
         </div>
 
+        <div class="panel" id="painel-cloudflare" style="margin:18px 0">
+          <div class="atividade-cabecalho">
+            <div>
+              <h2>Cloudflare · Monitoramento</h2>
+              <p class="detail">Consumo observado do Worker e do D1. Os dados podem ter atraso de processamento.</p>
+            </div>
+            <button class="secondary" type="button" id="cloudflare-atualizar">↻ Atualizar métricas</button>
+          </div>
+          <div class="stats" style="margin-top:14px">
+            <div class="stat"><div class="label">Requisições do Worker · 24h</div><div class="value blue" id="cf-worker-requests">—</div><div class="detail">AXION API</div></div>
+            <div class="stat"><div class="label">CPU P99 · 24h</div><div class="value" id="cf-worker-cpu">—</div><div class="detail">Microssegundos, maior P99 observado</div></div>
+            <div class="stat"><div class="label">Linhas lidas no D1 · 7 dias</div><div class="value orange" id="cf-d1-reads">—</div><div class="detail">Métrica importante para acompanhar custo</div></div>
+            <div class="stat"><div class="label">Linhas escritas no D1 · 7 dias</div><div class="value green" id="cf-d1-writes">—</div><div class="detail">Métrica importante para acompanhar custo</div></div>
+            <div class="stat"><div class="label">Armazenamento D1</div><div class="value" id="cf-d1-storage">—</div><div class="detail" id="cf-d1-databases">Bancos observados</div></div>
+            <div class="stat"><div class="label">Erros do Worker · 24h</div><div class="value" id="cf-worker-errors">—</div><div class="detail">Falhas registradas</div></div>
+          </div>
+          <div id="cloudflare-status" class="empty" role="status" style="margin-top:12px">Aguardando consulta das métricas...</div>
+          <p class="detail" style="margin-top:10px">Atenção: este painel mostra uso observado, não valores de fatura nem garantia de permanência no plano gratuito. Confira Billing na Cloudflare para cobrança oficial.</p>
+        </div>
+
         <div class="panel-grid">
 
           <div class="panel">
@@ -2309,6 +2329,7 @@ async function requisicaoAPIInterna(caminho, opcoes = {}) {
 
 async function carregarDashboard() {
   const token = tokenSessao;
+  carregarMetricasCloudflare();
 
   $("estadoDashboard").textContent =
     "Consultando Google Sheets...";
@@ -2344,6 +2365,44 @@ async function carregarDashboard() {
       "Erro ao carregar Dashboard: " + erro.message;
   }
 }
+
+// =====================================================
+// CLOUDFLARE MONITORAMENTO
+// =====================================================
+function axionNumero(valor) {
+  return Number(valor || 0).toLocaleString("pt-BR");
+}
+function axionBytes(valor) {
+  const n = Number(valor || 0);
+  if (!n) return "0 B";
+  const unidades = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.min(Math.floor(Math.log(n) / Math.log(1024)), unidades.length - 1);
+  return `${(n / Math.pow(1024, i)).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${unidades[i]}`;
+}
+async function carregarMetricasCloudflare() {
+  const status = $("cloudflare-status");
+  if (!status) return;
+  status.textContent = "Consultando Analytics da Cloudflare...";
+  const botao = $("cloudflare-atualizar");
+  if (botao) botao.disabled = true;
+  try {
+    const dados = await requisicaoAPI("/api/cloudflare/metricas");
+    $("cf-worker-requests").textContent = axionNumero(dados.worker?.requisicoes);
+    $("cf-worker-cpu").textContent = `${axionNumero(dados.worker?.cpuP99Us)} µs`;
+    $("cf-d1-reads").textContent = axionNumero(dados.d1?.linhasLidas);
+    $("cf-d1-writes").textContent = axionNumero(dados.d1?.linhasEscritas);
+    $("cf-d1-storage").textContent = axionBytes(dados.d1?.armazenamentoBytes);
+    $("cf-d1-databases").textContent = `${(dados.d1?.bancos || []).length} banco(s) com métricas`;
+    $("cf-worker-errors").textContent = axionNumero(dados.worker?.erros);
+    const data = dados.atualizadoEm ? new Date(dados.atualizadoEm).toLocaleString("pt-BR") : "horário indisponível";
+    status.textContent = `● Atualizado em ${data}. Worker: ${dados.periodo?.worker || "24h"}; D1: ${dados.periodo?.d1 || "7 dias"}.`;
+  } catch (erro) {
+    status.textContent = `Não foi possível carregar as métricas: ${erro.message}`;
+  } finally {
+    if (botao) botao.disabled = false;
+  }
+}
+$("cloudflare-atualizar")?.addEventListener("click", carregarMetricasCloudflare);
 
 // =====================================================
 // MENSAGENS
