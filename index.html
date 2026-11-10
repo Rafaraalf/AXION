@@ -1260,6 +1260,22 @@ body { overflow-x:hidden; }
 #ax-posicoes-feedback{white-space:pre-line;line-height:1.5}
 @media(max-width:680px){.ax-import-panel{padding:15px}.ax-import-metrics{grid-template-columns:1fr}.ax-import-complete{padding:14px}#page-importar-posicoes .toolbar{display:grid;grid-template-columns:1fr}#page-importar-posicoes .toolbar button{width:100%}}
 
+
+/* AXION V12 | Percentuais de uso e saldo dos limites de referência */
+#painel-cloudflare .cf-stats{grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:14px}
+#painel-cloudflare .cf-stat{min-width:0;padding:18px;display:flex;flex-direction:column;gap:9px}
+#painel-cloudflare .cf-usage{margin-top:3px;padding-top:2px}
+#painel-cloudflare .cf-usage-line{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;margin-bottom:8px}
+#painel-cloudflare .cf-usage-line strong{color:#d9f4ff;font-weight:750}
+#painel-cloudflare .cf-usage-line span{color:#9fb3c8;white-space:nowrap}
+#painel-cloudflare .cf-meter{height:9px;width:100%;overflow:hidden;border-radius:99px;background:#0b1728;border:1px solid #35516c}
+#painel-cloudflare .cf-meter span{display:block;width:0;height:100%;border-radius:99px;background:#35c58b;transition:width .35s ease,background .2s ease}
+#painel-cloudflare .cf-meter.is-warn span{background:#f4b740}
+#painel-cloudflare .cf-meter.is-danger span{background:#f16b6b}
+#painel-cloudflare .cf-range{display:flex;justify-content:space-between;margin-top:5px;color:#8298ae;font-size:10px}
+#painel-cloudflare .cf-usage-line .cf-over{color:#ff9696}
+#painel-cloudflare .cf-usage-line .cf-ok{color:#75dfad}
+@media(max-width:640px){#painel-cloudflare .cf-stats{grid-template-columns:minmax(0,1fr)}#painel-cloudflare .cf-stat{padding:15px}}
 </style>
 </head>
 
@@ -1405,22 +1421,50 @@ body { overflow-x:hidden; }
           <div class="atividade-cabecalho">
             <div>
               <h2>Cloudflare · Monitoramento</h2>
-              <p class="detail">Consumo observado do Worker e do D1. Os dados podem ter atraso de processamento.</p>
+              <p class="detail">Consumo observado e percentual das referências do plano Free. Os dados podem ter atraso de processamento.</p>
             </div>
             <button class="secondary" type="button" id="cloudflare-atualizar">↻ Atualizar métricas</button>
           </div>
-          <div class="stats" style="margin-top:14px">
-            <div class="stat"><div class="label">Requisições do Worker · 24h</div><div class="value blue" id="cf-worker-requests">—</div><div class="detail">AXION API</div></div>
-            <div class="stat"><div class="label">CPU P99 · 24h</div><div class="value" id="cf-worker-cpu">—</div><div class="detail">Microssegundos, maior P99 observado</div></div>
-            <div class="stat"><div class="label">Linhas lidas no D1 · 7 dias</div><div class="value orange" id="cf-d1-reads">—</div><div class="detail">Métrica importante para acompanhar custo</div></div>
-            <div class="stat"><div class="label">Linhas escritas no D1 · 7 dias</div><div class="value green" id="cf-d1-writes">—</div><div class="detail">Métrica importante para acompanhar custo</div></div>
-            <div class="stat"><div class="label">Armazenamento D1</div><div class="value" id="cf-d1-storage">—</div><div class="detail" id="cf-d1-databases">Bancos observados</div></div>
-            <div class="stat"><div class="label">Erros do Worker · 24h</div><div class="value" id="cf-worker-errors">—</div><div class="detail">Falhas registradas</div></div>
+          <div class="stats cf-stats" style="margin-top:14px">
+            <div class="stat cf-stat">
+              <div class="label">Requisições do Worker · hoje UTC</div>
+              <div class="value blue" id="cf-worker-requests">—</div>
+              <div class="cf-usage"><div class="cf-usage-line"><strong id="cf-req-used">— usado</strong><span id="cf-req-free">— livre</span></div><div class="cf-meter" role="progressbar" aria-label="Uso da referência diária de requisições do Workers Free" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-req-bar"></span></div><div class="cf-range"><span>0%</span><span>100% · 100 mil/dia</span></div></div>
+              <div class="detail">Referência diária do Workers Free</div>
+            </div>
+            <div class="stat cf-stat">
+              <div class="label">CPU P99 · hoje UTC</div>
+              <div class="value" id="cf-worker-cpu">—</div>
+              <div class="cf-usage"><div class="cf-usage-line"><strong id="cf-cpu-used">— usado</strong><span id="cf-cpu-free">— livre</span></div><div class="cf-meter" role="progressbar" aria-label="CPU P99 comparado à referência de 10 mil microssegundos" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-cpu-bar"></span></div><div class="cf-range"><span>0%</span><span>100% · 10 ms/invocação</span></div></div>
+              <div class="detail">P99 é percentil, não média nem pico absoluto. Referência Free.</div>
+            </div>
+            <div class="stat cf-stat">
+              <div class="label">Maior leitura diária D1 · 7 dias</div>
+              <div class="value orange" id="cf-d1-reads">—</div>
+              <div class="cf-usage"><div class="cf-usage-line"><strong id="cf-reads-used">— usado</strong><span id="cf-reads-free">— livre</span></div><div class="cf-meter" role="progressbar" aria-label="Maior uso diário de linhas lidas D1 comparado à referência Free" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-reads-bar"></span></div><div class="cf-range"><span>0%</span><span>100% · 5 mi/dia</span></div></div>
+              <div class="detail" id="cf-d1-reads-detail">Total dos últimos 7 dias: —</div>
+            </div>
+            <div class="stat cf-stat">
+              <div class="label">Maior escrita diária D1 · 7 dias</div>
+              <div class="value green" id="cf-d1-writes">—</div>
+              <div class="cf-usage"><div class="cf-usage-line"><strong id="cf-writes-used">— usado</strong><span id="cf-writes-free">— livre</span></div><div class="cf-meter" role="progressbar" aria-label="Maior uso diário de linhas escritas D1 comparado à referência Free" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-writes-bar"></span></div><div class="cf-range"><span>0%</span><span>100% · 100 mil/dia</span></div></div>
+              <div class="detail" id="cf-d1-writes-detail">Total dos últimos 7 dias: —</div>
+            </div>
+            <div class="stat cf-stat">
+              <div class="label">Armazenamento D1</div>
+              <div class="value" id="cf-d1-storage">—</div>
+              <div class="cf-usage"><div class="cf-usage-line"><strong id="cf-storage-used">— usado</strong><span id="cf-storage-free">— livre</span></div><div class="cf-meter" role="progressbar" aria-label="Uso da referência de armazenamento D1" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-storage-bar"></span></div><div class="cf-range"><span>0%</span><span>100% · 5 GB</span></div></div>
+              <div class="detail" id="cf-d1-databases">Bancos observados</div>
+            </div>
+            <div class="stat cf-stat">
+              <div class="label">Erros do Worker · hoje UTC</div>
+              <div class="value" id="cf-worker-errors">—</div>
+              <div class="detail">Falhas registradas no período. Meta operacional: zero.</div>
+            </div>
           </div>
           <div id="cloudflare-status" class="empty" role="status" style="margin-top:12px">Aguardando consulta das métricas...</div>
-          <p class="detail" style="margin-top:10px">Atenção: este painel mostra uso observado, não valores de fatura nem garantia de permanência no plano gratuito. Confira Billing na Cloudflare para cobrança oficial.</p>
+          <p class="detail" style="margin-top:10px">Escala das barras: 0% a 100%. Quando ultrapassar 100%, o valor numérico mostra o excedente e a barra fica no máximo. As cotas são referências públicas do Workers Free; não identificam seu plano contratado nem substituem o Billing oficial.</p>
         </div>
-
         <div class="panel-grid">
 
           <div class="panel">
@@ -2379,6 +2423,30 @@ function axionBytes(valor) {
   const i = Math.min(Math.floor(Math.log(n) / Math.log(1024)), unidades.length - 1);
   return `${(n / Math.pow(1024, i)).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${unidades[i]}`;
 }
+function axionPercentual(valor, limite) {
+  if (!Number.isFinite(Number(valor)) || !Number.isFinite(Number(limite)) || Number(limite) <= 0) return 0;
+  return Math.max(0, Number(valor) / Number(limite) * 100);
+}
+function axionDefinirQuota(prefixo, valor, limite) {
+  const percentual = axionPercentual(valor, limite);
+  const restante = Math.max(0, 100 - percentual);
+  const barra = $(`cf-${prefixo}-bar`);
+  const usado = $(`cf-${prefixo}-used`);
+  const livre = $(`cf-${prefixo}-free`);
+  if (usado) {
+    usado.textContent = `${percentual.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}% usado`;
+    usado.className = percentual >= 100 ? "cf-over" : percentual >= 80 ? "cf-over" : "cf-ok";
+  }
+  if (livre) livre.textContent = `${restante.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}% livre`;
+  if (barra) {
+    barra.style.width = `${Math.min(100, percentual)}%`;
+    const trilho = barra.parentElement;
+    trilho.classList.toggle("is-warn", percentual >= 80 && percentual < 100);
+    trilho.classList.toggle("is-danger", percentual >= 100);
+    trilho.setAttribute("aria-valuenow", String(Math.min(100, percentual).toFixed(1)));
+    trilho.setAttribute("aria-valuetext", `${percentual.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}% do limite de referência usado`);
+  }
+}
 async function carregarMetricasCloudflare() {
   const status = $("cloudflare-status");
   if (!status) return;
@@ -2387,15 +2455,42 @@ async function carregarMetricasCloudflare() {
   if (botao) botao.disabled = true;
   try {
     const dados = await requisicaoAPI("/api/cloudflare/metricas");
-    $("cf-worker-requests").textContent = axionNumero(dados.worker?.requisicoes);
-    $("cf-worker-cpu").textContent = `${axionNumero(dados.worker?.cpuP99Us)} µs`;
-    $("cf-d1-reads").textContent = axionNumero(dados.d1?.linhasLidas);
-    $("cf-d1-writes").textContent = axionNumero(dados.d1?.linhasEscritas);
-    $("cf-d1-storage").textContent = axionBytes(dados.d1?.armazenamentoBytes);
+    const limites = dados.limitesReferenciaFree || {
+      workerRequisicoesDia: 100000,
+      workerCpuUsPorInvocacao: 10000,
+      d1LinhasLidasDia: 5000000,
+      d1LinhasEscritasDia: 100000,
+      d1ArmazenamentoBytes: 5000000000
+    };
+    const requisicoes = Number(dados.worker?.requisicoes || 0);
+    const cpuP99 = Number(dados.worker?.cpuP99Us || 0);
+    const picoLeituras = Number(dados.d1?.maiorDiaLeituras?.quantidade || 0);
+    const picoEscritas = Number(dados.d1?.maiorDiaEscritas?.quantidade || 0);
+    const armazenamento = Number(dados.d1?.armazenamentoBytes || 0);
+
+    $("cf-worker-requests").textContent = axionNumero(requisicoes);
+    $("cf-worker-cpu").textContent = `${axionNumero(cpuP99)} µs`;
+    $("cf-d1-reads").textContent = axionNumero(picoLeituras);
+    $("cf-d1-writes").textContent = axionNumero(picoEscritas);
+    $("cf-d1-storage").textContent = axionBytes(armazenamento);
     $("cf-d1-databases").textContent = `${(dados.d1?.bancos || []).length} banco(s) com métricas`;
     $("cf-worker-errors").textContent = axionNumero(dados.worker?.erros);
+
+    axionDefinirQuota("req", requisicoes, limites.workerRequisicoesDia);
+    axionDefinirQuota("cpu", cpuP99, limites.workerCpuUsPorInvocacao);
+    axionDefinirQuota("reads", picoLeituras, limites.d1LinhasLidasDia);
+    axionDefinirQuota("writes", picoEscritas, limites.d1LinhasEscritasDia);
+    axionDefinirQuota("storage", armazenamento, limites.d1ArmazenamentoBytes);
+
+    const totalReads = axionNumero(dados.d1?.linhasLidas || 0);
+    const totalWrites = axionNumero(dados.d1?.linhasEscritas || 0);
+    const diaReads = dados.d1?.maiorDiaLeituras?.data || "dia indisponível";
+    const diaWrites = dados.d1?.maiorDiaEscritas?.data || "dia indisponível";
+    $("cf-d1-reads-detail").textContent = `Pico em ${diaReads} · total 7 dias: ${totalReads}`;
+    $("cf-d1-writes-detail").textContent = `Pico em ${diaWrites} · total 7 dias: ${totalWrites}`;
+
     const data = dados.atualizadoEm ? new Date(dados.atualizadoEm).toLocaleString("pt-BR") : "horário indisponível";
-    status.textContent = `● Atualizado em ${data}. Worker: ${dados.periodo?.worker || "24h"}; D1: ${dados.periodo?.d1 || "7 dias"}.`;
+    status.textContent = `● Atualizado em ${data}. Worker: ${dados.periodo?.worker || "hoje (UTC)"}; D1: ${dados.periodo?.d1 || "7 dias"}. As barras mostram o pico diário do D1 nos últimos 7 dias.`;
   } catch (erro) {
     status.textContent = `Não foi possível carregar as métricas: ${erro.message}`;
   } finally {
