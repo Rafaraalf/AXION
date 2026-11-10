@@ -1193,6 +1193,39 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
   #page-abastecimento .data-table tbody td:nth-child(12) input{width:19px;height:19px}
 }
 
+
+
+/* AXION FIX 10/11/2026 - impedir rolagem horizontal nas tabelas */
+html, body, #app, main, .main-content { max-width:100%; }
+body { overflow-x:hidden; }
+#page-abastecimento, #page-abastecimento .table-wrap {
+  width:100%; max-width:100%; min-width:0; overflow-x:hidden !important;
+}
+#page-abastecimento .table-wrap { box-sizing:border-box; }
+#page-abastecimento .data-table {
+  width:100% !important; max-width:100% !important; min-width:0 !important;
+  table-layout:fixed !important; border-collapse:collapse;
+}
+#page-abastecimento .data-table th,
+#page-abastecimento .data-table td {
+  box-sizing:border-box; min-width:0; white-space:normal !important;
+  overflow-wrap:anywhere; word-break:normal;
+}
+#page-abastecimento .data-table .actions {
+  display:flex; flex-wrap:wrap; gap:5px; min-width:0;
+}
+#page-abastecimento .data-table .actions button {
+  flex:1 1 68px; min-width:0;
+}
+@media (min-width:1101px) {
+  #page-abastecimento .data-table th,
+  #page-abastecimento .data-table td { padding:8px 5px !important; font-size:11px; }
+}
+@media (max-width:1100px) {
+  #page-abastecimento .table-wrap { overflow-x:hidden !important; }
+  #page-abastecimento .data-table { display:block; }
+}
+
 </style>
 </head>
 
