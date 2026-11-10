@@ -1898,6 +1898,190 @@ html, body {
 }
 
 
+
+
+/* AXION FIX 2026-11-10 | layout único e páginas sempre sincronizadas com a navegação */
+html, body {
+  width: 100% !important;
+  min-width: 320px;
+  height: 100% !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+#appView.hidden { display: none !important; }
+#appView:not(.hidden) {
+  display: grid !important;
+  grid-template-columns: 250px minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+#appView .sidebar {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  position: relative !important;
+  inset: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+#appView .main {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: 68px minmax(0, 1fr) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+#appView .topbar {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-height: 68px !important;
+  height: 68px !important;
+  margin: 0 !important;
+}
+#appView .content {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 24px clamp(16px, 2.2vw, 36px) 40px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+}
+#appView .content > section.page {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  animation: none !important;
+  box-sizing: border-box !important;
+}
+#appView .content > section.page:not(.active) {
+  display: none !important;
+}
+#appView .content > section.page.active {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+#appView.sidebar-collapsed {
+  grid-template-columns: 76px minmax(0, 1fr) !important;
+}
+#appView.sidebar-collapsed .sidebar {
+  width: 76px !important;
+  min-width: 76px !important;
+  max-width: 76px !important;
+  padding: 22px 9px !important;
+}
+#appView.sidebar-collapsed .sidebar-brand {
+  font-size: 0 !important;
+  letter-spacing: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+#appView.sidebar-collapsed .sidebar-brand::after {
+  content: "A";
+  font-size: 25px;
+}
+#appView.sidebar-collapsed .sidebar-caption,
+#appView.sidebar-collapsed .sidebar-bottom {
+  display: none !important;
+}
+#appView.sidebar-collapsed .nav button {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  padding: 10px 4px !important;
+  overflow: hidden !important;
+  font-size: 0 !important;
+}
+#appView.sidebar-collapsed .nav button::first-letter {
+  font-size: 19px;
+}
+@media (max-width: 760px) {
+  html, body { overflow: hidden !important; }
+  #appView:not(.hidden) {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+  }
+  #appView .sidebar {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: 34dvh !important;
+    padding: 12px !important;
+    overflow: hidden !important;
+  }
+  #appView .sidebar-caption,
+  #appView .sidebar-bottom { display: none !important; }
+  #appView .sidebar-brand {
+    font-size: 23px !important;
+    padding: 0 8px 8px !important;
+  }
+  #appView .nav {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 7px !important;
+    overflow-x: auto !important;
+    padding-bottom: 4px;
+  }
+  #appView .nav button {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-height: 40px !important;
+    padding: 9px 11px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+  #appView .main {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    grid-template-rows: 58px minmax(0, 1fr) !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  #appView .topbar {
+    min-height: 58px !important;
+    height: 58px !important;
+  }
+  #appView .content {
+    padding: 16px 12px 28px !important;
+  }
+  #appView .sidebar-toggle { display: none !important; }
+}
+
 </style>
 </head>
 
@@ -2019,25 +2203,25 @@ html, body {
           <div class="stat">
             <div class="label">Produtos cadastrados</div>
             <div class="value blue" id="stat-produtos">—</div>
-            <div class="detail">Dados do Google Sheets</div>
+            <div class="detail">Dados do Cloudflare D1</div>
           </div>
 
           <div class="stat">
             <div class="label">Unidades pendentes</div>
             <div class="value orange" id="stat-pendentes">—</div>
-            <div class="detail">Dados do Google Sheets</div>
+            <div class="detail">Dados do Cloudflare D1</div>
           </div>
 
           <div class="stat">
             <div class="label">Unidades abastecidas</div>
             <div class="value green" id="stat-abastecidas">—</div>
-            <div class="detail">Dados do Google Sheets</div>
+            <div class="detail">Dados do Cloudflare D1</div>
           </div>
 
           <div class="stat">
             <div class="label">Itens sem estoque</div>
             <div class="value" id="stat-semEstoque">—</div>
-            <div class="detail">Dados do Google Sheets</div>
+            <div class="detail">Dados do Cloudflare D1</div>
           </div>
 
         </div>
@@ -2173,7 +2357,7 @@ html, body {
 
         <div class="notice">
           <span id="estadoDashboard">
-            Conectando ao Google Sheets...
+            Conectando ao Cloudflare D1...
           </span>
         </div>
 
@@ -2972,12 +3156,49 @@ $("cfg-salvar-desconto").addEventListener("click",async()=>{
 // LOGIN / SESSÃO
 // =====================================================
 
+function axionAtivarPagina(pagina) {
+  const paginas = document.querySelectorAll("#appView .content > section.page");
+  const botoes = document.querySelectorAll("#appView [data-page]");
+  let encontrada = false;
+
+  paginas.forEach(secao => {
+    const ativa = secao.id === "page-" + pagina;
+    secao.classList.toggle("active", ativa);
+    // O estilo inline evita que regras CSS antigas escondam a página selecionada.
+    secao.style.setProperty("display", ativa ? "block" : "none", "important");
+    secao.setAttribute("aria-hidden", String(!ativa));
+    if (ativa) encontrada = true;
+  });
+
+  botoes.forEach(botao => {
+    const ativo = botao.dataset.page === pagina;
+    botao.classList.toggle("active", ativo);
+    botao.setAttribute("aria-current", ativo ? "page" : "false");
+  });
+
+  const botaoAtivo = document.querySelector(`#appView [data-page="${pagina}"]`);
+  if (botaoAtivo) $("tituloPagina").textContent = botaoAtivo.textContent.trim();
+
+  const conteudo = document.querySelector("#appView .content");
+  if (conteudo) {
+    conteudo.scrollTop = 0;
+    conteudo.scrollLeft = 0;
+  }
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
+  if (!encontrada) {
+    console.error("AXION: página não encontrada:", pagina);
+  }
+  return encontrada;
+}
+
 function mostrarPainel(usuario) {
   $("usuarioLogado").textContent =
     usuario || "Administrador";
 
   $("loginView").classList.add("hidden");
   $("appView").classList.remove("hidden");
+  axionAtivarPagina("dashboard");
 }
 
 function mostrarLogin() {
@@ -3048,7 +3269,7 @@ async function carregarDashboard() {
   carregarMetricasCloudflare();
 
   $("estadoDashboard").textContent =
-    "Consultando Google Sheets...";
+    "Consultando dados no Cloudflare D1...";
 
   try {
     const dados = await requisicaoAPI("/api/dashboard");
@@ -3072,7 +3293,7 @@ async function carregarDashboard() {
     }
 
     $("estadoDashboard").textContent =
-      "● Dados atualizados a partir do Google Sheets.";
+      "● Dados atualizados a partir do Cloudflare D1.";
 
   } catch (erro) {
     if (token !== tokenSessao) return;
@@ -4441,7 +4662,7 @@ async function carregarHistorico(forcar = false) {
   if (!token) return;
 
   $("hist-estado").textContent =
-    "Consultando histórico no Google Sheets...";
+    "Consultando histórico no Cloudflare D1...";
 
   $("hist-atualizar").disabled = true;
 
@@ -4569,55 +4790,19 @@ if (sidebarToggle) {
 // NAVEGAÇÃO
 // =====================================================
 
-document.querySelectorAll("[data-page]").forEach(botao => {
+document.querySelectorAll("#appView [data-page]").forEach(botao => {
   botao.addEventListener("click", () => {
     const pagina = botao.dataset.page;
+    if (!axionAtivarPagina(pagina)) return;
 
-    // A V14.4 usa somente a rolagem da página (window).
-    // Isso evita scroll interno preservado entre abas e elimina o salto vertical.
-    const appConteudo = document.querySelector("#appView .content");
-
-    document.querySelectorAll("[data-page]").forEach(item => {
-      item.classList.toggle(
-        "active",
-        item === botao
-      );
-    });
-
-    document.querySelectorAll(".page").forEach(secao => {
-      secao.classList.toggle(
-        "active",
-        secao.id === "page-" + pagina
-      );
-    });
-
-    $("tituloPagina").textContent =
-      botao.textContent.trim();
-
-    const resetarRolagemDaAba = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      if (appConteudo) {
-        appConteudo.scrollTop = 0;
-        appConteudo.scrollLeft = 0;
-      }
-    };
-    // Reaplica depois do cálculo de layout e após a restauração de foco do navegador.
-    resetarRolagemDaAba();
-    requestAnimationFrame(() => {
-      resetarRolagemDaAba();
-      requestAnimationFrame(resetarRolagemDaAba);
-    });
-    setTimeout(resetarRolagemDaAba, 80);
-
-    if (
-      pagina === "abastecimento" &&
-      !pendentesCarregados
-    ) {
-      carregarPendentes();
+    if (pagina === "dashboard") {
+      carregarDashboard();
+      carregarAtividadeRecente();
     }
 
+    if (pagina === "abastecimento" && !pendentesCarregados) {
+      carregarPendentes();
+    }
 
     if (pagina === "historico") {
       carregarHistorico();
@@ -4627,9 +4812,6 @@ document.querySelectorAll("[data-page]").forEach(botao => {
       carregarEstoque();
     }
 
-    if (pagina === "dashboard") {
-      carregarAtividadeRecente();
-    }
     if (pagina === "configuracoes") {
       carregarConfigDesconto();
     }
