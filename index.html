@@ -1226,18 +1226,6 @@ body { overflow-x:hidden; }
   #page-abastecimento .data-table { display:block; }
 }
 
-
-/* Importação integral de posições */
-.ax-import-panel{max-width:100%;padding:24px;border:1px solid #2b4059;background:linear-gradient(155deg,#19273c,#152236);border-radius:16px}
-.ax-import-drop{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;min-height:150px;margin:18px 0;padding:22px;border:2px dashed #426782;border-radius:14px;background:#102036;color:#d9efff;cursor:pointer;text-align:center}
-.ax-import-drop strong{font-size:16px;color:#45c5f5}.ax-import-drop span{font-size:12px;color:#9fb4c9;overflow-wrap:anywhere}
-.ax-import-preview{margin:16px 0;padding:16px;border:1px solid #34516d;border-radius:12px;background:#102036;overflow:auto}
-.ax-import-preview table{width:100%;border-collapse:collapse}.ax-import-preview th,.ax-import-preview td{padding:9px;text-align:left;border-bottom:1px solid #2b4059}.ax-import-preview th{color:#9fb4c9;font-size:12px}
-.ax-import-progress{height:10px;margin:16px 0;background:#0b1727;border-radius:20px;overflow:hidden}.ax-import-progress div{height:100%;width:0;background:#38bdf8;transition:width .15s}
-#page-importar-posicoes .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-#page-importar-posicoes .toolbar button{min-height:44px;padding:10px 16px;border-radius:10px}
-@media(max-width:680px){.ax-import-panel{padding:15px}#page-importar-posicoes .toolbar button{width:100%}}
-
 </style>
 </head>
 
@@ -1307,10 +1295,6 @@ body { overflow-x:hidden; }
 
       <button data-page="estoque">
         ▤ Estoque
-      </button>
-
-      <button data-page="importar-posicoes">
-        ⇧ Atualizar posições
       </button>
 
       <button data-page="historico">
@@ -1560,22 +1544,6 @@ body { overflow-x:hidden; }
       </section>
 <!-- HISTÓRICO -->
 
-      <!-- IMPORTAÇÃO INTEGRAL DE POSIÇÕES -->
-      <section class="page" id="page-importar-posicoes">
-        <div class="heading"><h1>Atualizar posições</h1><p>Substitui integralmente a base física das lojas 66, 67 e 68. O catálogo USE e os dados operacionais permanecem intactos.</p></div>
-        <div class="panel ax-import-panel">
-          <h2>Importar planilha atualizada</h2>
-          <p class="status-line">Selecione o arquivo XLSX com a aba DADOSPOSIÇÕES. A importação valida as 11 colunas antes de alterar a base.</p>
-          <label class="ax-import-drop" for="ax-posicoes-arquivo"><strong>⇧ Selecionar arquivo XLSX</strong><span id="ax-posicoes-nome">Nenhum arquivo selecionado</span></label>
-          <input id="ax-posicoes-arquivo" type="file" accept=".xlsx,.xls" hidden>
-          <div id="ax-posicoes-preview" class="ax-import-preview hidden"></div>
-          <div id="ax-posicoes-feedback" class="feedback hidden" role="status" aria-live="polite"></div>
-          <div class="ax-import-progress hidden" id="ax-posicoes-progresso"><div id="ax-posicoes-barra"></div></div>
-          <div class="toolbar"><button class="primary" id="ax-posicoes-validar" type="button" disabled>Validar planilha</button><button class="primary" id="ax-posicoes-confirmar" type="button" disabled>Confirmar substituição integral</button></div>
-          <p class="status-line">A base anterior será copiada para backup antes da troca. Se a validação ou o envio falhar, a base atual continuará ativa. O catálogo USE não será alterado.</p>
-        </div>
-      </section>
-
       <section class="page" id="page-historico">
 
         <div class="heading">
@@ -1799,7 +1767,6 @@ body { overflow-x:hidden; }
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 
 // =====================================================
@@ -2024,129 +1991,6 @@ $('est-catalogo-limpar').addEventListener('click',()=>{
 });
 
 
-
-
-// =====================================================
-// IMPORTAÇÃO INTEGRAL DA PLANILHA DE POSIÇÕES
-// =====================================================
-let axPosicoesArquivo = null;
-let axPosicoesValidadas = null;
-const axPosicoesSetFeedback = (msg, erro=false) => {
-  const el=$("ax-posicoes-feedback"); if(!el)return;
-  el.textContent=msg; el.className="feedback "+(erro?"error":"success");
-};
-const axPosTxt = v => v===null||v===undefined?"":String(v).trim();
-function axPosNumeroInteiro(v, linha){
-  if(v===""||v===null||v===undefined)return 0;
-  const s=String(v).trim().replace(',','.'); const n=Number(s);
-  if(!Number.isFinite(n)||n<0||!Number.isInteger(n))throw new Error(`Linha ${linha}: quantidade inválida (${v}).`);
-  return n;
-}
-function axPosEAN(v){
-  if(v===null||v===undefined||v==="")return "";
-  if(typeof v==="number"){
-    if(!Number.isFinite(v)||!Number.isInteger(v))throw new Error("EAN numérico inválido.");
-    return String(v);
-  }
-  return String(v).trim().replace(/\.0$/,'');
-}
-function axPosData(v){
-  if(v instanceof Date && !isNaN(v))return v.toISOString().slice(0,19).replace('T',' ');
-  return axPosTxt(v);
-}
-function axPosicaoNormalizar(v, linha){
-  if(typeof v==='number'){
-    if(!Number.isFinite(v))throw new Error(`Linha ${linha}: posição numérica inválida.`);
-    return Number.isInteger(v)?String(v):String(v).replace(/\.0$/,'');
-  }
-  let s=axPosTxt(v);
-  if(/^\d+\.0$/.test(s))s=s.slice(0,-2);
-  if(!s)throw new Error(`Linha ${linha}: posição vazia.`);
-  return s;
-}
-async function axPosValidarArquivo(file){
-  if(!window.XLSX)throw new Error("Biblioteca de leitura XLSX não carregou. Atualize a página e tente novamente.");
-  if(!file)throw new Error("Selecione um arquivo XLSX.");
-  // SheetJS precisa receber os bytes do arquivo, não o objeto File diretamente.
-  const bytes=await file.arrayBuffer();
-  const wb=XLSX.read(bytes,{type:'array',cellDates:true});
-  const nomeAba=wb.SheetNames.find(n=>n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()==='DADOSPOSICOES');
-  if(!nomeAba)throw new Error("A aba DADOSPOSIÇÕES não foi encontrada no arquivo.");
-  const ws=wb.Sheets[nomeAba];
-  // Algumas planilhas carregam formatação até dezenas de milhares de linhas/colunas vazias.
-  // Descobre a última célula real somente nas 11 colunas usadas e limita a leitura a A:K.
-  let ultimaLinha=1;
-  for(const chave of Object.keys(ws)){
-    if(chave[0]==='!')continue;
-    const m=/^([A-K])(\d+)$/.exec(chave);
-    if(m){const cel=ws[chave];if(cel&&cel.v!==undefined&&cel.v!==null&&cel.v!=='')ultimaLinha=Math.max(ultimaLinha,Number(m[2]));}
-  }
-  if(ultimaLinha<2)throw new Error("A planilha não contém registros.");
-  const linhas=XLSX.utils.sheet_to_json(ws,{header:1,range:`A1:K${ultimaLinha}`,defval:'',raw:true,blankrows:false});
-  if(linhas.length<2)throw new Error("A planilha não contém registros.");
-  const cab=(linhas[0]||[]).slice(0,11).map(v=>axPosTxt(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
-  const esperado=['POSICAO','EAN','QUANTIDADE','ATUALIZADO_EM','REF','DESCRICAO','MARCA','COR','TAMANHO','EAN','LOJA'];
-  if(esperado.some((x,i)=>cab[i]!==x))throw new Error("Cabeçalho diferente do padrão esperado. Confira as 11 colunas da aba DADOSPOSIÇÕES.");
-  const itens=[], erros=[], contagem={'66':0,'67':0,'68':0};
-  for(let i=1;i<linhas.length;i++){
-    const r=linhas[i]||[]; if(!r.some(v=>v!==''&&v!==null&&v!==undefined))continue;
-    const linha=i+1;
-    try{
-      const posicao=axPosicaoNormalizar(r[0],linha), ean1=axPosEAN(r[1]), quantidade=axPosNumeroInteiro(r[2],linha);
-      const loja=String(r[10]).trim().replace(/\.0$/,'');
-      if(!['66','67','68'].includes(loja))throw new Error(`Linha ${linha}: loja inválida (${loja}).`);
-      const ean2=axPosEAN(r[9]);
-      if(!ean1&&!ean2)throw new Error(`Linha ${linha}: registro sem EAN.`);
-      itens.push({posicao,ean_1:ean1,quantidade,atualizado_em:axPosData(r[3]),ref:axPosTxt(r[4]),descricao:axPosTxt(r[5]),marca:axPosTxt(r[6]),cor:axPosTxt(r[7]),tamanho:axPosTxt(r[8]),ean_2:ean2,loja});
-      contagem[loja]++;
-    }catch(e){erros.push(e.message);if(erros.length>=25)break;}
-  }
-  if(erros.length)throw new Error(`${erros.length} erro(s) encontrados. Nenhum dado foi enviado:\n${erros.join('\n')}`);
-  if(!itens.length)throw new Error("Nenhum registro válido encontrado.");
-  return {itens,contagem,aba:nomeAba,arquivo:file.name};
-}
-function axPosMostrarPreview(d){
-  const box=$("ax-posicoes-preview");
-  box.innerHTML=`<strong>Prévia validada: ${d.itens.length.toLocaleString('pt-BR')} registros</strong><table><thead><tr><th>Loja</th><th>Registros</th></tr></thead><tbody><tr><td>66</td><td>${d.contagem['66'].toLocaleString('pt-BR')}</td></tr><tr><td>67</td><td>${d.contagem['67'].toLocaleString('pt-BR')}</td></tr><tr><td>68</td><td>${d.contagem['68'].toLocaleString('pt-BR')}</td></tr></tbody></table><p class="status-line">Amostra de posições: ${d.itens.slice(0,8).map(x=>x.posicao).join(' · ')}</p><p class="status-line">Catálogo USE: preservado. Substituição integral das posições: confirmada.</p>`;
-  box.classList.remove('hidden');
-}
-$("ax-posicoes-arquivo")?.addEventListener('change',e=>{
-  axPosicoesArquivo=e.target.files?.[0]||null; axPosicoesValidadas=null;
-  $("ax-posicoes-nome").textContent=axPosicoesArquivo?.name||"Nenhum arquivo selecionado";
-  $("ax-posicoes-validar").disabled=!axPosicoesArquivo; $("ax-posicoes-confirmar").disabled=true;
-  $("ax-posicoes-preview").classList.add('hidden'); $("ax-posicoes-feedback").className='feedback hidden';
-});
-$("ax-posicoes-validar")?.addEventListener('click',async()=>{
-  try{
-    const botao=$("ax-posicoes-validar");botao.disabled=true;
-    axPosicoesValidadas=await axPosValidarArquivo(axPosicoesArquivo); axPosMostrarPreview(axPosicoesValidadas);
-    axPosicoesSetFeedback("Planilha validada. Nenhuma alteração foi feita no banco."); $("ax-posicoes-confirmar").disabled=false;
-  }catch(e){axPosicoesSetFeedback(e.message,true);$("ax-posicoes-confirmar").disabled=true;}
-  finally{$("ax-posicoes-validar").disabled=!axPosicoesArquivo;}
-});
-$("ax-posicoes-confirmar")?.addEventListener('click',async()=>{
-  if(!axPosicoesValidadas||!confirm(`ATENÇÃO: substituir TODAS as posições atuais pelas ${axPosicoesValidadas.itens.length.toLocaleString('pt-BR')} linhas deste arquivo?\n\nO catálogo USE e os registros de abastecimento/histórico serão preservados.`))return;
-  const btn=$("ax-posicoes-confirmar"),prog=$("ax-posicoes-progresso"),bar=$("ax-posicoes-barra");
-  btn.disabled=true;$("ax-posicoes-validar").disabled=true;prog.classList.remove('hidden');bar.style.width='0%';
-  const uploadId=(crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`);
-  const d=axPosicoesValidadas, total=d.itens.length;
-  try{
-    await requisicaoAPI('/api/posicoes/importar/iniciar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadId,total})});
-    const lote=100;
-    for(let i=0;i<total;i+=lote){
-      const itens=d.itens.slice(i,i+lote);
-      await requisicaoAPI('/api/posicoes/importar/lote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadId,itens})});
-      bar.style.width=`${Math.min(95,Math.round(((i+itens.length)/total)*95))}%`;
-      axPosicoesSetFeedback(`Enviando registros: ${(i+itens.length).toLocaleString('pt-BR')} de ${total.toLocaleString('pt-BR')}. A base antiga continua ativa até a conclusão.`);
-    }
-    const resultado=await requisicaoAPI('/api/posicoes/importar/finalizar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadId,total,lojas:{...d.contagem,total}})});
-    bar.style.width='100%';
-    axPosicoesSetFeedback(`Atualização concluída: ${resultado.total.toLocaleString('pt-BR')} registros substituídos. Backup anterior preservado. Catálogo USE intacto.`);
-    estoqueCarregado=false; await carregarEstoque();
-    axPosicoesValidadas=null; $("ax-posicoes-confirmar").disabled=true;
-  }catch(e){axPosicoesSetFeedback(`Importação não concluída: ${e.message}. A base atual foi mantida.`,true);}
-  finally{btn.disabled=false;$("ax-posicoes-validar").disabled=!axPosicoesArquivo;}
-});
 
 // CONFIGURAÇÃO DE PERMISSÕES DE DESCONTO
 async function carregarConfigDesconto(){
