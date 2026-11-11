@@ -2083,6 +2083,7 @@ html, body {
 }
 
 </style>
+<style id="axion-historico-protecao">#hist-limpar-tudo,#hist-limpar-dia{display:none!important}</style>
 </head>
 
 <body>
@@ -2184,7 +2185,7 @@ html, body {
         <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">☰</button>
         <strong id="tituloPagina">Dashboard</strong>
       </div>
-      <span>AXION WEB · v4.1 D1</span>
+      <span>AXION WEB · v4.2 D1</span>
     </header>
 
     <div class="content">
@@ -2521,7 +2522,7 @@ html, body {
         <div class="heading">
           <h1>Histórico de abastecimentos</h1>
           <p>
-            Consulte os registros de OK e S/E realizados no AXION.
+            Consulte o arquivo histórico e acompanhe as movimentações do dia atual.
           </p>
         </div>
 
@@ -2549,12 +2550,12 @@ html, body {
           <div class="hist-cabecalho">
             <div>
               <h2>Arquivo de abastecimentos por data</h2>
-              <p class="status-line">Escolha uma pasta para ver vendas, OK, S/E e pendências daquele dia.</p>
+              <p class="status-line">Dias encerrados ficam arquivados no Google Sheets. Somente o dia atual permite editar ou excluir movimentações.</p>
             </div>
-            <button type="button" class="hist-btn-perigo" id="hist-limpar-tudo">🗑 Limpar todo o histórico</button>
+            <button type="button" class="hist-btn-perigo" id="hist-limpar-tudo" style="display:none" disabled>Histórico arquivado automaticamente</button>
           </div>
           <div id="hist-pastas" class="hist-pastas"></div>
-          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn">← Voltar às datas</button><strong id="hist-dia-titulo"></strong><button type="button" class="hist-btn-perigo" id="hist-limpar-dia">🗑 Limpar movimentações deste dia</button></div>
+          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn">← Voltar às datas</button><strong id="hist-dia-titulo"></strong><button type="button" class="hist-btn-perigo" id="hist-limpar-dia" style="display:none" disabled>Limpeza desativada</button></div>
           <div class="stats" id="hist-resumo-vendas" style="margin:14px 0;display:none"><div class="stat"><div class="label">Unidades vendidas</div><div class="value blue" id="hist-vendido">0</div></div><div class="stat"><div class="label">Pendentes</div><div class="value orange" id="hist-pendente">0</div></div></div>
           <div id="hist-vendas-bloco" style="display:none"><h3>Vendas do dia</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Loja</th><th>Marca</th><th>Descrição</th><th>REF</th><th>Cor</th><th>Tamanho</th><th>Vendido</th><th>OK</th><th>S/E</th><th>Pendente</th></tr></thead><tbody id="hist-vendas-lista"></tbody></table></div><h3 style="margin:18px 0 10px">Movimentações do dia</h3></div>
           <div id="hist-detalhes" style="display:none">
@@ -2667,7 +2668,7 @@ html, body {
         </div>
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 4.1 · D1</p>
+          <p>Versão da interface: 4.2 · D1</p>
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
             Interface: GitHub Pages<br>
@@ -4390,6 +4391,14 @@ async function carregarAtividadeRecente(
 // HISTÓRICO DE ABASTECIMENTOS
 // =====================================================
 
+function axionHojeLocalHistorico() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date());
+}
+
+
 function atualizarFiltroLojasHistorico() {
   const seletor = $("hist-loja");
   const atual = seletor.value;
@@ -4464,7 +4473,7 @@ async function editarMovimentoHistorico(item) {
       body:JSON.stringify({id:item.id,tipo:novoTipo,quantidade,motivo:motivo.trim()})
     });
     await atualizarDepoisDeAlterarHistorico(historicoDiaSelecionado);
-    alert(resposta.alterado ? "Movimentação corrigida. Pendências, Dashboard e atividade foram atualizados." : "Nenhuma alteração necessária.");
+    alert(resposta.aviso ? resposta.aviso : (resposta.alterado ? "Movimentação corrigida. Saldo, pendências, Dashboard e atividade foram atualizados." : "Nenhuma alteração necessária."));
   } catch (erro) { alert("Não foi possível salvar: " + erro.message); }
 }
 
@@ -4481,26 +4490,12 @@ async function excluirMovimentoHistorico(item) {
       body:JSON.stringify({id:item.id,motivo:motivo.trim() || "Exclusão solicitada pelo AXION Web"})
     });
     await atualizarDepoisDeAlterarHistorico(historicoDiaSelecionado);
-    alert(`Movimentação excluída. ${Number(resposta.excluidos || 0)} registro(s) removido(s). Pendências recalculadas.`);
+    alert(resposta.aviso ? resposta.aviso : `Movimentação excluída. ${Number(resposta.excluidos || 0)} registro(s) removido(s). Saldo e pendências atualizados.`);
   } catch (erro) { alert("Não foi possível excluir: " + erro.message); }
 }
 
 async function limparHistorico(data) {
-  const limparTudo = !data;
-  const frase = limparTudo ? "APAGAR HISTORICO" : `APAGAR DIA ${data}`;
-  const escopo = limparTudo ? "TODO O HISTÓRICO DE MOVIMENTAÇÕES OK/S/E" : `AS MOVIMENTAÇÕES DO DIA ${data.split("-").reverse().join("/")}`;
-  if (!confirm(`ATENÇÃO: esta ação excluirá ${escopo}.\n\nVendas arquivadas e dados de estoque serão preservados. As exclusões ficarão registradas na auditoria.`)) return;
-  const digitado = prompt(`Para confirmar, digite exatamente:\n${frase}`);
-  if (digitado === null) return;
-  if (digitado.trim().toUpperCase() !== frase) { alert("Confirmação incorreta. Nada foi apagado."); return; }
-  try {
-    const resposta = await requisicaoAPI("/api/historico/limpar", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({data:limparTudo ? "TODOS" : data,confirmacao:frase})
-    });
-    await atualizarDepoisDeAlterarHistorico(limparTudo ? "" : data);
-    alert(`${Number(resposta.excluidos || 0)} movimentação(ões) removida(s). Vendas e estoque foram preservados.`);
-  } catch (erro) { alert("Não foi possível limpar o histórico: " + erro.message); }
+  alert("A limpeza em massa foi desativada para proteger o histórico arquivado. Somente movimentações individuais do dia atual podem ser editadas ou excluídas.");
 }
 
 function axionHistChave(item){return [item.loja,item.ref,item.cor,item.tamanho].map(x=>String(x??'').trim().toUpperCase()).join('|');}
@@ -4516,7 +4511,9 @@ function axionHistPastas(){
    const vendidos=ven.reduce((s,x)=>s+Number(x.quantidade||0),0);
    const ok=mov.filter(x=>String(x.tipo).toUpperCase()==='OK').reduce((s,x)=>s+Number(x.quantidade||0),0);
    const se=mov.filter(x=>String(x.tipo).toUpperCase()==='S/E').reduce((s,x)=>s+Number(x.quantidade||0),0);
-   info.textContent=ven.length?`${vendidos} vendidos · ${ok} OK · ${se} S/E`:`Vendas não arquivadas · ${ok} OK · ${se} S/E`;
+   const hoje = data === axionHojeLocalHistorico();
+   const origem = hoje ? "Hoje · operacional" : "Arquivado · Sheets";
+   info.textContent=ven.length?`${origem} · ${vendidos} vendidos · ${ok} OK · ${se} S/E`:`${origem} · Vendas não disponíveis · ${ok} OK · ${se} S/E`;
    if(!ven.length)info.classList.add('hist-unverified');
    bloco.append(titulo,info);btn.append(bloco);btn.addEventListener('click',()=>{historicoDiaSelecionado=data;$('hist-data').value=data;renderizarHistorico();});container.appendChild(btn);
  }
@@ -4534,6 +4531,18 @@ function axionHistVendas(data,loja,busca){
 $('hist-voltar-btn').addEventListener('click',()=>{historicoDiaSelecionado='';$('hist-data').value='';renderizarHistorico();});
 function renderizarHistorico() {
   axionHistPastas();
+
+  const resumoGeral = historicoCache;
+  $("hist-total").textContent = resumoGeral.length.toLocaleString("pt-BR");
+  $("hist-ok").textContent = resumoGeral
+    .filter(item => item.tipo === "OK")
+    .reduce((s,item) => s + (Number(item.quantidade) || 0), 0)
+    .toLocaleString("pt-BR");
+  $("hist-se").textContent = resumoGeral
+    .filter(item => item.tipo === "S/E")
+    .reduce((s,item) => s + (Number(item.quantidade) || 0), 0)
+    .toLocaleString("pt-BR");
+
   const aberto=Boolean(historicoDiaSelecionado);
   $('hist-pastas').style.display=aberto?'none':'flex';
   $('hist-voltar').classList.toggle('hidden',!aberto);
@@ -4636,20 +4645,25 @@ function renderizarHistorico() {
       }
     });
     const acao = linha.insertCell();
-    const grupoAcoes = document.createElement("div");
-    grupoAcoes.className = "hist-acoes";
-    const botaoEditar = document.createElement("button");
-    botaoEditar.type = "button";
-    botaoEditar.className = "secondary";
-    botaoEditar.textContent = "✎ Editar";
-    botaoEditar.addEventListener("click", () => editarMovimentoHistorico(item));
-    const botaoExcluir = document.createElement("button");
-    botaoExcluir.type = "button";
-    botaoExcluir.className = "hist-btn-excluir";
-    botaoExcluir.textContent = "🗑 Excluir";
-    botaoExcluir.addEventListener("click", () => excluirMovimentoHistorico(item));
-    grupoAcoes.append(botaoEditar, botaoExcluir);
-    acao.appendChild(grupoAcoes);
+    if (item.editavel === true && item.dataISO === axionHojeLocalHistorico()) {
+      const grupoAcoes = document.createElement("div");
+      grupoAcoes.className = "hist-acoes";
+      const botaoEditar = document.createElement("button");
+      botaoEditar.type = "button";
+      botaoEditar.className = "secondary";
+      botaoEditar.textContent = "✎ Editar";
+      botaoEditar.addEventListener("click", () => editarMovimentoHistorico(item));
+      const botaoExcluir = document.createElement("button");
+      botaoExcluir.type = "button";
+      botaoExcluir.className = "hist-btn-excluir";
+      botaoExcluir.textContent = "🗑 Excluir";
+      botaoExcluir.addEventListener("click", () => excluirMovimentoHistorico(item));
+      grupoAcoes.append(botaoEditar, botaoExcluir);
+      acao.appendChild(grupoAcoes);
+    } else {
+      acao.textContent = "Arquivado · somente leitura";
+      acao.className = "status-line";
+    }
   }
 
   $("hist-estado").textContent =
