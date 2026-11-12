@@ -4500,7 +4500,9 @@ async function limparHistorico(data) {
 
 function axionHistChave(item){return [item.loja,item.ref,item.cor,item.tamanho].map(x=>String(x??'').trim().toUpperCase()).join('|');}
 function axionHistPastas(){
- const datas=[...new Set([...historicoCache.map(x=>x.dataISO),...historicoVendasCache.map(x=>x.dataISO)].filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)))].sort().reverse();
+ // A data local de hoje deve existir mesmo quando ainda não há vendas ou movimentos.
+ const hoje = axionHojeLocalHistorico();
+ const datas=[...new Set([...historicoCache.map(x=>x.dataISO),...historicoVendasCache.map(x=>x.dataISO),hoje].filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(String(x||''))))].sort().reverse();
  const container=$('hist-pastas');container.replaceChildren();
  for(const data of datas){
    const mov=historicoCache.filter(x=>x.dataISO===data), ven=historicoVendasCache.filter(x=>x.dataISO===data);
@@ -4513,7 +4515,7 @@ function axionHistPastas(){
    const se=mov.filter(x=>String(x.tipo).toUpperCase()==='S/E').reduce((s,x)=>s+Number(x.quantidade||0),0);
    const hoje = data === axionHojeLocalHistorico();
    const origem = hoje ? "Hoje · operacional" : "Arquivado · Sheets";
-   info.textContent=ven.length?`${origem} · ${vendidos} vendidos · ${ok} OK · ${se} S/E`:`${origem} · Vendas não disponíveis · ${ok} OK · ${se} S/E`;
+   info.textContent=ven.length?`${origem} · ${vendidos} vendidos · ${ok} OK · ${se} S/E`:hoje===data?`${origem} · ${mov.length} movimentações · ${ok} OK · ${se} S/E`:`${origem} · Vendas não disponíveis · ${ok} OK · ${se} S/E`;
    if(!ven.length)info.classList.add('hist-unverified');
    bloco.append(titulo,info);btn.append(bloco);btn.addEventListener('click',()=>{historicoDiaSelecionado=data;$('hist-data').value=data;renderizarHistorico();});container.appendChild(btn);
  }
