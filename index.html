@@ -2084,6 +2084,69 @@ html, body {
 
 </style>
 <style id="axion-historico-protecao">#hist-limpar-tudo,#hist-limpar-dia{display:none!important}</style>
+
+
+<style id="axion-layout-historico-final">
+/* Histórico: os três indicadores ocupam toda a largura disponível. */
+#page-historico > .stats {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  max-width: none !important;
+  gap: 16px !important;
+}
+#page-historico > .panel {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+#page-historico .hist-pastas {
+  width: 100%;
+  min-width: 0;
+}
+#page-historico .hist-pastas > * {
+  max-width: none;
+  box-sizing: border-box;
+}
+#hist-resumo-vendas.stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Menu recolhido: usa ícones explícitos, sem depender de ::first-letter. */
+#appView.sidebar-collapsed .nav button {
+  position: relative !important;
+  font-size: 0 !important;
+  justify-content: center !important;
+  gap: 0 !important;
+}
+#appView.sidebar-collapsed .nav button::before {
+  display: block;
+  font-size: 19px;
+  line-height: 1;
+}
+#appView.sidebar-collapsed .nav button[data-page="dashboard"]::before { content: "▦"; }
+#appView.sidebar-collapsed .nav button[data-page="abastecimento"]::before { content: "↻"; }
+#appView.sidebar-collapsed .nav button[data-page="estoque"]::before { content: "▤"; }
+#appView.sidebar-collapsed .nav button[data-page="importar-posicoes"]::before { content: "⇧"; }
+#appView.sidebar-collapsed .nav button[data-page="historico"]::before { content: "◷"; }
+#appView.sidebar-collapsed .nav button[data-page="configuracoes"]::before { content: "⚙"; }
+
+@media (max-width: 1100px) {
+  #page-historico > .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 640px) {
+  #page-historico > .stats,
+  #hist-resumo-vendas.stats {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  #page-historico .hist-cabecalho {
+    align-items: stretch;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -3199,6 +3262,18 @@ function mostrarPainel(usuario) {
 
   $("loginView").classList.add("hidden");
   $("appView").classList.remove("hidden");
+
+  // Sempre inicia com o menu expandido em telas grandes.
+  // Evita que uma classe de recolhimento anterior esconda a navegação.
+  const app = $("appView");
+  const toggle = $("sidebar-toggle");
+  app.classList.remove("sidebar-collapsed");
+  if (toggle) {
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Recolher menu");
+    toggle.title = "Recolher menu";
+  }
+
   axionAtivarPagina("dashboard");
 }
 
@@ -4500,9 +4575,7 @@ async function limparHistorico(data) {
 
 function axionHistChave(item){return [item.loja,item.ref,item.cor,item.tamanho].map(x=>String(x??'').trim().toUpperCase()).join('|');}
 function axionHistPastas(){
- // A data local de hoje deve existir mesmo quando ainda não há vendas ou movimentos.
- const hoje = axionHojeLocalHistorico();
- const datas=[...new Set([...historicoCache.map(x=>x.dataISO),...historicoVendasCache.map(x=>x.dataISO),hoje].filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(String(x||''))))].sort().reverse();
+ const datas=[...new Set([...historicoCache.map(x=>x.dataISO),...historicoVendasCache.map(x=>x.dataISO)].filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)))].sort().reverse();
  const container=$('hist-pastas');container.replaceChildren();
  for(const data of datas){
    const mov=historicoCache.filter(x=>x.dataISO===data), ven=historicoVendasCache.filter(x=>x.dataISO===data);
@@ -4515,7 +4588,7 @@ function axionHistPastas(){
    const se=mov.filter(x=>String(x.tipo).toUpperCase()==='S/E').reduce((s,x)=>s+Number(x.quantidade||0),0);
    const hoje = data === axionHojeLocalHistorico();
    const origem = hoje ? "Hoje · operacional" : "Arquivado · Sheets";
-   info.textContent=ven.length?`${origem} · ${vendidos} vendidos · ${ok} OK · ${se} S/E`:hoje===data?`${origem} · ${mov.length} movimentações · ${ok} OK · ${se} S/E`:`${origem} · Vendas não disponíveis · ${ok} OK · ${se} S/E`;
+   info.textContent=ven.length?`${origem} · ${vendidos} vendidos · ${ok} OK · ${se} S/E`:`${origem} · Vendas não disponíveis · ${ok} OK · ${se} S/E`;
    if(!ven.length)info.classList.add('hist-unverified');
    bloco.append(titulo,info);btn.append(bloco);btn.addEventListener('click',()=>{historicoDiaSelecionado=data;$('hist-data').value=data;renderizarHistorico();});container.appendChild(btn);
  }
