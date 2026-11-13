@@ -2084,69 +2084,6 @@ html, body {
 
 </style>
 <style id="axion-historico-protecao">#hist-limpar-tudo,#hist-limpar-dia{display:none!important}</style>
-
-
-<style id="axion-layout-historico-final">
-/* Histórico: os três indicadores ocupam toda a largura disponível. */
-#page-historico > .stats {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  width: 100% !important;
-  max-width: none !important;
-  gap: 16px !important;
-}
-#page-historico > .panel {
-  width: 100% !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
-}
-#page-historico .hist-pastas {
-  width: 100%;
-  min-width: 0;
-}
-#page-historico .hist-pastas > * {
-  max-width: none;
-  box-sizing: border-box;
-}
-#hist-resumo-vendas.stats {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-}
-
-/* Menu recolhido: usa ícones explícitos, sem depender de ::first-letter. */
-#appView.sidebar-collapsed .nav button {
-  position: relative !important;
-  font-size: 0 !important;
-  justify-content: center !important;
-  gap: 0 !important;
-}
-#appView.sidebar-collapsed .nav button::before {
-  display: block;
-  font-size: 19px;
-  line-height: 1;
-}
-#appView.sidebar-collapsed .nav button[data-page="dashboard"]::before { content: "▦"; }
-#appView.sidebar-collapsed .nav button[data-page="abastecimento"]::before { content: "↻"; }
-#appView.sidebar-collapsed .nav button[data-page="estoque"]::before { content: "▤"; }
-#appView.sidebar-collapsed .nav button[data-page="importar-posicoes"]::before { content: "⇧"; }
-#appView.sidebar-collapsed .nav button[data-page="historico"]::before { content: "◷"; }
-#appView.sidebar-collapsed .nav button[data-page="configuracoes"]::before { content: "⚙"; }
-
-@media (max-width: 1100px) {
-  #page-historico > .stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
-@media (max-width: 640px) {
-  #page-historico > .stats,
-  #hist-resumo-vendas.stats {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-  #page-historico .hist-cabecalho {
-    align-items: stretch;
-  }
-}
-</style>
-
 </head>
 
 <body>
@@ -2763,6 +2700,14 @@ html, body {
 
     <div id="modalProduto" class="modal-product"></div>
 
+    <div id="origemEstoqueWrap" class="hidden" style="margin:14px 0">
+      <label for="lojaOrigemEstoque" style="display:block;margin-bottom:8px;font-weight:700">Estoque físico de origem (DADOS/POSIÇÕES)</label>
+      <select id="lojaOrigemEstoque" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+        <option value="">Selecione a loja de origem</option>
+      </select>
+      <small id="lojaOrigemDetalhe" class="status-line">A loja do USE é apenas a referência da pendência. Escolha o estoque físico.</small>
+    </div>
+
     <form id="formAbastecimento">
 
       <label for="quantidadeAbastecimento">
@@ -3262,18 +3207,6 @@ function mostrarPainel(usuario) {
 
   $("loginView").classList.add("hidden");
   $("appView").classList.remove("hidden");
-
-  // Sempre inicia com o menu expandido em telas grandes.
-  // Evita que uma classe de recolhimento anterior esconda a navegação.
-  const app = $("appView");
-  const toggle = $("sidebar-toggle");
-  app.classList.remove("sidebar-collapsed");
-  if (toggle) {
-    toggle.setAttribute("aria-expanded", "true");
-    toggle.setAttribute("aria-label", "Recolher menu");
-    toggle.title = "Recolher menu";
-  }
-
   axionAtivarPagina("dashboard");
 }
 
@@ -3757,6 +3690,10 @@ function selecionarPendentesVisiveis(marcar) {
 
 async function registrarPendentesEmLote(tipo) {
   if (enviandoMovimento || movimentoAtual) return;
+  if (tipo === "OK") {
+    mostrarFeedback("Para registrar OK, abra cada produto individualmente e escolha a loja de origem em DADOS/POSIÇÕES. O registro em lote continua disponível para S/E.", "error");
+    return;
+  }
 
   const selecionados = itensSelecionadosPendentes();
   if (!selecionados.length) {
@@ -3803,6 +3740,7 @@ async function registrarPendentesEmLote(tipo) {
       const movimento = {
         id_movimento: crypto.randomUUID().replaceAll("-", ""),
         loja: String(item.loja),
+        loja_origem: "",
         marca: String(item.marca ?? ""),
         ref: String(item.ref),
         cor: String(item.cor ?? ""),
@@ -3961,7 +3899,7 @@ function renderizarPendentes() {
         detalhe.className = "positions-detail";
 
         detalhe.textContent = locais.map(local =>
-          `${local.posicao || "Sem posição"}: ` +
+          `Loja ${local.loja || "?"} · ${local.posicao || "Sem posição"}: ` +
           `${Number(local.saldo) || 0}`
         ).join(" · ");
 
@@ -4114,42 +4052,77 @@ async function carregarPendentes() {
 // CONFIRMAÇÃO OK / S/E
 // =====================================================
 
+function agruparOrigensEstoque(item) {
+  const locais = localizacoesDoItem(item);
+  const mapa = new Map();
+  for (const local of locais) {
+    const loja = String(local.loja || "").trim();
+    if (!["66", "67", "68"].includes(loja)) continue;
+    if (!mapa.has(loja)) mapa.set(loja, { loja, saldo: 0, posicoes: [] });
+    const grupo = mapa.get(loja);
+    grupo.saldo += Number(local.saldo ?? local.quantidade ?? 0) || 0;
+    const posicao = String(local.posicao || "").trim();
+    if (posicao && !grupo.posicoes.includes(posicao)) grupo.posicoes.push(posicao);
+  }
+  return [...mapa.values()].sort((a,b) => Number(a.loja)-Number(b.loja));
+}
+
+function atualizarSeletorOrigem(item, tipo) {
+  const wrap = $("origemEstoqueWrap");
+  const select = $("lojaOrigemEstoque");
+  const detalhe = $("lojaOrigemDetalhe");
+  select.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Selecione a loja de origem";
+  select.appendChild(placeholder);
+
+  if (tipo !== "OK") {
+    wrap.classList.add("hidden");
+    select.required = false;
+    return;
+  }
+
+  const origens = agruparOrigensEstoque(item);
+  wrap.classList.remove("hidden");
+  select.required = origens.length > 0;
+  for (const origem of origens) {
+    const option = document.createElement("option");
+    option.value = origem.loja;
+    option.textContent = `Loja ${origem.loja} · Saldo ${origem.saldo.toLocaleString("pt-BR")} · ${origem.posicoes.join(", ") || "sem posição"}`;
+    option.dataset.saldo = String(origem.saldo);
+    select.appendChild(option);
+  }
+  if (!origens.length) {
+    detalhe.textContent = "Nenhuma posição física encontrada no D1. O OK poderá ser registrado, mas não haverá desconto de estoque.";
+    select.required = false;
+  } else {
+    detalhe.textContent = "Escolha a loja que possui fisicamente o produto. A autorização de desconto será aplicada a essa loja, não à loja do USE.";
+  }
+}
+
 function abrirConfirmacao(item, tipo) {
   if (enviandoMovimento || movimentoAtual) return;
 
   const quantidade = Number(item.quantidade);
-
   if (!Number.isSafeInteger(quantidade) || quantidade < 1) {
     mostrarFeedback("Quantidade pendente inválida.", "error");
     return;
   }
 
-  movimentoAtual = {
-    item,
-    tipo,
-    id: crypto.randomUUID().replaceAll("-", ""),
-    quantidade
-  };
-
-  $("modalTitulo").textContent =
-    tipo === "OK"
-      ? "Confirmar abastecimento"
-      : "Confirmar sem estoque";
-
+  movimentoAtual = { item, tipo, id: crypto.randomUUID().replaceAll("-", ""), quantidade };
+  $("modalTitulo").textContent = tipo === "OK" ? "Confirmar abastecimento" : "Confirmar sem estoque";
   $("modalProduto").textContent =
-    `${item.descricao || item.marca || "Produto"} · ` +
-    `REF ${item.ref} · ${item.cor} · ${item.tamanho} · ` +
-    `Loja ${item.loja} · Pendente: ${quantidade}`;
+    `${item.descricao || item.marca || "Produto"} · REF ${item.ref} · ${item.cor} · ${item.tamanho} · ` +
+    `Loja USE ${item.loja} · Pendente: ${quantidade}`;
 
+  atualizarSeletorOrigem(item, tipo);
+  $("lojaOrigemEstoque").value = "";
   $("quantidadeAbastecimento").value = quantidade;
   $("quantidadeAbastecimento").max = quantidade;
-
-  $("confirmarAbastecimento").textContent =
-    tipo === "OK" ? "Confirmar OK" : "Confirmar S/E";
-
+  $("confirmarAbastecimento").textContent = tipo === "OK" ? "Confirmar OK" : "Confirmar S/E";
   $("modalErro").textContent = "";
   $("modalAbastecimento").classList.remove("hidden");
-
   $("quantidadeAbastecimento").focus();
   $("quantidadeAbastecimento").select();
 }
@@ -4168,6 +4141,7 @@ function bloquearConfirmacao(bloquear) {
   $("confirmarAbastecimento").disabled = bloquear;
   $("cancelarAbastecimento").disabled = bloquear;
   $("quantidadeAbastecimento").disabled = bloquear;
+  $("lojaOrigemEstoque").disabled = bloquear;
 
   $("confirmarAbastecimento").textContent = bloquear
     ? "Registrando..."
@@ -4205,9 +4179,17 @@ async function confirmarMovimento(evento) {
     atual.quantidadeEnviada = quantidade;
   }
 
+  const origensDisponiveis = agruparOrigensEstoque(atual.item);
+  const lojaOrigem = atual.tipo === "OK" ? String($("lojaOrigemEstoque").value || "") : "";
+  if (atual.tipo === "OK" && origensDisponiveis.length && !lojaOrigem) {
+    $("modalErro").textContent = "Selecione a loja de origem do estoque físico em DADOS/POSIÇÕES.";
+    return;
+  }
+
   const movimento = {
     id_movimento: atual.id,
     loja: String(atual.item.loja),
+    loja_origem: lojaOrigem,
     marca: String(atual.item.marca ?? ""),
     ref: String(atual.item.ref),
     cor: String(atual.item.cor ?? ""),
@@ -4225,7 +4207,7 @@ async function confirmarMovimento(evento) {
   const token = tokenSessao;
 
   try {
-    await requisicaoAPI("/api/abastecer", {
+    const resultadoAbastecimento = await requisicaoAPI("/api/abastecer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -4242,9 +4224,11 @@ async function confirmarMovimento(evento) {
 
     $("modalAbastecimento").classList.add("hidden");
 
+    const detalheDesconto = atual.tipo === "OK"
+      ? (resultadoAbastecimento.mensagem || "")
+      : "Registro S/E concluído sem desconto de estoque.";
     mostrarFeedback(
-      `${atual.tipo} registrado: ${quantidade} unidade(s) ` +
-      `de ${descricao}.`,
+      `${atual.tipo} registrado: ${quantidade} unidade(s) de ${descricao}. ${detalheDesconto}`,
       "success"
     );
 
@@ -4604,6 +4588,14 @@ function axionHistVendas(data,loja,busca){
  $('hist-vendido').textContent=total.toLocaleString('pt-BR');$('hist-pendente').textContent=pendentes.toLocaleString('pt-BR');
 }
 $('hist-voltar-btn').addEventListener('click',()=>{historicoDiaSelecionado='';$('hist-data').value='';renderizarHistorico();});
+function lojaOrigemDoHistorico(item) {
+  const direta = String(item.lojaOrigem || item.loja_origem || "").trim();
+  if (direta) return direta;
+  const observacao = String(item.observacao || "");
+  const achou = observacao.match(/Estoque origem:\s*Loja\s*(66|67|68)/i);
+  return achou ? achou[1] : "";
+}
+
 function renderizarHistorico() {
   axionHistPastas();
 
@@ -4693,7 +4685,7 @@ function renderizarHistorico() {
     const valores = [
       item.data,
       item.hora,
-      item.loja,
+      lojaOrigemDoHistorico(item) ? `${item.loja} (USE) · ${lojaOrigemDoHistorico(item)} (estoque)` : item.loja,
       item.marca,
       item.descricao,
       item.ref,
