@@ -2082,6 +2082,229 @@ html, body {
   #appView .sidebar-toggle { display: none !important; }
 }
 
+
+/* =========================================================
+   AXION 4.3 | Identidade visual, ícones e microinterações
+   Alteração exclusivamente visual. Nenhuma regra de API.
+   ========================================================= */
+:root{
+  --ax-accent:#42c8ff;
+  --ax-accent-strong:#159bd4;
+  --ax-accent-soft:rgba(56,189,248,.12);
+  --ax-panel-shadow:0 14px 38px rgba(0,0,0,.18);
+  --ax-focus:0 0 0 3px rgba(56,189,248,.18);
+}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(ellipse at 78% -18%,rgba(22,116,166,.12),transparent 38%),
+    var(--bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.sidebar{
+  background:linear-gradient(180deg,#121f33 0%,#101b2c 100%);
+  box-shadow:8px 0 28px rgba(0,0,0,.10);
+}
+.sidebar-brand{
+  color:#f5faff;
+  letter-spacing:5px;
+  text-shadow:0 5px 22px rgba(56,189,248,.12);
+}
+.sidebar-caption{letter-spacing:.08em;text-transform:uppercase}
+.nav{gap:8px}
+.sidebar .nav button{
+  position:relative;
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 13px;
+  border:1px solid transparent;
+  border-radius:12px;
+  color:#b8c8d9;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.01em;
+  overflow:hidden;
+}
+.ax-nav-icon{
+  width:19px;height:19px;flex:0 0 19px;
+  fill:none;stroke:currentColor;stroke-width:1.75;
+  stroke-linecap:round;stroke-linejoin:round;
+  opacity:.9;
+  transition:transform .2s ease,opacity .2s ease;
+}
+.sidebar .nav button:hover .ax-nav-icon{transform:scale(1.08);opacity:1}
+.sidebar .nav button.active{
+  color:#5bd0ff;
+  border-color:rgba(56,189,248,.28);
+  background:linear-gradient(100deg,rgba(25,117,164,.28),rgba(22,50,74,.72));
+  box-shadow:inset 3px 0 #42c8ff,0 7px 22px rgba(0,0,0,.12);
+}
+.sidebar .nav button.active .ax-nav-icon{filter:drop-shadow(0 0 5px rgba(56,189,248,.35))}
+.user-box{
+  background:rgba(24,42,64,.55);
+  border-color:#30465f;
+}
+.topbar{
+  background:rgba(11,18,32,.78);
+  backdrop-filter:blur(12px);
+}
+.content{padding-top:30px}
+.heading h1{letter-spacing:-.035em}
+.panel,.stat,.login-card{
+  border-color:#2d425c;
+  box-shadow:var(--ax-panel-shadow);
+}
+.panel{
+  background:linear-gradient(145deg,rgba(25,42,64,.98),rgba(20,34,53,.98));
+}
+.stat{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(145deg,#1a2b42,#152338);
+  border-radius:17px;
+}
+.stat:after{
+  content:"";
+  position:absolute;
+  width:110px;height:110px;
+  right:-52px;top:-55px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(56,189,248,.09),transparent 70%);
+  pointer-events:none;
+}
+.stat .label{
+  display:flex;align-items:center;gap:9px;
+  font-weight:600;
+  color:#a9bfd4;
+}
+.stat .value{letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+button{
+  font-weight:650;
+  letter-spacing:.005em;
+}
+button:not(:disabled){
+  transition:transform .17s ease,box-shadow .2s ease,background .2s ease,border-color .2s ease,color .2s ease,filter .2s ease;
+}
+button:not(:disabled):active{transform:translateY(1px) scale(.985)}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:2px solid var(--ax-accent);
+  outline-offset:3px;
+  box-shadow:var(--ax-focus);
+}
+.primary,.secondary,.toolbar button,.btn-ok,.btn-se,.logout,.hist-btn-perigo{
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  border-radius:11px;
+  font-weight:700;
+}
+.primary{
+  color:#041522;
+  background:linear-gradient(135deg,#54d2ff,#29aee8);
+  border:1px solid #64d7ff;
+  box-shadow:0 5px 15px rgba(34,174,232,.13);
+}
+.primary:not(:disabled):hover{
+  background:linear-gradient(135deg,#83e0ff,#39bdf2);
+  box-shadow:0 8px 22px rgba(34,174,232,.22);
+  transform:translateY(-1px);
+}
+.secondary,.toolbar button{
+  color:#bdeaff;
+  background:linear-gradient(135deg,#1b3a55,#172f47);
+  border:1px solid #345775;
+}
+.secondary:not(:disabled):hover,.toolbar button:not(:disabled):hover{
+  color:#effaff;background:#224965;border-color:#4ba9d4;
+  box-shadow:0 6px 18px rgba(0,0,0,.16);transform:translateY(-1px);
+}
+.ax-btn-icon{
+  width:17px;height:17px;flex:0 0 17px;
+  fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+.logout{
+  width:100%;
+  color:#d7e4f1;
+  background:rgba(20,34,53,.65);
+  border:1px solid #30465f;
+}
+.logout:hover{background:#263b54;border-color:#4c6b88;color:#fff}
+.btn-ok{
+  color:#d5ffe5;background:linear-gradient(135deg,#16643e,#14532d);
+  border:1px solid #278455;box-shadow:0 4px 12px rgba(20,83,45,.14);
+}
+.btn-ok:hover{background:linear-gradient(135deg,#1d8050,#166534);box-shadow:0 6px 16px rgba(34,197,94,.15)}
+.btn-se{
+  color:#ffe0e3;background:linear-gradient(135deg,#8b2934,#701f2a);
+  border:1px solid #a8424d;
+}
+.btn-se:hover{background:linear-gradient(135deg,#a93441,#862630);box-shadow:0 6px 16px rgba(248,113,113,.13)}
+.hist-btn-perigo,.hist-btn-excluir{
+  border:1px solid #82404a;
+  background:linear-gradient(135deg,#512630,#3d202a);
+  color:#ffd9dd;
+}
+.hist-btn-perigo:hover,.hist-btn-excluir:hover{background:#642c38;border-color:#bd5965}
+.sidebar-toggle{
+  display:inline-grid;place-items:center;
+  width:42px;height:42px;flex:0 0 42px;
+  border:1px solid #34516c;border-radius:12px;
+  color:#5bd0ff;background:linear-gradient(145deg,#1a3852,#142b42);
+  box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+.sidebar-toggle:hover{background:#214967;border-color:#4bbce9;transform:translateY(-1px)}
+.toolbar input,.toolbar select,.modal-card input,.login-card input{
+  border-radius:11px;
+  border-color:#344b64;
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.toolbar input:focus,.toolbar select:focus,.modal-card input:focus,.login-card input:focus{
+  border-color:#42c8ff;box-shadow:var(--ax-focus);outline:none;
+}
+.data-table thead th{
+  color:#a9bfd4;
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+}
+.data-table tbody tr{transition:background .16s ease}
+.position-pill{
+  border:1px solid rgba(56,189,248,.18);
+  box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+.modal{
+  backdrop-filter:blur(7px);
+  background:rgba(3,9,18,.76);
+}
+.modal-card{
+  border-color:#3b5874;
+  background:linear-gradient(145deg,#1b2d44,#142338);
+  box-shadow:0 24px 80px rgba(0,0,0,.48);
+}
+.feedback,.notice{box-shadow:0 6px 20px rgba(0,0,0,.10)}
+#mensagem{font-size:13px}
+button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
+@media(hover:hover) and (min-width:761px){
+  .panel{transition:border-color .2s ease,box-shadow .2s ease}
+  .panel:hover{border-color:#38536f}
+}
+@media(max-width:760px){
+  .sidebar{box-shadow:0 8px 25px rgba(0,0,0,.16)}
+  .sidebar .nav button{min-height:42px;padding:9px 11px}
+  .ax-nav-icon{width:17px;height:17px;flex-basis:17px}
+  .content{padding-top:20px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+
 </style>
 <style id="axion-historico-protecao">#hist-limpar-tudo,#hist-limpar-dia{display:none!important}</style>
 </head>
@@ -2143,27 +2366,33 @@ html, body {
 
     <nav class="nav">
       <button class="active" data-page="dashboard">
-        ▦ Dashboard
+        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+        <span>Dashboard</span>
       </button>
 
       <button data-page="abastecimento">
-        ↻ Abastecimento
+        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11a5 5 0 0 1 0 10H8"/><path d="m8 13-4 4 4 4"/><path d="M20 7h-5"/><path d="m17 4 3 3-3 3"/></svg>
+        <span>Abastecimento</span>
       </button>
 
       <button data-page="estoque">
-        ▤ Estoque
+        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3.5 7.8 12 12l8.5-4.2M12 12v9"/><path d="m7.5 5.2 9 4.5"/></svg>
+        <span>Estoque</span>
       </button>
 
       <button data-page="importar-posicoes">
-        ⇧ Atualizar posições
+        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"/><path d="m7 8 5-5 5 5"/><path d="M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg>
+        <span>Atualizar posições</span>
       </button>
 
       <button data-page="historico">
-        ◷ Histórico
+        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <span>Histórico</span>
       </button>
 
       <button data-page="configuracoes">
-        ⚙ Configurações
+        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1a1.8 1.8 0 0 1-2.5 2.5l-.1-.1a1.8 1.8 0 0 0-3.1 1.3v.2a1.8 1.8 0 0 1-3.6 0v-.2a1.8 1.8 0 0 0-3.1-1.3l-.1.1a1.8 1.8 0 0 1-2.5-2.5l.1-.1a1.8 1.8 0 0 0-1.3-3.1h-.2a1.8 1.8 0 0 1 0-3.6h.2a1.8 1.8 0 0 0 1.3-3.1l-.1-.1a1.8 1.8 0 0 1 2.5-2.5l.1.1a1.8 1.8 0 0 0 3.1-1.3v-.2a1.8 1.8 0 0 1 3.6 0v.2a1.8 1.8 0 0 0 3.1 1.3l.1-.1a1.8 1.8 0 0 1 2.5 2.5l-.1.1a1.8 1.8 0 0 0 1.3 3.1h.2a1.8 1.8 0 0 1 0 3.6h-.2a1.8 1.8 0 0 0-1.3 3.1Z"/></svg>
+        <span>Configurações</span>
       </button>
     </nav>
 
@@ -2173,7 +2402,7 @@ html, body {
         <small>Administrador</small>
       </div>
 
-      <button class="logout" id="sair">Sair</button>
+      <button class="logout" id="sair"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Sair</span></button>
     </div>
 
   </aside>
@@ -2233,7 +2462,7 @@ html, body {
               <h2>Cloudflare · Monitoramento mensal</h2>
               <p class="detail">Referências do Workers Paid de US$ 5/mês. Uso acumulado no mês UTC, com projeção até o fechamento.</p>
             </div>
-            <button class="secondary" type="button" id="cloudflare-atualizar">↻ Atualizar métricas</button>
+            <button class="secondary" type="button" id="cloudflare-atualizar"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar métricas</span></button>
           </div>
 
           <div class="notice" style="margin-top:12px">
@@ -2490,7 +2719,7 @@ html, body {
                 <option value="68">Loja 68</option>
               </select>
               <button class="primary" id="est-catalogo-buscar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Pesquisar</span></button>
-              <button class="secondary" id="est-catalogo-limpar" type="button">Limpar</button>
+              <button class="secondary" id="est-catalogo-limpar" type="button"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span>Limpar</span></button>
             </div>
             <div id="est-catalogo-resultado" class="feedback hidden" role="status" aria-live="polite"></div>
           </div>
@@ -2555,7 +2784,7 @@ html, body {
             <button type="button" class="hist-btn-perigo" id="hist-limpar-tudo" style="display:none" disabled>Histórico arquivado automaticamente</button>
           </div>
           <div id="hist-pastas" class="hist-pastas"></div>
-          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn">← Voltar às datas</button><strong id="hist-dia-titulo"></strong><button type="button" class="hist-btn-perigo" id="hist-limpar-dia" style="display:none" disabled>Limpeza desativada</button></div>
+          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg><span>Voltar às datas</span></button><strong id="hist-dia-titulo"></strong><button type="button" class="hist-btn-perigo" id="hist-limpar-dia" style="display:none" disabled>Limpeza desativada</button></div>
           <div class="stats" id="hist-resumo-vendas" style="margin:14px 0;display:none"><div class="stat"><div class="label">Unidades vendidas</div><div class="value blue" id="hist-vendido">0</div></div><div class="stat"><div class="label">Pendentes</div><div class="value orange" id="hist-pendente">0</div></div></div>
           <div id="hist-vendas-bloco" style="display:none"><h3>Vendas do dia</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Loja</th><th>Marca</th><th>Descrição</th><th>REF</th><th>Cor</th><th>Tamanho</th><th>Vendido</th><th>OK</th><th>S/E</th><th>Pendente</th></tr></thead><tbody id="hist-vendas-lista"></tbody></table></div><h3 style="margin:18px 0 10px">Movimentações do dia</h3></div>
           <div id="hist-detalhes" style="display:none">
@@ -2663,7 +2892,7 @@ html, body {
             <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="67"> Loja 67</label>
             <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="68"> Loja 68</label>
           </div>
-          <div class="toolbar"><button class="primary" id="cfg-salvar-desconto" type="button">Salvar permissões</button></div>
+          <div class="toolbar"><button class="primary" id="cfg-salvar-desconto" type="button"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg><span>Salvar permissões</span></button></div>
           <div class="feedback hidden" id="cfg-desconto-msg" role="status"></div>
         </div>
         <div class="panel">
@@ -2726,13 +2955,7 @@ html, body {
 
       <div class="modal-buttons">
 
-        <button
-          class="secondary"
-          type="button"
-          id="cancelarAbastecimento"
-        >
-          Cancelar
-        </button>
+        <button class="secondary" type="button" id="cancelarAbastecimento"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg><span>Cancelar</span></button>
 
         <button
           class="primary"
