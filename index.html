@@ -2331,6 +2331,9 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
 .ax-origem-lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:12px 0 18px}
 .ax-origem-card{display:flex;align-items:center;gap:12px;width:100%;min-height:76px;padding:13px 15px;text-align:left;border:1px solid #34536d;border-radius:13px;background:#102237;color:#eaf6ff}
 .ax-origem-card:hover{border-color:#3ccafa;background:#15334b}
+.ax-origem-card{font:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.ax-origem-card:focus-visible{outline:3px solid #38cafa;outline-offset:2px}
+.ax-origem-card:active{transform:scale(.995)}
 .ax-origem-card.selecionada{border:2px solid #38cafa;background:linear-gradient(120deg,#123b56,#143047);box-shadow:0 0 0 3px #38cafa20}
 .ax-origem-radio{width:20px;height:20px;flex:0 0 20px;border:2px solid #91a9bd;border-radius:50%;display:grid;place-items:center}
 .ax-origem-card.selecionada .ax-origem-radio{border-color:#38cafa}
@@ -4348,6 +4351,10 @@ function formatarSaldoOrigem(valor) {
   return `${n.toLocaleString("pt-BR")} un.`;
 }
 
+function chavePosicao(loja, posicao) {
+  return `${String(loja || "").trim()}|${String(posicao || "").trim().toLocaleUpperCase("pt-BR")}`;
+}
+
 function renderizarPreviaPosicoes(item) {
   const lista = $("origemEstoqueLista");
   const aviso = $("origemEstoqueAviso");
@@ -4369,28 +4376,48 @@ function renderizarPreviaPosicoes(item) {
     lista.appendChild(vazio);
   } else {
     for (const local of locais) {
-      const card = document.createElement("div");
-      card.className = "ax-origem-card";
-      card.style.cursor = "default";
-      const info = document.createElement("div");
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "ax-origem-card ax-origem-previa";
+      card.dataset.posicaoChave = chavePosicao(local.loja, local.posicao);
+      card.setAttribute("aria-pressed", "false");
+      card.setAttribute("aria-label", `Selecionar loja ${local.loja}, posição ${local.posicao}, saldo ${local.saldo}`);
+
+      const radio = document.createElement("span");
+      radio.className = "ax-origem-radio";
+      radio.setAttribute("aria-hidden", "true");
+      const info = document.createElement("span");
       info.className = "ax-origem-info";
       const nome = document.createElement("strong");
       nome.textContent = `Loja ${local.loja} · ${local.posicao}`;
       const detalhe = document.createElement("small");
-      detalhe.textContent = "Posição física identificada no D1";
+      detalhe.textContent = "Toque para selecionar esta posição";
       const saldo = document.createElement("span");
       saldo.className = "ax-origem-saldo" + (local.saldo <= 0 ? " zero" : "");
       saldo.textContent = formatarSaldoOrigem(local.saldo);
       info.append(nome, detalhe);
-      card.append(info, saldo);
+      card.append(radio, info, saldo);
+      card.addEventListener("click", () => {
+        if (enviandoMovimento || !movimentoAtual) return;
+        movimentoAtual.posicaoOrigemChave = card.dataset.posicaoChave;
+        lista.querySelectorAll(".ax-origem-previa").forEach(outro => {
+          const ativa = outro === card;
+          outro.classList.toggle("selecionada", ativa);
+          outro.setAttribute("aria-pressed", ativa ? "true" : "false");
+          const texto = outro.querySelector(".ax-origem-info small");
+          if (texto) texto.textContent = ativa ? "Posição selecionada · confirme para validar" : "Toque para selecionar esta posição";
+        });
+        $("modalErro").textContent = "";
+        $("confirmarAbastecimento").textContent = "Verificar posição selecionada";
+      });
       lista.appendChild(card);
     }
   }
 
-  aviso.textContent = "Prévia das posições físicas. Toque em Confirmar para carregar a seleção oficial. Você poderá escolher qualquer loja; somente lojas autorizadas terão baixa de quantidade.";
+  aviso.textContent = "Selecione uma posição física tocando no cartão. Depois confirme para validar a posição no servidor. Qualquer loja pode ser escolhida; somente lojas autorizadas terão baixa de quantidade.";
 }
 
-function renderizarOpcoesPosicao(opcoes) {
+function renderizarOpcoesPosicao(opcoes, posicaoSelecionadaId = null) {
   const lista = $("origemEstoqueLista");
   const aviso = $("origemEstoqueAviso");
   lista.replaceChildren();
@@ -4405,7 +4432,9 @@ function renderizarOpcoesPosicao(opcoes) {
     botao.type = "button";
     botao.className = "ax-origem-card";
     botao.dataset.posicaoId = String(opcao.id);
-    botao.setAttribute("aria-pressed", "false");
+    const estaSelecionada = posicaoSelecionadaId != null && Number(opcao.id) === Number(posicaoSelecionadaId);
+    botao.classList.toggle("selecionada", estaSelecionada);
+    botao.setAttribute("aria-pressed", estaSelecionada ? "true" : "false");
 
     const radio = document.createElement("span");
     radio.className = "ax-origem-radio";
@@ -4456,6 +4485,7 @@ function abrirConfirmacao(item, tipo) {
     id: crypto.randomUUID().replaceAll("-", ""),
     quantidade,
     posicaoOrigemId: null,
+    posicaoOrigemChave: null,
     opcoesPosicao: null
   };
 
@@ -4503,7 +4533,7 @@ function bloquearConfirmacao(bloquear) {
   $("confirmarAbastecimento").textContent = bloquear
     ? "Registrando..."
     : movimentoAtual?.tipo === "OK"
-      ? (movimentoAtual?.opcoesPosicao?.length ? "Confirmar OK" : "Verificar posições e confirmar")
+      ? (movimentoAtual?.opcoesPosicao?.length ? "Confirmar OK" : (movimentoAtual?.posicaoOrigemChave ? "Verificar posição selecionada" : "Verificar posições e confirmar"))
       : "Confirmar S/E";
 }
 
@@ -4592,9 +4622,16 @@ async function confirmarMovimento(evento) {
     if (atual.tipo === "OK" && dadosErro.precisaEscolherPosicao &&
         Array.isArray(dadosErro.opcoesPosicao) && dadosErro.opcoesPosicao.length) {
       atual.opcoesPosicao = dadosErro.opcoesPosicao;
-      atual.posicaoOrigemId = null;
-      renderizarOpcoesPosicao(dadosErro.opcoesPosicao);
-      $("modalErro").textContent = "Encontramos mais de uma posição física. Escolha a origem e confirme novamente. Se a loja não estiver autorizada, o OK será registrado sem descontar o saldo.";
+      const opcaoPreSelecionada = atual.posicaoOrigemChave
+        ? dadosErro.opcoesPosicao.find(opcao => chavePosicao(opcao.loja, opcao.posicao) === atual.posicaoOrigemChave)
+        : null;
+      atual.posicaoOrigemId = opcaoPreSelecionada ? Number(opcaoPreSelecionada.id) : null;
+      renderizarOpcoesPosicao(dadosErro.opcoesPosicao, atual.posicaoOrigemId);
+      if (opcaoPreSelecionada) {
+        $("modalErro").textContent = `Posição Loja ${opcaoPreSelecionada.loja} · ${opcaoPreSelecionada.posicao} selecionada. Confirme novamente para registrar. A autorização de desconto continua sendo verificada pelo servidor.`;
+      } else {
+        $("modalErro").textContent = "Escolha uma das posições oficiais retornadas pelo servidor e confirme novamente. Lojas não autorizadas podem ser escolhidas, mas não terão o saldo descontado.";
+      }
       $("confirmarAbastecimento").textContent = "Confirmar OK";
     } else {
       $("modalErro").textContent = erro.message +
