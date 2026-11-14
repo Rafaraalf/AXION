@@ -492,61 +492,67 @@ button:disabled { opacity:.55;cursor:wait; }
   color:#bbf7d0;
 }
 
-/* CONFIRMAÇÃO */
-
+/* CONFIRMAÇÃO DE ABASTECIMENTO · LAYOUT 4.5 */
 .modal {
-  position:fixed;
-  inset:0;
-  z-index:100;
-  background:rgba(0,0,0,.75);
-  display:grid;
-  place-items:center;
-  padding:20px;
+  position:fixed; inset:0; z-index:100; display:grid; place-items:center;
+  padding:20px; background:rgba(3,9,18,.82); backdrop-filter:blur(9px);
 }
-
 .modal-card {
-  width:100%;
-  max-width:460px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:25px;
+  width:min(100%,760px); max-height:calc(100dvh - 40px); overflow:auto;
+  padding:0; color:#edf6ff; border:1px solid #355775; border-radius:22px;
+  background:linear-gradient(145deg,#172a40,#0e1b2b 72%);
+  box-shadow:0 28px 90px rgba(0,0,0,.58);
 }
-
-.modal-card h2 { margin:0 0 16px; }
-
+.modal-card h2 {
+  margin:0; padding:22px 26px; font-size:clamp(20px,3vw,27px);
+  border-bottom:1px solid rgba(125,174,211,.2); letter-spacing:-.02em;
+}
 .modal-product {
-  color:var(--muted);
-  line-height:1.7;
-  margin-bottom:20px;
+  margin:16px 24px 22px; padding:17px 19px; border:1px solid #31516d;
+  border-radius:15px; background:rgba(7,18,31,.48); color:#c0d2e4;
+  line-height:1.75; font-size:14px;
 }
-
-.modal-card label {
-  display:block;
-  margin-bottom:8px;
+#origemEstoqueWrap { margin:0 24px 20px!important; }
+#origemEstoqueWrap > label { margin:0 0 5px!important; font-size:17px; font-weight:800; }
+#lojaOrigemDetalhe { display:block; margin:0 0 13px; color:#a9bfd3; line-height:1.5; }
+#origemLista { display:grid; gap:8px; }
+.origem-cabecalho,.origem-opcao {
+  display:grid; grid-template-columns: minmax(75px,.65fr) minmax(90px,1fr) minmax(90px,1fr) minmax(90px,.8fr);
+  align-items:center; gap:10px;
 }
-
-.modal-card input {
-  width:100%;
-  padding:13px;
-  background:var(--bg);
-  color:var(--text);
-  border:1px solid var(--border);
-  border-radius:9px;
+.origem-cabecalho { padding:10px 14px; color:#b9d2e8; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
+.origem-opcao {
+  min-height:58px; padding:10px 14px; border:1px solid #29445e; border-radius:12px;
+  background:rgba(5,16,28,.62); color:#e8f3fc; cursor:pointer; text-align:center;
+  transition:border-color .15s,background .15s,transform .15s;
 }
-
-.modal-buttons {
-  display:flex;
-  gap:10px;
-  margin-top:22px;
-}
-
-.modal-buttons button { flex:1; }
-
-#modalErro {
-  color:#fecaca;
-  margin-top:12px;
-  line-height:1.5;
+.origem-opcao:hover:not(:disabled) { border-color:#36c9f2; background:rgba(18,67,94,.55); }
+.origem-opcao.selecionada { border:2px solid #29c9f3; padding:9px 13px; background:rgba(10,91,127,.32); box-shadow:0 0 0 2px rgba(41,201,243,.08); }
+.origem-opcao:disabled { cursor:not-allowed; opacity:.48; }
+.origem-radio { width:19px!important; height:19px; margin:0 auto; accent-color:#27c5ef; }
+.origem-loja { display:inline-flex; justify-content:center; min-width:48px; padding:6px 10px; border-radius:8px; background:#193b56; font-weight:800; }
+.origem-saldo { display:inline-block; min-width:76px; padding:6px 9px; border-radius:8px; font-weight:800; }
+.origem-saldo.disponivel { background:#104c36; color:#a7f3c5; }
+.origem-saldo.indisponivel { background:#54252b; color:#fecaca; }
+.origem-status { margin:10px 2px 0; color:#a9bfd3; font-size:12px; line-height:1.5; }
+#formAbastecimento { padding:0 24px 24px; }
+#formAbastecimento > label { display:block; margin:0 0 8px; font-weight:750; }
+#quantidadeAbastecimento { width:100%; padding:14px; background:#091421; color:#f2f8ff; border:1px solid #355775; border-radius:11px; font-size:17px; }
+.modal-card input:focus-visible,.origem-opcao:focus-visible { outline:2px solid #39c9f2; outline-offset:2px; }
+.modal-buttons { display:flex; gap:12px; margin-top:20px; }
+.modal-buttons button { flex:1; min-height:52px; border-radius:12px; font-weight:800; }
+#modalErro { color:#fecaca; margin:12px 0 0; line-height:1.5; }
+@media(max-width:560px) {
+  .modal { padding:10px; }
+  .modal-card { max-height:calc(100dvh - 20px); border-radius:16px; }
+  .modal-card h2 { padding:18px; }
+  .modal-product { margin:12px 14px 17px; padding:13px; }
+  #origemEstoqueWrap { margin:0 14px 17px!important; }
+  #formAbastecimento { padding:0 14px 16px; }
+  .origem-cabecalho,.origem-opcao { grid-template-columns:48px 58px minmax(55px,1fr) 70px; gap:5px; padding-left:7px; padding-right:7px; font-size:12px; }
+  .origem-cabecalho { font-size:10px; }
+  .origem-saldo { min-width:0; padding:5px 4px; font-size:11px; }
+  .modal-buttons { flex-direction:column-reverse; }
 }
 
 /* RESPONSIVIDADE */
@@ -2929,12 +2935,17 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
 
     <div id="modalProduto" class="modal-product"></div>
 
-    <div id="origemEstoqueWrap" class="hidden" style="margin:14px 0">
-      <label for="lojaOrigemEstoque" style="display:block;margin-bottom:8px;font-weight:700">Posição física de origem (DADOS/POSIÇÕES)</label>
-      <select id="lojaOrigemEstoque" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+    <div id="origemEstoqueWrap" class="hidden">
+      <label>Posição física de origem</label>
+      <small id="lojaOrigemDetalhe" class="status-line">Selecione de qual posição será registrado o abastecimento.</small>
+      <div class="origem-cabecalho" aria-hidden="true">
+        <span>Selecionar</span><span>Loja</span><span>Posição</span><span>Saldo</span>
+      </div>
+      <div id="origemLista" role="radiogroup" aria-label="Posições físicas de origem"></div>
+      <p id="origemStatus" class="origem-status"></p>
+      <select id="lojaOrigemEstoque" class="hidden" aria-hidden="true" tabindex="-1">
         <option value="">Selecione a posição de origem</option>
       </select>
-      <small id="lojaOrigemDetalhe" class="status-line">A loja do USE é apenas a referência da pendência. Escolha o estoque físico.</small>
     </div>
 
     <form id="formAbastecimento">
@@ -4292,13 +4303,17 @@ async function atualizarSeletorOrigem(item, tipo) {
   const wrap = $("origemEstoqueWrap");
   const select = $("lojaOrigemEstoque");
   const detalhe = $("lojaOrigemDetalhe");
+  const lista = $("origemLista");
+  const status = $("origemStatus");
   select.replaceChildren();
+  lista.replaceChildren();
   const placeholder = document.createElement("option");
   placeholder.value = "";
   placeholder.textContent = "Selecione a posição de origem";
   select.appendChild(placeholder);
   movimentoAtual.posicaoOrigemId = null;
   movimentoAtual.lojaOrigem = "";
+  movimentoAtual.origensElegiveis = [];
 
   if (tipo !== "OK") {
     wrap.classList.add("hidden");
@@ -4316,38 +4331,77 @@ async function atualizarSeletorOrigem(item, tipo) {
   }
 
   const elegiveis = todas.filter(local => autorizadas.includes(local.loja) && local.saldo > 0);
+  movimentoAtual.origensElegiveis = elegiveis;
   const resumoTodas = todas.length
-    ? todas.map(local => `Loja ${local.loja} · ${local.posicao} · ${local.saldo} un.`).join(" | ")
+    ? todas.map(local => `Loja ${local.loja} · ${local.posicao} · ${local.saldo.toLocaleString("pt-BR")} un.`).join(" | ")
     : "Nenhuma posição física cadastrada para este produto.";
 
   wrap.classList.remove("hidden");
   select.required = elegiveis.length > 1;
 
-  if (elegiveis.length === 1) {
-    movimentoAtual.posicaoOrigemId = elegiveis[0].id;
-    movimentoAtual.lojaOrigem = elegiveis[0].loja;
-    select.value = String(elegiveis[0].id);
-    select.classList.add("hidden");
-    detalhe.textContent = `Localizado: ${resumoTodas}. Baixa automática somente na Loja ${elegiveis[0].loja}, posição ${elegiveis[0].posicao}.`;
-    return;
+  function selecionarOrigem(local) {
+    if (!local || !elegiveis.some(x => x.id === local.id)) return;
+    select.value = String(local.id);
+    select.dispatchEvent(new Event("change", { bubbles:true }));
+    lista.querySelectorAll(".origem-opcao").forEach(botao => {
+      const ativo = Number(botao.dataset.id) === local.id;
+      botao.classList.toggle("selecionada", ativo);
+      const radio = botao.querySelector("input");
+      if (radio) radio.checked = ativo;
+      botao.setAttribute("aria-checked", ativo ? "true" : "false");
+    });
   }
 
-  if (elegiveis.length > 1) {
-    select.classList.remove("hidden");
-    for (const local of elegiveis) {
+  for (const local of todas) {
+    const autorizado = autorizadas.includes(local.loja);
+    const disponivel = autorizado && local.saldo > 0;
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "origem-opcao";
+    botao.dataset.id = String(local.id);
+    botao.disabled = !disponivel;
+    botao.setAttribute("role", "radio");
+    botao.setAttribute("aria-checked", "false");
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "origemFisicaVisual";
+    radio.className = "origem-radio";
+    radio.tabIndex = -1;
+    radio.checked = false;
+    radio.disabled = !disponivel;
+    const loja = document.createElement("span");
+    loja.className = "origem-loja";
+    loja.textContent = local.loja;
+    const posicao = document.createElement("strong");
+    posicao.textContent = local.posicao;
+    const saldo = document.createElement("span");
+    saldo.className = "origem-saldo " + (local.saldo > 0 ? "disponivel" : "indisponivel");
+    saldo.textContent = `${local.saldo.toLocaleString("pt-BR")} un.`;
+    botao.append(radio, loja, posicao, saldo);
+    if (!autorizado) botao.title = "Loja não autorizada para desconto de estoque";
+    else if (local.saldo <= 0) botao.title = "Sem saldo disponível nesta posição";
+    botao.addEventListener("click", () => selecionarOrigem(local));
+    lista.appendChild(botao);
+    if (disponivel) {
       const option = document.createElement("option");
       option.value = String(local.id);
-      option.textContent = `Loja ${local.loja} · ${local.posicao} · Saldo ${local.saldo.toLocaleString("pt-BR")}`;
+      option.textContent = `Loja ${local.loja} · ${local.posicao} · Saldo ${local.saldo}`;
       option.dataset.loja = local.loja;
       select.appendChild(option);
     }
-    detalhe.textContent = `Encontrado em: ${resumoTodas}. Escolha somente a posição física de onde será retirado. As lojas não autorizadas aparecem apenas como informação e não terão desconto.`;
-    return;
   }
 
-  select.classList.add("hidden");
-  select.required = false;
-  detalhe.textContent = `Localização: ${resumoTodas}. Nenhuma posição com saldo em loja autorizada. O OK será registrado normalmente, sem descontar estoque.`;
+  if (elegiveis.length === 1) {
+    selecionarOrigem(elegiveis[0]);
+    detalhe.textContent = "Encontramos uma única posição autorizada com saldo. Ela já está selecionada.";
+    status.textContent = `Baixa de estoque: Loja ${elegiveis[0].loja}, posição ${elegiveis[0].posicao}.`;
+  } else if (elegiveis.length > 1) {
+    detalhe.textContent = "Escolha a posição física de onde as unidades serão retiradas.";
+    status.textContent = "Somente posições autorizadas e com saldo podem ser selecionadas.";
+  } else {
+    detalhe.textContent = "Nenhuma posição possui saldo em uma loja autorizada. O OK poderá ser registrado sem desconto.";
+    status.textContent = resumoTodas;
+  }
 }
 
 async function abrirConfirmacao(item, tipo) {
@@ -4371,9 +4425,6 @@ async function abrirConfirmacao(item, tipo) {
     movimentoAtual = null;
     mostrarFeedback(e.message, "error");
     return;
-  }
-  if (tipo === "OK" && $("lojaOrigemEstoque").classList.contains("hidden")) {
-    $("lojaOrigemEstoque").value = "";
   }
   $("quantidadeAbastecimento").value = quantidade;
   $("quantidadeAbastecimento").max = quantidade;
@@ -4399,6 +4450,9 @@ function bloquearConfirmacao(bloquear) {
   $("cancelarAbastecimento").disabled = bloquear;
   $("quantidadeAbastecimento").disabled = bloquear;
   $("lojaOrigemEstoque").disabled = bloquear;
+  $("origemLista").querySelectorAll("button").forEach(botao => {
+    if (botao.dataset.id) botao.disabled = bloquear || !((movimentoAtual?.origensElegiveis || []).some(x => String(x.id) === botao.dataset.id));
+  });
 
   $("confirmarAbastecimento").textContent = bloquear
     ? "Registrando..."
@@ -4437,15 +4491,17 @@ async function confirmarMovimento(evento) {
   }
 
   const origensDisponiveis = agruparOrigensEstoque(atual.item);
-  let posicaoOrigemId = atual.tipo === "OK" ? Number(atual.posicaoOrigemId || 0) : 0;
-  if (atual.tipo === "OK" && $("lojaOrigemEstoque").classList.contains("hidden") === false) {
-    posicaoOrigemId = Number($("lojaOrigemEstoque").value || 0);
-  }
-  if (atual.tipo === "OK" && origensDisponiveis.filter(x => x.saldo > 0).length > 1 && !posicaoOrigemId) {
+  let posicaoOrigemId = atual.tipo === "OK" ? Number($("lojaOrigemEstoque").value || atual.posicaoOrigemId || 0) : 0;
+  const elegiveis = Array.isArray(atual.origensElegiveis) ? atual.origensElegiveis : [];
+  if (atual.tipo === "OK" && elegiveis.length > 1 && !posicaoOrigemId) {
     $("modalErro").textContent = "Selecione a posição física de origem.";
     return;
   }
-  const localEscolhido = origensDisponiveis.find(x => x.id === posicaoOrigemId);
+  const localEscolhido = elegiveis.find(x => x.id === posicaoOrigemId);
+  if (atual.tipo === "OK" && posicaoOrigemId && !localEscolhido) {
+    $("modalErro").textContent = "A posição escolhida não está autorizada ou não possui saldo disponível. Atualize a tela e tente novamente.";
+    return;
+  }
 
   const movimento = {
     id_movimento: atual.id,
