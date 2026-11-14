@@ -4521,7 +4521,8 @@ async function confirmarMovimento(evento) {
   }
 
   if (atual.tipo === "OK" && Array.isArray(atual.opcoesPosicao) &&
-      atual.opcoesPosicao.length > 1 && !Number.isSafeInteger(Number(atual.posicaoOrigemId))) {
+      atual.opcoesPosicao.length > 1 &&
+      (atual.posicaoOrigemId == null || !Number.isSafeInteger(Number(atual.posicaoOrigemId)) || Number(atual.posicaoOrigemId) < 1)) {
     $("modalErro").textContent = "Selecione uma posição física antes de confirmar.";
     return;
   }
@@ -4535,7 +4536,9 @@ async function confirmarMovimento(evento) {
     id_movimento: atual.id,
     loja: String(atual.item.loja),
     loja_origem: "",
-    posicao_origem_id: atual.tipo === "OK" && Number.isSafeInteger(Number(atual.posicaoOrigemId))
+    posicao_origem_id: atual.tipo === "OK" && atual.posicaoOrigemId != null &&
+      atual.posicaoOrigemId !== "" && Number.isSafeInteger(Number(atual.posicaoOrigemId)) &&
+      Number(atual.posicaoOrigemId) > 0
       ? Number(atual.posicaoOrigemId)
       : null,
     marca: String(atual.item.marca ?? ""),
