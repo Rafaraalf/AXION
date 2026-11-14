@@ -2351,16 +2351,33 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
 #modalErro{min-height:0;margin:10px 0 0}
 #modalErro:empty{display:none}
 @media(max-width:640px){
- .modal{padding:10px}
- .modal-card{max-height:calc(100dvh - 20px);border-radius:16px}
- .ax-modal-head{padding:16px}
- .ax-modal-title{font-size:19px!important}
- .ax-modal-body{padding:15px}
- .ax-origem-lista{grid-template-columns:1fr}
- .ax-qtd-area{align-items:flex-start;flex-direction:column}
+ .modal{padding:8px;place-items:center;overflow-y:auto}
+ .modal-card{width:100%;max-width:none;max-height:calc(100dvh - 16px);border-radius:15px;overscroll-behavior:contain}
+ .ax-modal-head{padding:14px 15px;gap:8px}
+ .ax-modal-title{font-size:18px!important;line-height:1.25}
+ .ax-modal-mark{width:34px;height:34px;flex:0 0 34px}
+ .ax-modal-body{padding:13px}
+ .modal-product{font-size:12px;line-height:1.5;padding:12px;margin-bottom:16px!important;overflow-wrap:anywhere}
+ .ax-origem-heading strong{font-size:15px}
+ .ax-origem-heading small{font-size:12px}
+ .ax-origem-lista{grid-template-columns:1fr;gap:8px;margin:10px 0 12px}
+ .ax-origem-card{min-height:68px;padding:12px;gap:10px;touch-action:manipulation}
+ .ax-origem-info strong{font-size:13px;overflow-wrap:anywhere}
+ .ax-origem-info small{font-size:11px;line-height:1.35}
+ .ax-origem-saldo{font-size:11px;padding:6px 7px;white-space:nowrap}
+ .ax-qtd-area{align-items:stretch;flex-direction:column;gap:10px;padding:13px 0}
  .ax-qtd-control{width:100%}
- .ax-qtd-control input{flex:1;width:auto}
- .ax-modal-actions{flex-direction:column-reverse}
+ .ax-qtd-control button{width:54px;min-width:54px;height:50px}
+ .ax-qtd-control input{flex:1;width:auto;min-width:0;height:50px}
+ .ax-modal-actions{flex-direction:column-reverse;gap:9px;margin-top:12px}
+ .ax-modal-actions button{width:100%;min-height:48px}
+}
+@media(max-width:380px){
+ .modal{padding:5px}
+ .modal-card{max-height:calc(100dvh - 10px)}
+ .ax-modal-body{padding:10px}
+ .ax-origem-card{padding:10px;gap:8px}
+ .ax-origem-saldo{font-size:10px}
 }
 
 </style>
@@ -2991,12 +3008,12 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
           <span class="ax-origem-icon" aria-hidden="true">⌖</span>
           <div>
             <strong>Posição física de origem</strong>
-            <small id="lojaOrigemDetalhe">As posições abaixo são informativas. Ao confirmar, o AXION valida no servidor quais lojas estão autorizadas para desconto.</small>
+            <small id="lojaOrigemDetalhe">Você pode selecionar posições de qualquer loja. A configuração define somente quais lojas podem ter o saldo descontado.</small>
           </div>
         </div>
         <div id="origemEstoqueLista" class="ax-origem-lista" aria-live="polite"></div>
         <div id="origemEstoqueAviso" class="ax-origem-aviso">
-          Somente posições de lojas autorizadas e com saldo serão consideradas para desconto. A loja do USE não define a origem física.
+          Todas as lojas podem ser selecionadas como origem física. Somente lojas autorizadas terão baixa de quantidade.
         </div>
       </section>
 
@@ -4370,7 +4387,7 @@ function renderizarPreviaPosicoes(item) {
     }
   }
 
-  aviso.textContent = "Estas posições são uma prévia do estoque físico. Ao confirmar, o Worker retorna as posições com saldo pertencentes às lojas autorizadas para desconto. Nenhuma loja não autorizada será descontada.";
+  aviso.textContent = "Prévia das posições físicas. Toque em Confirmar para carregar a seleção oficial. Você poderá escolher qualquer loja; somente lojas autorizadas terão baixa de quantidade.";
 }
 
 function renderizarOpcoesPosicao(opcoes) {
@@ -4399,7 +4416,7 @@ function renderizarOpcoesPosicao(opcoes) {
     const nome = document.createElement("strong");
     nome.textContent = `Loja ${opcao.loja} · ${opcao.posicao || "Sem identificação"}`;
     const detalhe = document.createElement("small");
-    detalhe.textContent = "Selecionar esta posição física";
+    detalhe.textContent = opcao.autorizadaDesconto ? "Selecionar · baixa autorizada nesta loja" : "Selecionar · sem desconto nesta loja";
     info.append(nome, detalhe);
 
     const saldo = document.createElement("span");
@@ -4421,7 +4438,7 @@ function renderizarOpcoesPosicao(opcoes) {
     lista.appendChild(botao);
   }
 
-  aviso.textContent = "Selecione a posição exata de onde o estoque será retirado. Somente as posições de lojas autorizadas aparecem nesta lista.";
+  aviso.textContent = "Selecione a posição física de origem. Lojas não autorizadas também podem ser escolhidas: o OK será registrado, mas o saldo não será descontado.";
 }
 
 function abrirConfirmacao(item, tipo) {
@@ -4574,7 +4591,7 @@ async function confirmarMovimento(evento) {
       atual.opcoesPosicao = dadosErro.opcoesPosicao;
       atual.posicaoOrigemId = null;
       renderizarOpcoesPosicao(dadosErro.opcoesPosicao);
-      $("modalErro").textContent = "Encontramos mais de uma posição autorizada. Escolha de qual delas o AXION deve retirar o estoque e confirme novamente.";
+      $("modalErro").textContent = "Encontramos mais de uma posição física. Escolha a origem e confirme novamente. Se a loja não estiver autorizada, o OK será registrado sem descontar o saldo.";
       $("confirmarAbastecimento").textContent = "Confirmar OK";
     } else {
       $("modalErro").textContent = erro.message +
