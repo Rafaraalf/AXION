@@ -4362,6 +4362,7 @@ function renderizarPreviaPosicoes(item) {
 
   const locais = localizacoesDoItem(item)
     .map(local => ({
+      id: Number(local.id),
       loja: String(local.loja || "").trim(),
       posicao: String(local.posicao || "").trim(),
       saldo: Number(local.saldo ?? local.quantidade ?? 0) || 0
@@ -4380,6 +4381,7 @@ function renderizarPreviaPosicoes(item) {
       card.type = "button";
       card.className = "ax-origem-card ax-origem-previa";
       card.dataset.posicaoChave = chavePosicao(local.loja, local.posicao);
+      card.dataset.posicaoId = Number.isSafeInteger(local.id) && local.id > 0 ? String(local.id) : "";
       card.setAttribute("aria-pressed", "false");
       card.setAttribute("aria-label", `Selecionar loja ${local.loja}, posição ${local.posicao}, saldo ${local.saldo}`);
 
@@ -4400,6 +4402,7 @@ function renderizarPreviaPosicoes(item) {
       card.addEventListener("click", () => {
         if (enviandoMovimento || !movimentoAtual) return;
         movimentoAtual.posicaoOrigemChave = card.dataset.posicaoChave;
+        movimentoAtual.posicaoOrigemId = card.dataset.posicaoId ? Number(card.dataset.posicaoId) : null;
         lista.querySelectorAll(".ax-origem-previa").forEach(outro => {
           const ativa = outro === card;
           outro.classList.toggle("selecionada", ativa);
@@ -4408,7 +4411,9 @@ function renderizarPreviaPosicoes(item) {
           if (texto) texto.textContent = ativa ? "Posição selecionada · confirme para validar" : "Toque para selecionar esta posição";
         });
         $("modalErro").textContent = "";
-        $("confirmarAbastecimento").textContent = "Verificar posição selecionada";
+        $("confirmarAbastecimento").textContent = movimentoAtual.posicaoOrigemId
+          ? "Confirmar posição selecionada"
+          : "Validar posição selecionada";
       });
       lista.appendChild(card);
     }
@@ -4533,7 +4538,7 @@ function bloquearConfirmacao(bloquear) {
   $("confirmarAbastecimento").textContent = bloquear
     ? "Registrando..."
     : movimentoAtual?.tipo === "OK"
-      ? (movimentoAtual?.opcoesPosicao?.length ? "Confirmar OK" : (movimentoAtual?.posicaoOrigemChave ? "Verificar posição selecionada" : "Verificar posições e confirmar"))
+      ? (movimentoAtual?.posicaoOrigemId ? "Confirmar posição selecionada" : (movimentoAtual?.posicaoOrigemChave ? "Validar posição selecionada" : "Selecione a posição de origem"))
       : "Confirmar S/E";
 }
 
@@ -4550,11 +4555,24 @@ async function confirmarMovimento(evento) {
     return;
   }
 
-  if (atual.tipo === "OK" && Array.isArray(atual.opcoesPosicao) &&
-      atual.opcoesPosicao.length > 1 &&
-      (atual.posicaoOrigemId == null || !Number.isSafeInteger(Number(atual.posicaoOrigemId)) || Number(atual.posicaoOrigemId) < 1)) {
-    $("modalErro").textContent = "Selecione uma posição física antes de confirmar.";
-    return;
+  if (atual.tipo === "OK") {
+    const possuiPosicoesNaPrevia = localizacoesDoItem(atual.item).some(local =>
+      String(local.loja || "").trim() && String(local.posicao || "").trim()
+    );
+    if (possuiPosicoesNaPrevia &&
+        (atual.posicaoOrigemId == null ||
+         !Number.isSafeInteger(Number(atual.posicaoOrigemId)) ||
+         Number(atual.posicaoOrigemId) < 1)) {
+      $("modalErro").textContent = "Toque em uma posição física para selecionar de qual estoque está retirando o item.";
+      return;
+    }
+    if (Array.isArray(atual.opcoesPosicao) && atual.opcoesPosicao.length > 0 &&
+        (atual.posicaoOrigemId == null ||
+         !Number.isSafeInteger(Number(atual.posicaoOrigemId)) ||
+         Number(atual.posicaoOrigemId) < 1)) {
+      $("modalErro").textContent = "Selecione uma posição física antes de confirmar.";
+      return;
+    }
   }
 
   if (atual.quantidadeEnviada !== quantidade) {
