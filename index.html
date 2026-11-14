@@ -2414,7 +2414,7 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
         <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">☰</button>
         <strong id="tituloPagina">Dashboard</strong>
       </div>
-      <span>AXION WEB · v4.2 D1</span>
+      <span>AXION WEB · v4.4 D1</span>
     </header>
 
     <div class="content">
@@ -2897,7 +2897,7 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
         </div>
         <div class="panel">
           <h2>AXION Web</h2>
-          <p>Versão da interface: 4.2 · D1</p>
+          <p>Versão da interface: 4.4 · D1</p>
           <p style="color:var(--muted);line-height:1.8">
             Autenticação: Cloudflare Workers<br>
             Interface: GitHub Pages<br>
@@ -2930,9 +2930,9 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
     <div id="modalProduto" class="modal-product"></div>
 
     <div id="origemEstoqueWrap" class="hidden" style="margin:14px 0">
-      <label for="lojaOrigemEstoque" style="display:block;margin-bottom:8px;font-weight:700">Estoque físico de origem (DADOS/POSIÇÕES)</label>
+      <label for="lojaOrigemEstoque" style="display:block;margin-bottom:8px;font-weight:700">Posição física de origem (DADOS/POSIÇÕES)</label>
       <select id="lojaOrigemEstoque" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
-        <option value="">Selecione a loja de origem</option>
+        <option value="">Selecione a posição de origem</option>
       </select>
       <small id="lojaOrigemDetalhe" class="status-line">A loja do USE é apenas a referência da pendência. Escolha o estoque físico.</small>
     </div>
@@ -4277,28 +4277,28 @@ async function carregarPendentes() {
 
 function agruparOrigensEstoque(item) {
   const locais = localizacoesDoItem(item);
-  const mapa = new Map();
-  for (const local of locais) {
-    const loja = String(local.loja || "").trim();
-    if (!["66", "67", "68"].includes(loja)) continue;
-    if (!mapa.has(loja)) mapa.set(loja, { loja, saldo: 0, posicoes: [] });
-    const grupo = mapa.get(loja);
-    grupo.saldo += Number(local.saldo ?? local.quantidade ?? 0) || 0;
-    const posicao = String(local.posicao || "").trim();
-    if (posicao && !grupo.posicoes.includes(posicao)) grupo.posicoes.push(posicao);
-  }
-  return [...mapa.values()].sort((a,b) => Number(a.loja)-Number(b.loja));
+  return locais
+    .filter(local => ["66", "67", "68"].includes(String(local.loja || "").trim()))
+    .map(local => ({
+      id: Number(local.id),
+      loja: String(local.loja || "").trim(),
+      posicao: String(local.posicao || "").trim(),
+      saldo: Number(local.saldo ?? local.quantidade ?? 0) || 0
+    }))
+    .filter(local => Number.isSafeInteger(local.id) && local.id > 0 && local.posicao);
 }
 
-function atualizarSeletorOrigem(item, tipo) {
+async function atualizarSeletorOrigem(item, tipo) {
   const wrap = $("origemEstoqueWrap");
   const select = $("lojaOrigemEstoque");
   const detalhe = $("lojaOrigemDetalhe");
   select.replaceChildren();
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = "Selecione a loja de origem";
+  placeholder.textContent = "Selecione a posição de origem";
   select.appendChild(placeholder);
+  movimentoAtual.posicaoOrigemId = null;
+  movimentoAtual.lojaOrigem = "";
 
   if (tipo !== "OK") {
     wrap.classList.add("hidden");
@@ -4306,25 +4306,51 @@ function atualizarSeletorOrigem(item, tipo) {
     return;
   }
 
-  const origens = agruparOrigensEstoque(item);
+  const todas = agruparOrigensEstoque(item);
+  let autorizadas = ["66"];
+  try {
+    const config = await requisicaoAPI("/api/config/desconto");
+    autorizadas = Array.isArray(config.lojas) ? config.lojas.map(String) : ["66"];
+  } catch (e) {
+    throw new Error("Não foi possível verificar quais lojas estão autorizadas a descontar: " + e.message);
+  }
+
+  const elegiveis = todas.filter(local => autorizadas.includes(local.loja) && local.saldo > 0);
+  const resumoTodas = todas.length
+    ? todas.map(local => `Loja ${local.loja} · ${local.posicao} · ${local.saldo} un.`).join(" | ")
+    : "Nenhuma posição física cadastrada para este produto.";
+
   wrap.classList.remove("hidden");
-  select.required = origens.length > 0;
-  for (const origem of origens) {
-    const option = document.createElement("option");
-    option.value = origem.loja;
-    option.textContent = `Loja ${origem.loja} · Saldo ${origem.saldo.toLocaleString("pt-BR")} · ${origem.posicoes.join(", ") || "sem posição"}`;
-    option.dataset.saldo = String(origem.saldo);
-    select.appendChild(option);
+  select.required = elegiveis.length > 1;
+
+  if (elegiveis.length === 1) {
+    movimentoAtual.posicaoOrigemId = elegiveis[0].id;
+    movimentoAtual.lojaOrigem = elegiveis[0].loja;
+    select.value = String(elegiveis[0].id);
+    select.classList.add("hidden");
+    detalhe.textContent = `Localizado: ${resumoTodas}. Baixa automática somente na Loja ${elegiveis[0].loja}, posição ${elegiveis[0].posicao}.`;
+    return;
   }
-  if (!origens.length) {
-    detalhe.textContent = "Nenhuma posição física encontrada no D1. O OK poderá ser registrado, mas não haverá desconto de estoque.";
-    select.required = false;
-  } else {
-    detalhe.textContent = "Escolha a loja que possui fisicamente o produto. A autorização de desconto será aplicada a essa loja, não à loja do USE.";
+
+  if (elegiveis.length > 1) {
+    select.classList.remove("hidden");
+    for (const local of elegiveis) {
+      const option = document.createElement("option");
+      option.value = String(local.id);
+      option.textContent = `Loja ${local.loja} · ${local.posicao} · Saldo ${local.saldo.toLocaleString("pt-BR")}`;
+      option.dataset.loja = local.loja;
+      select.appendChild(option);
+    }
+    detalhe.textContent = `Encontrado em: ${resumoTodas}. Escolha somente a posição física de onde será retirado. As lojas não autorizadas aparecem apenas como informação e não terão desconto.`;
+    return;
   }
+
+  select.classList.add("hidden");
+  select.required = false;
+  detalhe.textContent = `Localização: ${resumoTodas}. Nenhuma posição com saldo em loja autorizada. O OK será registrado normalmente, sem descontar estoque.`;
 }
 
-function abrirConfirmacao(item, tipo) {
+async function abrirConfirmacao(item, tipo) {
   if (enviandoMovimento || movimentoAtual) return;
 
   const quantidade = Number(item.quantidade);
@@ -4339,8 +4365,16 @@ function abrirConfirmacao(item, tipo) {
     `${item.descricao || item.marca || "Produto"} · REF ${item.ref} · ${item.cor} · ${item.tamanho} · ` +
     `Loja USE ${item.loja} · Pendente: ${quantidade}`;
 
-  atualizarSeletorOrigem(item, tipo);
-  $("lojaOrigemEstoque").value = "";
+  try {
+    await atualizarSeletorOrigem(item, tipo);
+  } catch (e) {
+    movimentoAtual = null;
+    mostrarFeedback(e.message, "error");
+    return;
+  }
+  if (tipo === "OK" && $("lojaOrigemEstoque").classList.contains("hidden")) {
+    $("lojaOrigemEstoque").value = "";
+  }
   $("quantidadeAbastecimento").value = quantidade;
   $("quantidadeAbastecimento").max = quantidade;
   $("confirmarAbastecimento").textContent = tipo === "OK" ? "Confirmar OK" : "Confirmar S/E";
@@ -4403,16 +4437,21 @@ async function confirmarMovimento(evento) {
   }
 
   const origensDisponiveis = agruparOrigensEstoque(atual.item);
-  const lojaOrigem = atual.tipo === "OK" ? String($("lojaOrigemEstoque").value || "") : "";
-  if (atual.tipo === "OK" && origensDisponiveis.length && !lojaOrigem) {
-    $("modalErro").textContent = "Selecione a loja de origem do estoque físico em DADOS/POSIÇÕES.";
+  let posicaoOrigemId = atual.tipo === "OK" ? Number(atual.posicaoOrigemId || 0) : 0;
+  if (atual.tipo === "OK" && $("lojaOrigemEstoque").classList.contains("hidden") === false) {
+    posicaoOrigemId = Number($("lojaOrigemEstoque").value || 0);
+  }
+  if (atual.tipo === "OK" && origensDisponiveis.filter(x => x.saldo > 0).length > 1 && !posicaoOrigemId) {
+    $("modalErro").textContent = "Selecione a posição física de origem.";
     return;
   }
+  const localEscolhido = origensDisponiveis.find(x => x.id === posicaoOrigemId);
 
   const movimento = {
     id_movimento: atual.id,
     loja: String(atual.item.loja),
-    loja_origem: lojaOrigem,
+    loja_origem: localEscolhido?.loja || "",
+    posicao_origem_id: posicaoOrigemId || null,
     marca: String(atual.item.marca ?? ""),
     ref: String(atual.item.ref),
     cor: String(atual.item.cor ?? ""),
@@ -5050,6 +5089,14 @@ $("formAbastecimento").addEventListener(
   "submit",
   confirmarMovimento
 );
+
+$("lojaOrigemEstoque").addEventListener("change", () => {
+  if (!movimentoAtual) return;
+  const id = Number($("lojaOrigemEstoque").value || 0);
+  const local = agruparOrigensEstoque(movimentoAtual.item).find(x => x.id === id);
+  movimentoAtual.posicaoOrigemId = local ? local.id : null;
+  movimentoAtual.lojaOrigem = local ? local.loja : "";
+});
 
 $("cancelarAbastecimento").addEventListener(
   "click",
