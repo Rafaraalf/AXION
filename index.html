@@ -3747,6 +3747,167 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
  #page-abastecimento .table-wrap>.data-table tbody td{font-size:12px!important}
  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(3){font-size:15px!important}
 }
+
+/* AXION MOBILE 5.5 | redesign real do cartão de abastecimento */
+@media (max-width:760px) {
+  #page-abastecimento .table-wrap>.data-table tbody {
+    gap:16px!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody tr {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:0 10px!important;
+    padding:0 13px 12px!important;
+    border:1px solid #315a78!important;
+    border-radius:18px!important;
+    background:linear-gradient(160deg,#142f49 0%,#0b2035 62%,#0a1b2d 100%)!important;
+    box-shadow:0 8px 22px #0004,inset 0 1px #ffffff0b!important;
+    overflow:hidden!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody tr:before {
+    width:4px!important;background:linear-gradient(180deg,#38d4ff,#1479b6 65%,transparent)!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td {
+    padding:10px 9px!important;
+    border:0!important;
+    border-bottom:1px solid #29445d!important;
+    font-size:13px!important;
+    line-height:1.35!important;
+    min-height:0!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:before {
+    font-size:9px!important;
+    letter-spacing:.09em!important;
+    color:#82a9c8!important;
+    margin-bottom:5px!important;
+  }
+  /* Faixa de identificação do produto */
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(3) {
+    grid-column:1/-1!important;grid-row:1!important;
+    margin:0 -13px 2px!important;
+    padding:17px 17px 15px 19px!important;
+    border:0!important;border-bottom:1px solid #35617f!important;
+    background:linear-gradient(105deg,#173e5d,#102a43 75%,#10253b)!important;
+    color:#f5fbff!important;
+    font-size:17px!important;font-weight:850!important;
+    line-height:1.28!important;letter-spacing:-.025em!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(3):before {
+    color:#64c9f4!important;font-size:9px!important;margin-bottom:7px!important;
+  }
+  /* Loja e marca como faixa de identificação */
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(1),
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(2) {
+    background:#102940!important;
+    padding:10px 11px!important;
+    margin-top:10px!important;
+    border:1px solid #294e6b!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(1) {
+    border-radius:10px 0 0 10px!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(2) {
+    border-radius:0 10px 10px 0!important;
+  }
+  /* Grade técnica */
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(4),
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(5),
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(6),
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(7) {
+    min-height:66px!important;
+    background:rgba(5,20,35,.22)!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(4),
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(6) {
+    grid-column:1!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(5),
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(7) {
+    grid-column:2!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(7) {
+    overflow-wrap:anywhere!important;font-variant-numeric:tabular-nums!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(7) .abast-ean-item {
+    display:inline-block!important;padding:4px 6px!important;border-radius:6px!important;
+    background:#173b59!important;border:1px solid #2d6388!important;font-size:10px!important;
+  }
+  /* Localização em faixa escura */
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(8) {
+    grid-column:1/-1!important;
+    margin-top:11px!important;padding:11px!important;
+    border:1px solid #315a78!important;border-radius:12px!important;
+    background:#091b2d!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(8):before {
+    display:block!important;margin-bottom:8px!important;
+  }
+  #page-abastecimento .table-wrap>.data-table .abast-local-list {
+    display:grid!important;gap:6px!important;
+  }
+  #page-abastecimento .table-wrap>.data-table .abast-local-item {
+    display:flex!important;align-items:center!important;justify-content:space-between!important;
+    gap:8px!important;padding:7px 9px!important;border-radius:8px!important;
+    background:#102a41!important;border:1px solid #1e4563!important;
+  }
+  /* Indicadores compactos e contrastantes */
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(9),
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(10) {
+    display:flex!important;flex-direction:column!important;justify-content:center!important;
+    align-items:center!important;min-height:72px!important;margin-top:11px!important;
+    padding:9px 5px!important;border-radius:12px!important;text-align:center!important;
+    font-size:24px!important;font-weight:900!important;font-variant-numeric:tabular-nums!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(9) {
+    grid-column:1!important;background:linear-gradient(145deg,#0b4057,#0d2e43)!important;
+    border:1px solid #1684ad!important;color:#5bdcff!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(10) {
+    grid-column:2!important;background:linear-gradient(145deg,#49351b,#302617)!important;
+    border:1px solid #a66b1c!important;color:#ffc36a!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(9):before,
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(10):before {
+    font-size:9px!important;margin-bottom:4px!important;
+  }
+  /* Ações realmente ocupam a largura toda */
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(11) {
+    grid-column:1/-1!important;
+    padding:13px 0 11px!important;margin-top:3px!important;
+    border-bottom:1px solid #29445d!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(11):before {
+    content:'REGISTRAR RESULTADO'!important;margin-bottom:9px!important;
+  }
+  #page-abastecimento .table-wrap>.data-table .actions {
+    display:grid!important;grid-template-columns:1fr 1fr!important;
+    gap:10px!important;width:100%!important;
+  }
+  #page-abastecimento .table-wrap>.data-table .btn-ok,
+  #page-abastecimento .table-wrap>.data-table .btn-se {
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:100%!important;min-height:49px!important;padding:10px!important;
+    border-radius:11px!important;font-size:15px!important;font-weight:850!important;
+  }
+  /* Seleção em uma barra própria */
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(12) {
+    grid-column:1/-1!important;display:flex!important;align-items:center!important;
+    justify-content:space-between!important;gap:12px!important;
+    padding:11px 2px 3px!important;border:0!important;
+    color:#b9d2e5!important;font-size:12px!important;font-weight:700!important;
+  }
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(12):before {
+    content:'Selecionar este produto'!important;color:#b9d2e5!important;
+    font-size:12px!important;letter-spacing:0!important;text-transform:none!important;
+    margin:0!important;
+  }
+  #page-abastecimento .table-wrap>.data-table .abast-check-item,
+  #page-abastecimento .table-wrap>.data-table tbody td:nth-child(12) input {
+    width:21px!important;height:21px!important;flex:0 0 21px!important;
+    accent-color:#27c5f5!important;
+  }
+}
+
 </style>
 
 </head>
