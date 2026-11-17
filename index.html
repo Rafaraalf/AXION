@@ -3087,6 +3087,238 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 .est-grade-table-wrap { overflow: hidden !important; }
 </style>
 
+<style id="axion-mobile-native-layout">
+/* AXION mobile: layout próprio, não desktop comprimido. */
+@media (max-width: 760px) {
+  html, body { width:100%; min-width:0; height:100%; overflow:hidden !important; }
+  body { overscroll-behavior:none; }
+  #appView:not(.hidden) {
+    display:block !important;
+    width:100% !important;
+    height:100dvh !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+  }
+  #appView .sidebar {
+    position:fixed !important;
+    z-index:1000 !important;
+    left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
+    display:block !important;
+    width:100% !important; max-width:none !important; min-width:0 !important;
+    height:auto !important; max-height:none !important;
+    padding:7px 5px calc(7px + env(safe-area-inset-bottom)) !important;
+    overflow:visible !important;
+    border-right:0 !important;
+    border-top:1px solid rgba(117,190,238,.24) !important;
+    background:rgba(5,20,39,.94) !important;
+    backdrop-filter:blur(22px) saturate(160%) !important;
+    -webkit-backdrop-filter:blur(22px) saturate(160%) !important;
+    box-shadow:0 -8px 28px rgba(0,0,0,.24) !important;
+  }
+  #appView .sidebar-brand, #appView .sidebar-caption, #appView .sidebar-bottom { display:none !important; }
+  #appView .nav {
+    display:grid !important;
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    gap:2px !important;
+    width:100% !important;
+    overflow:visible !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+  #appView .nav button {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+    width:100% !important; min-width:0 !important;
+    min-height:54px !important;
+    padding:5px 1px !important;
+    margin:0 !important;
+    border:1px solid transparent !important;
+    border-radius:10px !important;
+    background:transparent !important;
+    color:#9db4ca !important;
+    font-size:9px !important;
+    line-height:1.1 !important;
+    white-space:normal !important;
+    text-align:center !important;
+    overflow:hidden !important;
+  }
+  #appView .nav button .ax-nav-icon { display:block !important; width:19px !important; height:19px !important; flex:0 0 19px !important; }
+  #appView .nav button span { display:block !important; max-width:100% !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+  #appView .nav button.active {
+    color:#55caff !important;
+    background:rgba(40,157,225,.17) !important;
+    border-color:rgba(69,190,255,.28) !important;
+    box-shadow:inset 0 0 0 1px rgba(69,190,255,.08) !important;
+  }
+  #appView .main {
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important; min-width:0 !important;
+    height:100dvh !important; min-height:0 !important;
+    overflow:hidden !important;
+  }
+  #appView .topbar {
+    position:relative !important;
+    z-index:20 !important;
+    display:flex !important;
+    flex:0 0 54px !important;
+    width:100% !important; min-height:54px !important; height:54px !important;
+    padding:8px 14px !important;
+    gap:8px !important;
+    background:rgba(5,22,43,.96) !important;
+    backdrop-filter:blur(18px) !important;
+    -webkit-backdrop-filter:blur(18px) !important;
+  }
+  #appView .topbar > span { font-size:9px !important; white-space:nowrap !important; }
+  #appView .sidebar-toggle { display:none !important; }
+  #appView .content {
+    display:block !important;
+    flex:1 1 auto !important;
+    width:100% !important; max-width:none !important; min-width:0 !important;
+    height:auto !important; min-height:0 !important;
+    margin:0 !important;
+    padding:16px 12px calc(92px + env(safe-area-inset-bottom)) !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  #appView .page { width:100% !important; min-width:0 !important; }
+  #appView .heading { margin-bottom:16px !important; }
+  #appView .heading h1 { font-size:24px !important; line-height:1.2 !important; }
+  #appView .heading p { font-size:12px !important; line-height:1.5 !important; }
+  #appView .stats { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:9px !important; }
+  #appView .stat, #appView .panel { min-width:0 !important; padding:13px !important; border-radius:14px !important; }
+  #appView .stat .label { font-size:10px !important; margin-bottom:8px !important; }
+  #appView .stat .value { font-size:25px !important; }
+  #appView .stat .detail { font-size:10px !important; }
+  #appView .panel h2 { font-size:15px !important; margin-bottom:12px !important; }
+  #appView .toolbar { display:flex !important; flex-wrap:wrap !important; gap:8px !important; width:100% !important; }
+  #appView .toolbar input, #appView .toolbar select { flex:1 1 100% !important; width:100% !important; min-width:0 !important; }
+  #appView .toolbar button { flex:1 1 auto !important; min-height:42px !important; }
+  #appView input, #appView select, #appView button { font-size:14px !important; }
+  #appView .est-catalogo-search { padding:12px !important; border-radius:13px !important; }
+  #appView .est-catalogo-controls { display:grid !important; grid-template-columns:1fr 1fr !important; gap:8px !important; }
+  #appView .est-catalogo-controls input { grid-column:1 / -1 !important; width:100% !important; min-width:0 !important; }
+  #appView .est-catalogo-controls select { grid-column:1 / -1 !important; width:100% !important; min-width:0 !important; }
+  #appView .est-catalogo-controls button { width:100% !important; min-width:0 !important; min-height:43px !important; }
+  #appView .est-grade-resumo { align-items:flex-start !important; }
+  #appView .est-grade-identificacao .est-cat-result-title { font-size:15px !important; }
+  #appView .est-grade-meta { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:7px !important; }
+  #appView .est-grade-meta-item { padding:8px !important; }
+  #appView .est-grade-meta-item strong { font-size:12px !important; }
+  #appView .est-grade-local-resumo { font-size:11px !important; line-height:1.55 !important; }
+  #appView .est-grade-panel { padding:12px !important; }
+  #appView .est-grade-topo { align-items:flex-start !important; }
+  #appView .est-grade-topo h3 { font-size:14px !important; }
+  #appView .est-grade-topo p { font-size:11px !important; }
+  /* Grade vira cartões de variação: todas as informações continuam visíveis. */
+  #appView .est-grade-table-wrap { overflow:visible !important; border:0 !important; }
+  #appView .est-grade-table, #appView .est-grade-table tbody { display:block !important; width:100% !important; }
+  #appView .est-grade-table thead { display:none !important; }
+  #appView .est-grade-table tbody tr {
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px 10px !important;
+    padding:11px !important;
+    margin:0 0 9px !important;
+    border:1px solid rgba(132,184,222,.18) !important;
+    border-radius:11px !important;
+    background:rgba(255,255,255,.045) !important;
+  }
+  #appView .est-grade-table tbody td {
+    display:block !important;
+    width:auto !important;
+    min-width:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    font-size:11px !important;
+    line-height:1.45 !important;
+    overflow-wrap:anywhere !important;
+    text-align:left !important;
+    white-space:normal !important;
+  }
+  #appView .est-grade-table tbody td::before {
+    display:block !important;
+    margin-bottom:3px !important;
+    color:#85abc9 !important;
+    font-size:9px !important;
+    font-weight:800 !important;
+    letter-spacing:.04em !important;
+    content:'';
+  }
+  #appView .est-grade-table tbody td:nth-child(1)::before { content:'COR'; }
+  #appView .est-grade-table tbody td:nth-child(2)::before { content:'TAMANHO'; }
+  #appView .est-grade-table tbody td:nth-child(3)::before { content:'EAN'; }
+  #appView .est-grade-table tbody td:nth-child(4)::before { content:'LOJA'; }
+  #appView .est-grade-table tbody td:nth-child(5)::before { content:'POSIÇÕES'; }
+  #appView .est-grade-table tbody td:nth-child(6)::before { content:'SALDO'; }
+  #appView .est-grade-table tbody td:nth-child(6) { text-align:left !important; }
+  #appView .est-grade-table tbody td[colspan] { grid-column:1 / -1 !important; }
+  /* Tabelas operacionais não são espremidas: cada registro vira um cartão. */
+  #appView .table-wrap { width:100% !important; max-width:100% !important; overflow:visible !important; }
+  #appView .data-table { width:100% !important; min-width:0 !important; table-layout:auto !important; }
+  #appView .data-table thead { display:none !important; }
+  #appView .data-table tbody { display:block !important; width:100% !important; }
+  #appView .data-table tbody tr {
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px 10px !important;
+    padding:12px !important;
+    margin:0 0 10px !important;
+    border:1px solid rgba(132,184,222,.18) !important;
+    border-radius:12px !important;
+    background:rgba(12,37,63,.78) !important;
+  }
+  #appView .data-table tbody td {
+    display:block !important;
+    width:auto !important; min-width:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    font-size:11px !important;
+    line-height:1.45 !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+  }
+  #page-estoque .est-stock-table tbody td:nth-child(1)::before { content:'POSIÇÃO'; }
+  #page-estoque .est-stock-table tbody td:nth-child(2)::before { content:'EAN'; }
+  #page-estoque .est-stock-table tbody td:nth-child(3)::before { content:'REFERÊNCIA'; }
+  #page-estoque .est-stock-table tbody td:nth-child(4)::before { content:'DESCRIÇÃO'; }
+  #page-estoque .est-stock-table tbody td:nth-child(5)::before { content:'MARCA'; }
+  #page-estoque .est-stock-table tbody td:nth-child(6)::before { content:'COR'; }
+  #page-estoque .est-stock-table tbody td:nth-child(7)::before { content:'TAMANHO'; }
+  #page-estoque .est-stock-table tbody td:nth-child(8)::before { content:'QUANTIDADE'; }
+  #page-estoque .est-stock-table tbody td:nth-child(9)::before { content:'LOJA'; }
+  #page-abastecimento .data-table tbody td:nth-child(1)::before { content:'LOJA'; }
+  #page-abastecimento .data-table tbody td:nth-child(2)::before { content:'MARCA'; }
+  #page-abastecimento .data-table tbody td:nth-child(3)::before { content:'DESCRIÇÃO'; }
+  #page-abastecimento .data-table tbody td:nth-child(4)::before { content:'REFERÊNCIA'; }
+  #page-abastecimento .data-table tbody td:nth-child(5)::before { content:'COR'; }
+  #page-abastecimento .data-table tbody td:nth-child(6)::before { content:'TAMANHO'; }
+  #page-abastecimento .data-table tbody td:nth-child(7)::before { content:'EAN'; }
+  #page-abastecimento .data-table tbody td:nth-child(8)::before { content:'POSIÇÕES / LOCAIS'; }
+  #page-abastecimento .data-table tbody td:nth-child(9)::before { content:'SALDO'; }
+  #page-abastecimento .data-table tbody td:nth-child(10)::before { content:'PENDENTE'; }
+  #page-abastecimento .data-table tbody td:nth-child(11)::before { content:'AÇÕES'; }
+  #page-abastecimento .data-table tbody td:nth-child(12)::before { content:'SELECIONAR'; }
+  #page-abastecimento .data-table tbody td:nth-child(11) { grid-column:1 / -1 !important; display:flex !important; gap:8px !important; }
+  #page-abastecimento .data-table tbody td:nth-child(11) button { flex:1 1 0 !important; min-height:40px !important; }
+  #page-abastecimento .data-table tbody td:nth-child(12) { display:flex !important; align-items:center !important; gap:8px !important; }
+  #page-abastecimento .abast-selecao-toolbar { display:flex !important; flex-wrap:wrap !important; gap:8px !important; }
+  #page-abastecimento .abast-acoes-lote { display:grid !important; grid-template-columns:1fr 1fr !important; width:100% !important; gap:7px !important; }
+  #page-abastecimento .abast-acoes-lote button { min-width:0 !important; white-space:normal !important; }
+  #appView .status-line { font-size:11px !important; line-height:1.5 !important; }
+}
+@media (max-width: 390px) {
+  #appView .content { padding-left:9px !important; padding-right:9px !important; }
+  #appView .nav button { font-size:8px !important; }
+  #appView .nav button .ax-nav-icon { width:17px !important; height:17px !important; }
+  #appView .data-table tbody tr, #appView .est-grade-table tbody tr { padding:9px !important; gap:7px !important; }
+}
+</style>
+
 </head>
 <body>
 <div aria-label="Carregando dados" aria-live="polite" id="axion-loading" role="status">
