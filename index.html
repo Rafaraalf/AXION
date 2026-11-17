@@ -2746,8 +2746,75 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
  .stat{min-height:108px!important}
 }
 </style>
-
-</head>
+<style>
+/* AXION 5.4 — tabelas fluidas: sem rolagem lateral e sem títulos truncados */
+.table-wrap,.est-table-wrap,#page-abastecimento .table-wrap,#page-estoque .est-table-wrap{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  overflow-x:hidden!important;overflow-y:visible!important;
+  scrollbar-width:none!important; -ms-overflow-style:none!important;
+}
+.table-wrap::-webkit-scrollbar,.est-table-wrap::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+#page-abastecimento .table-wrap>.data-table,
+#page-estoque .est-table-wrap>.est-stock-table,
+#page-estoque .est-stock-table{
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  table-layout:fixed!important;border-collapse:separate!important;border-spacing:0!important;
+}
+#page-abastecimento .data-table th,#page-abastecimento .data-table td,
+#page-estoque .est-stock-table th,#page-estoque .est-stock-table td{
+  box-sizing:border-box!important;min-width:0!important;max-width:none!important;
+  overflow:visible!important;text-overflow:clip!important;vertical-align:middle!important;
+}
+#page-abastecimento .data-table thead th,#page-estoque .est-stock-table thead th{
+  white-space:normal!important;word-break:normal!important;overflow-wrap:normal!important;
+  hyphens:none!important;line-height:1.25!important;font-size:clamp(9px,.68vw,11px)!important;
+  padding:11px 5px!important;text-align:center!important;letter-spacing:0!important;
+}
+#page-abastecimento .data-table tbody td,#page-estoque .est-stock-table tbody td{
+  white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;
+  line-height:1.35!important;font-size:clamp(9px,.68vw,11px)!important;padding:10px 6px!important;
+}
+/* Abastecimento: soma de larguras = 100%, com espaço reservado aos dois botões. */
+#page-abastecimento .data-table th:nth-child(1),#page-abastecimento .data-table td:nth-child(1){width:4%;text-align:center!important}
+#page-abastecimento .data-table th:nth-child(2),#page-abastecimento .data-table td:nth-child(2){width:7%}
+#page-abastecimento .data-table th:nth-child(3),#page-abastecimento .data-table td:nth-child(3){width:13%}
+#page-abastecimento .data-table th:nth-child(4),#page-abastecimento .data-table td:nth-child(4){width:7%}
+#page-abastecimento .data-table th:nth-child(5),#page-abastecimento .data-table td:nth-child(5){width:8%}
+#page-abastecimento .data-table th:nth-child(6),#page-abastecimento .data-table td:nth-child(6){width:4%;text-align:center!important}
+#page-abastecimento .data-table th:nth-child(7),#page-abastecimento .data-table td:nth-child(7){width:9%}
+#page-abastecimento .data-table th:nth-child(8),#page-abastecimento .data-table td:nth-child(8){width:13%}
+#page-abastecimento .data-table th:nth-child(9),#page-abastecimento .data-table td:nth-child(9){width:4%;text-align:center!important}
+#page-abastecimento .data-table th:nth-child(10),#page-abastecimento .data-table td:nth-child(10){width:5%;text-align:center!important}
+#page-abastecimento .data-table th:nth-child(11),#page-abastecimento .data-table td:nth-child(11){width:21%;text-align:center!important}
+#page-abastecimento .data-table th:nth-child(12),#page-abastecimento .data-table td:nth-child(12){width:5%;text-align:center!important}
+#page-abastecimento .data-table td:nth-child(11){white-space:normal!important}
+#page-abastecimento .data-table td:nth-child(11) button{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:calc(50% - 5px)!important;min-width:0!important;max-width:none!important;padding:8px 3px!important;margin:2px!important;font-size:10px!important;white-space:nowrap!important}
+#page-abastecimento .data-table td:nth-child(8) small,
+#page-abastecimento .data-table td:nth-child(8) span{max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+/* Estoque: colunas proporcionais, incluindo largura suficiente para LOJA. */
+#page-estoque .est-stock-table th:nth-child(1),#page-estoque .est-stock-table td:nth-child(1){width:8%;white-space:nowrap!important}
+#page-estoque .est-stock-table th:nth-child(2),#page-estoque .est-stock-table td:nth-child(2){width:12%;white-space:normal!important}
+#page-estoque .est-stock-table th:nth-child(3),#page-estoque .est-stock-table td:nth-child(3){width:9%;white-space:normal!important}
+#page-estoque .est-stock-table th:nth-child(4),#page-estoque .est-stock-table td:nth-child(4){width:20%}
+#page-estoque .est-stock-table th:nth-child(5),#page-estoque .est-stock-table td:nth-child(5){width:10%}
+#page-estoque .est-stock-table th:nth-child(6),#page-estoque .est-stock-table td:nth-child(6){width:14%}
+#page-estoque .est-stock-table th:nth-child(7),#page-estoque .est-stock-table td:nth-child(7){width:8%;text-align:center!important}
+#page-estoque .est-stock-table th:nth-child(8),#page-estoque .est-stock-table td:nth-child(8){width:9%;text-align:center!important;white-space:nowrap!important}
+#page-estoque .est-stock-table th:nth-child(9),#page-estoque .est-stock-table td:nth-child(9){width:10%;text-align:center!important;white-space:nowrap!important}
+#page-estoque .est-stock-table th:nth-child(9){padding-left:9px!important;padding-right:9px!important}
+/* Ícones de filtro ficam dentro do cabeçalho e não roubam a largura do nome. */
+#page-estoque .est-stock-table th svg,#page-abastecimento .data-table th svg,
+#page-estoque .est-stock-table th .filter-icon,#page-abastecimento .data-table th .filter-icon{
+  max-width:10px!important;width:10px!important;flex:0 0 10px!important;margin-right:3px!important;
+}
+@media(max-width:760px){
+ #page-abastecimento .table-wrap,#page-estoque .est-table-wrap{overflow-x:hidden!important}
+ #page-abastecimento .data-table,#page-estoque .est-stock-table{min-width:0!important;width:100%!important}
+ #page-abastecimento .data-table thead th,#page-estoque .est-stock-table thead th{font-size:8px!important;padding:7px 3px!important}
+ #page-abastecimento .data-table tbody td,#page-estoque .est-stock-table tbody td{font-size:8px!important;padding:7px 3px!important}
+ #page-abastecimento .data-table td:nth-child(11) button{font-size:8px!important;padding:6px 1px!important}
+}
+</style></head>
 <body>
 <div aria-label="Carregando dados" aria-live="polite" id="axion-loading" role="status">
 <div class="ax-loading-card">
