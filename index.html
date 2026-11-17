@@ -2885,6 +2885,196 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 }
 </style>
 
+
+<style id="axion-grade-reference-layout">
+/* Resultado da busca: resumo compacto, sem o antigo painel verde congestionado. */
+.est-catalogo-result {
+  display: block;
+  margin-top: 12px;
+  padding: 14px 16px !important;
+  border: 1px solid rgba(105, 180, 235, .28) !important;
+  border-radius: 14px;
+  background: rgba(9, 29, 51, .62) !important;
+  color: #e7f3ff !important;
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+.est-grade-resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.est-grade-identificacao {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.est-grade-identificacao .est-cat-result-title {
+  color: #f1f7ff;
+  font-size: 15px;
+  line-height: 1.35;
+}
+.est-grade-identificacao > span {
+  color: #9dbbd6;
+  font-size: 11px;
+}
+.est-grade-ref {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(52, 145, 218, .15);
+  border: 1px solid rgba(102, 183, 241, .25);
+  flex: 0 0 auto;
+}
+.est-grade-ref small,
+.est-grade-meta-item small {
+  color: #8faecb;
+  font-size: 9px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.est-grade-ref strong {
+  color: #8ed5ff;
+  font-size: 15px;
+}
+.est-grade-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.est-grade-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(160,200,235,.10);
+}
+.est-grade-meta-item strong {
+  color: #e4f2ff;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.est-grade-local-resumo {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(151,190,224,.14);
+  color: #b5cbe0;
+  font-size: 10px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.est-grade-panel {
+  margin: 12px 0 16px;
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(105,180,235,.28);
+  background: linear-gradient(145deg, rgba(18,54,86,.78), rgba(7,25,47,.82));
+  box-shadow: 0 12px 30px rgba(0,0,0,.14), inset 0 1px rgba(255,255,255,.045);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+.est-grade-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.est-grade-topo h3 {
+  margin: 0;
+  color: #f0f7ff;
+  font-size: 14px;
+}
+.est-grade-topo p {
+  margin: 4px 0 0;
+  color: #9ebbd6;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.est-grade-count {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(40,157,232,.16);
+  border: 1px solid rgba(99,190,250,.28);
+  color: #9bdcff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.est-grade-table-wrap {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(128,177,216,.20);
+  border-radius: 10px;
+}
+.est-grade-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.est-grade-table th {
+  padding: 9px 10px;
+  background: rgba(66,132,181,.24);
+  color: #bfe4ff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-align: left;
+  white-space: nowrap;
+}
+.est-grade-table td {
+  padding: 9px 10px;
+  border-top: 1px solid rgba(142,180,213,.12);
+  color: #e0edfa;
+  font-size: 10px;
+  line-height: 1.4;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+.est-grade-table tbody tr:nth-child(even) {
+  background: rgba(255,255,255,.035);
+}
+.est-grade-table tbody tr:hover {
+  background: rgba(65,157,222,.10);
+}
+.est-grade-table th:nth-child(1) { width: 20%; }
+.est-grade-table th:nth-child(2) { width: 10%; }
+.est-grade-table th:nth-child(3) { width: 24%; }
+.est-grade-table th:nth-child(4) { width: 9%; }
+.est-grade-table th:nth-child(5) { width: 25%; }
+.est-grade-table th:nth-child(6) { width: 12%; text-align: right; }
+.est-grade-table td.est-grade-cor { color: #b9e2ff; font-weight: 700; }
+.est-grade-table td.est-grade-ean {
+  font-variant-numeric: tabular-nums;
+  color: #c9dced;
+}
+.est-grade-table td.est-grade-saldo {
+  color: #83d5b2;
+  font-weight: 800;
+  text-align: right;
+  white-space: nowrap;
+}
+.est-grade-table td.est-grade-vazio {
+  padding: 18px;
+  color: #a9c2d9;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .est-grade-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .est-grade-panel { padding: 11px; }
+  .est-grade-table th, .est-grade-table td { padding: 7px 6px; font-size: 9px; }
+}
+</style>
+
 </head>
 <body>
 <div aria-label="Carregando dados" aria-live="polite" id="axion-loading" role="status">
@@ -4108,92 +4298,195 @@ function eansDoItem(item) {
 function renderizarResultadoCatalogo(dados, destinoId = 'resultadoCatalogo') {
   const box = $(destinoId);
   if (!box) return;
+
+  // Remove a grade da pesquisa anterior, mantendo o resultado atual independente.
+  const gradeAnterior = box.parentElement?.querySelector(
+    `[data-grade-resultado="${destinoId}"]`
+  );
+  gradeAnterior?.remove();
+
   box.replaceChildren();
   box.className = 'feedback success est-catalogo-result';
 
-  const head = document.createElement('div');
-  head.className = 'est-cat-result-head';
+  const produto = dados.produto || {};
+  const locais = Array.isArray(dados.localizacoes) ? dados.localizacoes : [];
+  const primeiraLocalizacao = locais[0] || {};
+  const referencia = String(
+    primeiraLocalizacao.ref || produto.ref || produto.referencia || ''
+  ).trim();
+
+  // Cabeçalho compacto do produto pesquisado.
+  const cabecalho = document.createElement('div');
+  cabecalho.className = 'est-grade-resumo';
+
+  const identificacao = document.createElement('div');
+  identificacao.className = 'est-grade-identificacao';
+
   const titulo = document.createElement('strong');
   titulo.className = 'est-cat-result-title';
-  titulo.textContent = dados.produto?.descricao || 'Produto identificado';
-  const codigoItem = document.createElement('span');
-  codigoItem.className = 'est-cat-result-code';
-  codigoItem.textContent = `Código do item: ${dados.produto?.codigo || '—'}`;
-  head.append(titulo, codigoItem);
-  box.appendChild(head);
+  titulo.textContent = produto.descricao || primeiraLocalizacao.descricao || 'Produto identificado';
 
-  const meta = document.createElement('div');
-  meta.className = 'est-cat-result-meta';
-  const chips = [
-    `Código pesquisado: ${dados.codigoBipado || '—'}`,
-    `Códigos equivalentes: ${(dados.codigosEquivalentes || []).join(', ') || '—'}`,
-    `Lojas no catálogo: ${(dados.produto?.lojaCatalogo || []).join(', ') || '—'}`
-  ];
-  for (const texto of chips) {
-    const chip = document.createElement('span');
-    chip.className = 'est-cat-chip';
-    chip.textContent = texto;
-    meta.appendChild(chip);
+  const codigo = document.createElement('span');
+  codigo.textContent = `Código interno: ${produto.codigo || primeiraLocalizacao.codigoEncontrado || '—'}`;
+
+  identificacao.append(titulo, codigo);
+
+  const referenciaBox = document.createElement('div');
+  referenciaBox.className = 'est-grade-ref';
+  const refLabel = document.createElement('small');
+  refLabel.textContent = 'REFERÊNCIA';
+  const refValor = document.createElement('strong');
+  refValor.textContent = referencia || 'Não identificada';
+  referenciaBox.append(refLabel, refValor);
+
+  cabecalho.append(identificacao, referenciaBox);
+  box.appendChild(cabecalho);
+
+  const dadosRapidos = document.createElement('div');
+  dadosRapidos.className = 'est-grade-meta';
+  [
+    ['EAN pesquisado', dados.codigoBipado || '—'],
+    ['Cor', primeiraLocalizacao.cor || produto.cor || '—'],
+    ['Tamanho', primeiraLocalizacao.tamanho || produto.tamanho || '—'],
+    ['Localizações', locais.length.toLocaleString('pt-BR')]
+  ].forEach(([rotulo, valor]) => {
+    const item = document.createElement('div');
+    item.className = 'est-grade-meta-item';
+    const label = document.createElement('small');
+    label.textContent = rotulo;
+    const strong = document.createElement('strong');
+    strong.textContent = String(valor);
+    item.append(label, strong);
+    dadosRapidos.appendChild(item);
+  });
+  box.appendChild(dadosRapidos);
+
+  const localResumo = document.createElement('div');
+  localResumo.className = 'est-grade-local-resumo';
+  if (locais.length) {
+    localResumo.textContent = locais.map(local =>
+      `Loja ${local.loja || '—'} · ${local.posicao || 'Sem posição'} · ${Number(local.quantidade || 0).toLocaleString('pt-BR')} un.`
+    ).join('  |  ');
+  } else {
+    localResumo.textContent = 'Produto localizado no catálogo, mas sem posição física correspondente na base atual.';
   }
-  box.appendChild(meta);
+  box.appendChild(localResumo);
 
-  const locais = Array.isArray(dados.localizacoes) ? dados.localizacoes : [];
-  const resumo = document.createElement('div');
-  resumo.className = 'est-cat-locations-title';
-  resumo.textContent = `${locais.length.toLocaleString('pt-BR')} localização(ões) encontrada(s)` +
-    (dados.lojasEncontradas?.length ? ` · Lojas físicas: ${dados.lojasEncontradas.join(', ')}` : '');
-  box.appendChild(resumo);
+  // A GRADE é montada com os registros já carregados da base D1.
+  // Agrupa posições repetidas do mesmo EAN/variação para não duplicar linhas.
+  const grade = document.createElement('section');
+  grade.className = 'est-grade-panel';
+  grade.dataset.gradeResultado = destinoId;
 
-  if (!locais.length) {
-    const aviso = document.createElement('p');
-    aviso.className = 'est-cat-empty';
-    aviso.textContent = 'Produto encontrado no catálogo, mas nenhum dos códigos equivalentes foi localizado em DADOS/POSIÇÕES. Confira os códigos cadastrados nas colunas B/J e a loja física na coluna K.';
-    box.appendChild(aviso);
-    return;
-  }
+  const gradeTopo = document.createElement('div');
+  gradeTopo.className = 'est-grade-topo';
 
-  const lista = document.createElement('div');
-  lista.className = 'est-cat-location-list';
-  for (const local of locais) {
-    const card = document.createElement('article');
-    card.className = 'est-cat-location';
-    const topo = document.createElement('div');
-    topo.className = 'est-cat-location-top';
-    const loja = document.createElement('strong');
-    loja.textContent = `Loja física ${local.loja || '—'}`;
-    const posicao = document.createElement('span');
-    posicao.className = 'est-cat-position';
-    posicao.textContent = local.posicao || 'Sem posição';
-    topo.append(loja, posicao);
-    card.appendChild(topo);
+  const gradeTitulo = document.createElement('div');
+  const h3 = document.createElement('h3');
+  h3.textContent = referencia ? `Grade da referência ${referencia}` : 'Grade do produto';
+  const subtitulo = document.createElement('p');
+  subtitulo.textContent = 'Variações encontradas na base de posições, agrupadas por cor, tamanho e loja.';
+  gradeTitulo.append(h3, subtitulo);
 
-    const grade = document.createElement('div');
-    grade.className = 'est-cat-location-grid';
-    const campos = [
-      ['REF', local.ref], ['Cor', local.cor], ['Tamanho', local.tamanho],
-      ['Saldo cadastrado', Number(local.quantidade || 0).toLocaleString('pt-BR')],
-      ['Código encontrado', local.codigoEncontrado], ['EAN da posição', local.ean]
-    ];
-    for (const [rotulo, valor] of campos) {
-      const campo = document.createElement('div');
-      campo.className = 'est-cat-field';
-      const small = document.createElement('small');
-      small.textContent = rotulo;
-      const span = document.createElement('span');
-      span.textContent = valor == null || valor === '' ? '—' : String(valor);
-      campo.append(small, span);
-      grade.appendChild(campo);
+  const badge = document.createElement('span');
+  badge.className = 'est-grade-count';
+  gradeTopo.append(gradeTitulo, badge);
+  grade.appendChild(gradeTopo);
+
+  const tabelaWrap = document.createElement('div');
+  tabelaWrap.className = 'est-grade-table-wrap';
+  const tabela = document.createElement('table');
+  tabela.className = 'est-grade-table';
+
+  const thead = document.createElement('thead');
+  const trHead = document.createElement('tr');
+  ['COR', 'TAMANHO', 'EAN', 'LOJA', 'POSIÇÕES', 'SALDO'].forEach(nome => {
+    const th = document.createElement('th');
+    th.textContent = nome;
+    trHead.appendChild(th);
+  });
+  thead.appendChild(trHead);
+  tabela.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  const filtroLoja = $(destinoId === 'est-catalogo-resultado' ? 'est-catalogo-loja' : '')?.value || '';
+  const itensMesmaRef = referencia && Array.isArray(estoqueCache)
+    ? estoqueCache.filter(item =>
+        estNorm(item.ref) === estNorm(referencia) &&
+        (!filtroLoja || String(item.loja) === String(filtroLoja))
+      )
+    : [];
+
+  const grupos = new Map();
+  for (const item of itensMesmaRef) {
+    const chave = [
+      estNorm(item.cor), estNorm(item.tamanho),
+      estNorm(item.ean), String(item.loja || '')
+    ].join('|');
+
+    if (!grupos.has(chave)) {
+      grupos.set(chave, {
+        cor: item.cor || '—',
+        tamanho: item.tamanho || '—',
+        ean: item.ean || '—',
+        loja: item.loja || '—',
+        posicoes: new Set(),
+        quantidade: 0
+      });
     }
-    card.appendChild(grade);
-    if (local.descricao) {
-      const descricao = document.createElement('p');
-      descricao.style.cssText = 'margin:9px 0 0;font-size:11px;color:#b9dfd0';
-      descricao.textContent = local.descricao;
-      card.appendChild(descricao);
-    }
-    lista.appendChild(card);
+    const grupo = grupos.get(chave);
+    if (item.posicao) grupo.posicoes.add(String(item.posicao));
+    grupo.quantidade += Number(item.quantidade || 0);
   }
-  box.appendChild(lista);
+
+  const linhasGrade = [...grupos.values()].sort((a, b) =>
+    String(a.cor).localeCompare(String(b.cor), 'pt-BR', { sensitivity: 'base' }) ||
+    String(a.tamanho).localeCompare(String(b.tamanho), 'pt-BR', { numeric: true }) ||
+    String(a.loja).localeCompare(String(b.loja), 'pt-BR', { numeric: true })
+  );
+
+  badge.textContent = `${linhasGrade.length.toLocaleString('pt-BR')} variação(ões)`;
+
+  if (linhasGrade.length) {
+    for (const item of linhasGrade) {
+      const tr = document.createElement('tr');
+      const valores = [
+        item.cor,
+        item.tamanho,
+        item.ean,
+        item.loja,
+        [...item.posicoes].join(', ') || 'Sem posição',
+        `${item.quantidade.toLocaleString('pt-BR')} un.`
+      ];
+      valores.forEach((valor, indice) => {
+        const td = document.createElement('td');
+        td.textContent = String(valor);
+        if (indice === 0) td.className = 'est-grade-cor';
+        if (indice === 2) td.className = 'est-grade-ean';
+        if (indice === 5) td.className = 'est-grade-saldo';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
+  } else {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 6;
+    td.className = 'est-grade-vazio';
+    td.textContent = referencia
+      ? 'Nenhuma outra variação dessa referência foi encontrada na base de posições.'
+      : 'Não foi possível identificar a referência para montar a grade.';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+
+  tabela.appendChild(tbody);
+  tabelaWrap.appendChild(tabela);
+  grade.appendChild(tabelaWrap);
+
+  if (box.parentElement) {
+    box.insertAdjacentElement('afterend', grade);
+  }
 }
 
 // Consulta compartilhada pelo Abastecimento e pela tela Consultar estoque.
