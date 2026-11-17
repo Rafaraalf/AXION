@@ -2383,6 +2383,45 @@ button:disabled{filter:saturate(.55);box-shadow:none;transform:none!important}
  .ax-origem-saldo{font-size:10px}
 }
 
+
+
+/* AJUSTE PONTUAL: manter o cartão V6 e expandir somente os botões de resultado */
+@media (max-width:760px) {
+  #page-abastecimento .table-wrap > .data-table tbody td:nth-child(11) {
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    padding-left:0 !important;
+    padding-right:0 !important;
+  }
+  #page-abastecimento .table-wrap > .data-table tbody td:nth-child(11) .actions,
+  #page-abastecimento .table-wrap > .data-table .actions {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    align-items:stretch !important;
+    justify-items:stretch !important;
+    gap:10px !important;
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+  }
+  #page-abastecimento .table-wrap > .data-table tbody td:nth-child(11) .actions > button,
+  #page-abastecimento .table-wrap > .data-table .actions > .btn-ok,
+  #page-abastecimento .table-wrap > .data-table .actions > .btn-se {
+    display:flex !important;
+    box-sizing:border-box !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    flex:1 1 0 !important;
+    margin:0 !important;
+    justify-content:center !important;
+    align-items:center !important;
+    min-height:52px !important;
+    padding:12px 8px !important;
+  }
+}
+
 </style>
 <style id="axion-historico-protecao">#hist-limpar-tudo,#hist-limpar-dia{display:none!important}</style>
 <style>
