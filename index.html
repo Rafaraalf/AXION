@@ -1,11 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-<link rel="icon" type="image/png" href="./favicon.png">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="./favicon.png" rel="icon" type="image/png"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>AXION | Gestão de Estoque</title>
-
 <style>
 :root {
   --bg:#0b1220;
@@ -2588,662 +2588,563 @@ input:focus,select:focus,textarea:focus{border-color:#38bdf8!important;box-shado
  .data-table tbody td{font-size:11px!important;padding:10px!important}
 }
 </style>
-</head>
-
+<style>
+/* AXION 5.2 — Glass interface, legibilidade e alinhamento */
+:root{
+ --glass-bg:rgba(18,37,61,.68);--glass-strong:rgba(22,47,75,.78);
+ --glass-line:rgba(133,190,235,.22);--glass-glow:rgba(56,189,248,.12);
+}
+html,body{background-color:#071426!important}
+body{background-image:radial-gradient(ellipse at 12% 8%,rgba(31,132,206,.20),transparent 38%),radial-gradient(ellipse at 88% 22%,rgba(89,91,210,.12),transparent 36%),linear-gradient(135deg,#071426,#0b1c32 58%,#081629)!important}
+.sidebar,.sidebar-inner{background:rgba(9,25,45,.82)!important;backdrop-filter:blur(24px) saturate(155%)!important;-webkit-backdrop-filter:blur(24px) saturate(155%)!important;border-right:1px solid rgba(150,200,240,.16)!important}
+.topbar{background:rgba(7,19,35,.72)!important;backdrop-filter:blur(24px) saturate(170%)!important;-webkit-backdrop-filter:blur(24px) saturate(170%)!important;border-bottom:1px solid rgba(150,200,240,.18)!important}
+.panel,.card,.stat-card,.content-card{background:linear-gradient(145deg,rgba(28,55,84,.76),rgba(13,33,56,.70))!important;border:1px solid rgba(128,183,226,.24)!important;box-shadow:0 16px 44px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.055)!important;backdrop-filter:blur(22px) saturate(150%)!important;-webkit-backdrop-filter:blur(22px) saturate(150%)!important}
+input,select,textarea{background:rgba(5,19,36,.72)!important;border:1px solid rgba(133,181,220,.30)!important;color:#f4f8ff!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.16)!important}
+input::placeholder,textarea::placeholder{color:#a9bfd7!important;opacity:1!important}
+input:focus,select:focus,textarea:focus{background:rgba(8,27,48,.92)!important;border-color:#49c8ff!important;box-shadow:0 0 0 3px rgba(56,189,248,.17),0 0 22px rgba(56,189,248,.10)!important}
+/* Abastecimento: grade de 12 colunas com largura estável. */
+#page-abastecimento .table-wrap{overflow-x:auto!important;border:1px solid rgba(116,177,222,.25)!important;border-radius:14px!important;background:rgba(5,18,33,.48)!important;backdrop-filter:blur(16px)!important}
+#page-abastecimento .table-wrap>.data-table{width:100%!important;min-width:1510px!important;table-layout:fixed!important;border-collapse:separate!important;border-spacing:0!important}
+#page-abastecimento .table-wrap>.data-table th,#page-abastecimento .table-wrap>.data-table td{box-sizing:border-box!important;vertical-align:middle!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#page-abastecimento .table-wrap>.data-table th{white-space:normal!important;line-height:1.25!important;padding:13px 10px!important;text-align:left!important}
+#page-abastecimento .table-wrap>.data-table td{padding:11px 10px!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:anywhere!important}
+#page-abastecimento .table-wrap>.data-table th:nth-child(1),#page-abastecimento .table-wrap>.data-table td:nth-child(1){width:4.5%;text-align:center!important}
+#page-abastecimento .table-wrap>.data-table th:nth-child(2),#page-abastecimento .table-wrap>.data-table td:nth-child(2){width:7.5%}
+#page-abastecimento .table-wrap>.data-table th:nth-child(3),#page-abastecimento .table-wrap>.data-table td:nth-child(3){width:13%}
+#page-abastecimento .table-wrap>.data-table th:nth-child(4),#page-abastecimento .table-wrap>.data-table td:nth-child(4){width:7.5%}
+#page-abastecimento .table-wrap>.data-table th:nth-child(5),#page-abastecimento .table-wrap>.data-table td:nth-child(5){width:9%}
+#page-abastecimento .table-wrap>.data-table th:nth-child(6),#page-abastecimento .table-wrap>.data-table td:nth-child(6){width:5%}
+#page-abastecimento .table-wrap>.data-table th:nth-child(7),#page-abastecimento .table-wrap>.data-table td:nth-child(7){width:9%;white-space:nowrap!important}
+#page-abastecimento .table-wrap>.data-table th:nth-child(8),#page-abastecimento .table-wrap>.data-table td:nth-child(8){width:12%}
+#page-abastecimento .table-wrap>.data-table th:nth-child(9),#page-abastecimento .table-wrap>.data-table td:nth-child(9){width:5%;text-align:center!important}
+#page-abastecimento .table-wrap>.data-table th:nth-child(10),#page-abastecimento .table-wrap>.data-table td:nth-child(10){width:5%;text-align:center!important}
+#page-abastecimento .table-wrap>.data-table th:nth-child(11),#page-abastecimento .table-wrap>.data-table td:nth-child(11){width:16%;white-space:nowrap!important}
+#page-abastecimento .table-wrap>.data-table th:nth-child(12),#page-abastecimento .table-wrap>.data-table td:nth-child(12){width:6.5%;text-align:center!important}
+#page-abastecimento .table-wrap>.data-table th:nth-child(11) button,#page-abastecimento .table-wrap>.data-table td:nth-child(11) button{min-width:76px!important;max-width:calc(50% - 5px)!important;padding:9px 8px!important}
+/* Estoque: colunas com proporções definidas, sem cabeçalhos colados. */
+#page-estoque .table-wrap.est-table-wrap{overflow-x:auto!important;border:1px solid rgba(116,177,222,.25)!important;border-radius:14px!important;background:rgba(5,18,33,.48)!important;backdrop-filter:blur(16px)!important}
+#page-estoque .est-stock-table{width:100%!important;min-width:1320px!important;table-layout:fixed!important;border-collapse:separate!important;border-spacing:0!important}
+#page-estoque .est-stock-table th,#page-estoque .est-stock-table td{box-sizing:border-box!important;overflow:hidden!important;text-overflow:ellipsis!important;vertical-align:middle!important}
+#page-estoque .est-stock-table th{white-space:nowrap!important;padding:14px 12px!important;line-height:1.25!important}
+#page-estoque .est-stock-table td{padding:12px!important;white-space:nowrap!important;line-height:1.35!important}
+#page-estoque .est-stock-table th:nth-child(1),#page-estoque .est-stock-table td:nth-child(1){width:8%}
+#page-estoque .est-stock-table th:nth-child(2),#page-estoque .est-stock-table td:nth-child(2){width:13%}
+#page-estoque .est-stock-table th:nth-child(3),#page-estoque .est-stock-table td:nth-child(3){width:10%}
+#page-estoque .est-stock-table th:nth-child(4),#page-estoque .est-stock-table td:nth-child(4){width:18%}
+#page-estoque .est-stock-table th:nth-child(5),#page-estoque .est-stock-table td:nth-child(5){width:9%}
+#page-estoque .est-stock-table th:nth-child(6),#page-estoque .est-stock-table td:nth-child(6){width:15%}
+#page-estoque .est-stock-table th:nth-child(7),#page-estoque .est-stock-table td:nth-child(7){width:9%}
+#page-estoque .est-stock-table th:nth-child(8),#page-estoque .est-stock-table td:nth-child(8){width:9%;text-align:center!important}
+#page-estoque .est-stock-table th:nth-child(9),#page-estoque .est-stock-table td:nth-child(9){width:9%;text-align:center!important}
+/* Ícones de filtro não podem empurrar os títulos para fora do centro da coluna. */
+.data-table th .filter-icon,.data-table th .sort-icon,.data-table th svg{flex:0 0 auto!important;max-width:14px!important}
+.data-table thead th{letter-spacing:.015em!important}
+/* Informações auxiliares com contraste e hierarquia melhores. */
+#page-abastecimento>p,#page-estoque>p,.notice,.hint,.table-info,.text-muted{color:#b9cde2!important;line-height:1.55!important}
+#page-abastecimento>p,#page-estoque>p{font-size:13px!important}
+#page-abastecimento h1,#page-estoque h1{letter-spacing:-.035em!important}
+.abast-selecao-toolbar{background:rgba(17,48,76,.72)!important;border:1px solid rgba(80,169,224,.30)!important;backdrop-filter:blur(16px)!important}
+.data-table thead th{background:rgba(31,69,101,.92)!important;color:#aee4ff!important}
+.data-table tbody tr:nth-child(odd){background:rgba(14,34,56,.84)!important}
+.data-table tbody tr:nth-child(even){background:rgba(22,46,71,.84)!important}
+.data-table tbody tr:hover{background:rgba(31,81,119,.92)!important}
+@media(max-width:760px){
+ #page-abastecimento .table-wrap>.data-table{min-width:1510px!important}
+ #page-estoque .est-stock-table{min-width:1320px!important}
+ .panel,.card,.stat-card,.content-card{backdrop-filter:blur(16px)!important}
+}
+</style></head>
 <body>
-<div id="axion-loading" role="status" aria-live="polite" aria-label="Carregando dados">
-  <div class="ax-loading-card">
-    <div class="ax-loading-mark"><span>AX</span></div>
-    <strong>Sincronizando AXION</strong>
-    <small>Consultando os dados com segurança...</small>
-    <div class="ax-loading-bar"></div>
-  </div>
+<div aria-label="Carregando dados" aria-live="polite" id="axion-loading" role="status">
+<div class="ax-loading-card">
+<div class="ax-loading-mark"><span>AX</span></div>
+<strong>Sincronizando AXION</strong>
+<small>Consultando os dados com segurança...</small>
+<div class="ax-loading-bar"></div>
 </div>
-
-
+</div>
 <!-- LOGIN -->
-
 <main id="loginView">
-  <section class="login-card">
-    <h1 class="brand">AXION</h1>
-
-    <p class="subtitle">
+<section class="login-card">
+<h1 class="brand">AXION</h1>
+<p class="subtitle">
       Gestão inteligente de estoque e abastecimento
     </p>
-
-    <form id="formLogin">
-      <label for="usuario">Usuário</label>
-      <input
-        id="usuario"
-        autocomplete="username"
-        required
-      >
-
-      <label for="senha">Senha</label>
-      <input
-        id="senha"
-        type="password"
-        autocomplete="current-password"
-        required
-      >
-
-      <button class="primary" id="entrar" type="submit">
+<form id="formLogin">
+<label for="usuario">Usuário</label>
+<input autocomplete="username" id="usuario" required=""/>
+<label for="senha">Senha</label>
+<input autocomplete="current-password" id="senha" required="" type="password"/>
+<button class="primary" id="entrar" type="submit">
         Entrar no AXION
       </button>
-    </form>
-
-    <div id="mensagem" role="status"></div>
-  </section>
+</form>
+<div id="mensagem" role="status"></div>
+</section>
 </main>
-
 <!-- SISTEMA -->
-
-<div id="appView" class="hidden">
-
-  <aside class="sidebar">
-
-    <div class="sidebar-brand">AXION</div>
-    <div class="sidebar-caption">STOCK MANAGEMENT</div>
-
-    <nav class="nav">
-      <button class="active" data-page="dashboard">
-        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
-        <span>Dashboard</span>
-      </button>
-
-      <button data-page="abastecimento">
-        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11a5 5 0 0 1 0 10H8"/><path d="m8 13-4 4 4 4"/><path d="M20 7h-5"/><path d="m17 4 3 3-3 3"/></svg>
-        <span>Abastecimento</span>
-      </button>
-
-      <button data-page="estoque">
-        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3.5 7.8 12 12l8.5-4.2M12 12v9"/><path d="m7.5 5.2 9 4.5"/></svg>
-        <span>Estoque</span>
-      </button>
-
-      <button data-page="importar-posicoes">
-        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"/><path d="m7 8 5-5 5 5"/><path d="M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg>
-        <span>Atualizar posições</span>
-      </button>
-
-      <button data-page="historico">
-        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-        <span>Histórico</span>
-      </button>
-
-      <button data-page="configuracoes">
-        <svg class="ax-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1a1.8 1.8 0 0 1-2.5 2.5l-.1-.1a1.8 1.8 0 0 0-3.1 1.3v.2a1.8 1.8 0 0 1-3.6 0v-.2a1.8 1.8 0 0 0-3.1-1.3l-.1.1a1.8 1.8 0 0 1-2.5-2.5l.1-.1a1.8 1.8 0 0 0-1.3-3.1h-.2a1.8 1.8 0 0 1 0-3.6h.2a1.8 1.8 0 0 0 1.3-3.1l-.1-.1a1.8 1.8 0 0 1 2.5-2.5l.1.1a1.8 1.8 0 0 0 3.1-1.3v-.2a1.8 1.8 0 0 1 3.6 0v.2a1.8 1.8 0 0 0 3.1 1.3l.1-.1a1.8 1.8 0 0 1 2.5 2.5l-.1.1a1.8 1.8 0 0 0 1.3 3.1h.2a1.8 1.8 0 0 1 0 3.6h-.2a1.8 1.8 0 0 0-1.3 3.1Z"/></svg>
-        <span>Configurações</span>
-      </button>
-    </nav>
-
-    <div class="sidebar-bottom">
-      <div class="user-box">
-        <strong id="usuarioLogado">Usuário</strong>
-        <small>Administrador</small>
-      </div>
-
-      <button class="logout" id="sair"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Sair</span></button>
-    </div>
-
-  </aside>
-
-  <div class="main">
-
-    <header class="topbar">
-      <div class="topbar-left">
-        <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">☰</button>
-        <strong id="tituloPagina">Dashboard</strong>
-      </div>
-      <span>AXION WEB · v4.2 D1</span>
-    </header>
-
-    <div class="content">
-
-      <!-- DASHBOARD -->
-
-      <section class="page active" id="page-dashboard">
-
-        <div class="heading">
-          <h1>Visão geral</h1>
-          <p>Acompanhe o estoque e as operações de abastecimento.</p>
-        </div>
-
-        <div class="stats">
-
-          <div class="stat">
-            <div class="label">Produtos cadastrados</div>
-            <div class="value blue" id="stat-produtos">—</div>
-            <div class="detail">Dados do Cloudflare D1</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Unidades pendentes</div>
-            <div class="value orange" id="stat-pendentes">—</div>
-            <div class="detail">Dados do Cloudflare D1</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Unidades abastecidas</div>
-            <div class="value green" id="stat-abastecidas">—</div>
-            <div class="detail">Dados do Cloudflare D1</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Itens sem estoque</div>
-            <div class="value" id="stat-semEstoque">—</div>
-            <div class="detail">Dados do Cloudflare D1</div>
-          </div>
-
-        </div>
-
-        <div class="panel" id="painel-cloudflare" style="margin:18px 0">
-          <div class="atividade-cabecalho">
-            <div>
-              <h2>Cloudflare · Monitoramento mensal</h2>
-              <p class="detail">Referências do Workers Paid de US$ 5/mês. Uso acumulado no mês UTC, com projeção até o fechamento.</p>
-            </div>
-            <button class="secondary" type="button" id="cloudflare-atualizar"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar métricas</span></button>
-          </div>
-
-          <div class="notice" style="margin-top:12px">
-            <strong>Franquias mensais incluídas no plano:</strong>
+<div class="hidden" id="appView">
+<aside class="sidebar">
+<div class="sidebar-brand">AXION</div>
+<div class="sidebar-caption">STOCK MANAGEMENT</div>
+<nav class="nav">
+<button class="active" data-page="dashboard">
+<svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="3" y="3"></rect><rect height="5" rx="1.5" width="7" x="14" y="3"></rect><rect height="9" rx="1.5" width="7" x="14" y="12"></rect><rect height="7" rx="1.5" width="7" x="3" y="14"></rect></svg>
+<span>Dashboard</span>
+</button>
+<button data-page="abastecimento">
+<svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><path d="M4 7h11a5 5 0 0 1 0 10H8"></path><path d="m8 13-4 4 4 4"></path><path d="M20 7h-5"></path><path d="m17 4 3 3-3 3"></path></svg>
+<span>Abastecimento</span>
+</button>
+<button data-page="estoque">
+<svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3.5 7.8 12 12l8.5-4.2M12 12v9"></path><path d="m7.5 5.2 9 4.5"></path></svg>
+<span>Estoque</span>
+</button>
+<button data-page="importar-posicoes">
+<svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"></path></svg>
+<span>Atualizar posições</span>
+</button>
+<button data-page="historico">
+<svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.5 2"></path></svg>
+<span>Histórico</span>
+</button>
+<button data-page="configuracoes">
+<svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="m19.4 15 .1.1a1.8 1.8 0 0 1-2.5 2.5l-.1-.1a1.8 1.8 0 0 0-3.1 1.3v.2a1.8 1.8 0 0 1-3.6 0v-.2a1.8 1.8 0 0 0-3.1-1.3l-.1.1a1.8 1.8 0 0 1-2.5-2.5l.1-.1a1.8 1.8 0 0 0-1.3-3.1h-.2a1.8 1.8 0 0 1 0-3.6h.2a1.8 1.8 0 0 0 1.3-3.1l-.1-.1a1.8 1.8 0 0 1 2.5-2.5l.1.1a1.8 1.8 0 0 0 3.1-1.3v-.2a1.8 1.8 0 0 1 3.6 0v.2a1.8 1.8 0 0 0 3.1 1.3l.1-.1a1.8 1.8 0 0 1 2.5 2.5l-.1.1a1.8 1.8 0 0 0 1.3 3.1h.2a1.8 1.8 0 0 1 0 3.6h-.2a1.8 1.8 0 0 0-1.3 3.1Z"></path></svg>
+<span>Configurações</span>
+</button>
+</nav>
+<div class="sidebar-bottom">
+<div class="user-box">
+<strong id="usuarioLogado">Usuário</strong>
+<small>Administrador</small>
+</div>
+<button class="logout" id="sair"><svg aria-hidden="true" class="ax-btn-icon" viewbox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"></path><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg><span>Sair</span></button>
+</div>
+</aside>
+<div class="main">
+<header class="topbar">
+<div class="topbar-left">
+<button aria-expanded="true" aria-label="Recolher menu" class="sidebar-toggle" id="sidebar-toggle" title="Recolher menu" type="button">☰</button>
+<strong id="tituloPagina">Dashboard</strong>
+</div>
+<span>AXION WEB · v4.2 D1</span>
+</header>
+<div class="content">
+<!-- DASHBOARD -->
+<section class="page active" id="page-dashboard">
+<div class="heading">
+<h1>Visão geral</h1>
+<p>Acompanhe o estoque e as operações de abastecimento.</p>
+</div>
+<div class="stats">
+<div class="stat">
+<div class="label">Produtos cadastrados</div>
+<div class="value blue" id="stat-produtos">—</div>
+<div class="detail">Dados do Cloudflare D1</div>
+</div>
+<div class="stat">
+<div class="label">Unidades pendentes</div>
+<div class="value orange" id="stat-pendentes">—</div>
+<div class="detail">Dados do Cloudflare D1</div>
+</div>
+<div class="stat">
+<div class="label">Unidades abastecidas</div>
+<div class="value green" id="stat-abastecidas">—</div>
+<div class="detail">Dados do Cloudflare D1</div>
+</div>
+<div class="stat">
+<div class="label">Itens sem estoque</div>
+<div class="value" id="stat-semEstoque">—</div>
+<div class="detail">Dados do Cloudflare D1</div>
+</div>
+</div>
+<div class="panel" id="painel-cloudflare" style="margin:18px 0">
+<div class="atividade-cabecalho">
+<div>
+<h2>Cloudflare · Monitoramento mensal</h2>
+<p class="detail">Referências do Workers Paid de US$ 5/mês. Uso acumulado no mês UTC, com projeção até o fechamento.</p>
+</div>
+<button class="secondary" id="cloudflare-atualizar" type="button"><svg aria-hidden="true" class="ax-btn-icon" viewbox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"></path><path d="M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"></path></svg><span>Atualizar métricas</span></button>
+</div>
+<div class="notice" style="margin-top:12px">
+<strong>Franquias mensais incluídas no plano:</strong>
             Workers: 10 milhões de requisições e 30 milhões de ms de CPU.
             D1: 25 bilhões de linhas lidas, 50 milhões de linhas escritas e 5 GB armazenados.
           </div>
-
-          <div class="stats cf-stats" style="margin-top:14px">
-            <div class="stat cf-stat">
-              <div class="label">Requisições Workers · mês atual</div>
-              <div class="value blue" id="cf-worker-requests">—</div>
-              <div class="cf-usage">
-                <div class="cf-usage-line"><strong id="cf-req-used">— usado</strong><span id="cf-req-free">— disponível</span></div>
-                <div class="cf-meter" role="progressbar" aria-label="Uso mensal de requisições Workers Paid" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-req-bar"></span></div>
-                <div class="cf-range"><span>0%</span><span>100% · 10 mi/mês</span></div>
-              </div>
-              <div class="detail" id="cf-req-forecast">Projeção de fechamento: —</div>
-            </div>
-
-            <div class="stat cf-stat">
-              <div class="label">CPU total Workers · mês atual</div>
-              <div class="value" id="cf-worker-cpu">—</div>
-              <div class="cf-usage">
-                <div class="cf-usage-line"><strong id="cf-cpu-used">— usado</strong><span id="cf-cpu-free">— disponível</span></div>
-                <div class="cf-meter" role="progressbar" aria-label="Uso mensal de CPU Workers Paid" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-cpu-bar"></span></div>
-                <div class="cf-range"><span>0%</span><span>100% · 30 mi ms/mês</span></div>
-              </div>
-              <div class="detail" id="cf-cpu-p99">CPU P99: — · indicador de desempenho, não franquia mensal.</div>
-              <div class="detail" id="cf-cpu-forecast">Projeção de fechamento: —</div>
-            </div>
-
-            <div class="stat cf-stat">
-              <div class="label">Linhas lidas D1 · mês atual</div>
-              <div class="value orange" id="cf-d1-reads">—</div>
-              <div class="cf-usage">
-                <div class="cf-usage-line"><strong id="cf-reads-used">— usado</strong><span id="cf-reads-free">— disponível</span></div>
-                <div class="cf-meter" role="progressbar" aria-label="Uso mensal de linhas lidas D1 Paid" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-reads-bar"></span></div>
-                <div class="cf-range"><span>0%</span><span>100% · 25 bi/mês</span></div>
-              </div>
-              <div class="detail" id="cf-reads-forecast">Projeção de fechamento: —</div>
-            </div>
-
-            <div class="stat cf-stat">
-              <div class="label">Linhas escritas D1 · mês atual</div>
-              <div class="value green" id="cf-d1-writes">—</div>
-              <div class="cf-usage">
-                <div class="cf-usage-line"><strong id="cf-writes-used">— usado</strong><span id="cf-writes-free">— disponível</span></div>
-                <div class="cf-meter" role="progressbar" aria-label="Uso mensal de linhas escritas D1 Paid" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-writes-bar"></span></div>
-                <div class="cf-range"><span>0%</span><span>100% · 50 mi/mês</span></div>
-              </div>
-              <div class="detail" id="cf-writes-forecast">Projeção de fechamento: —</div>
-            </div>
-
-            <div class="stat cf-stat">
-              <div class="label">Armazenamento D1</div>
-              <div class="value" id="cf-d1-storage">—</div>
-              <div class="cf-usage">
-                <div class="cf-usage-line"><strong id="cf-storage-used">— usado</strong><span id="cf-storage-free">— disponível</span></div>
-                <div class="cf-meter" role="progressbar" aria-label="Uso do armazenamento incluído no D1 Paid" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="cf-storage-bar"></span></div>
-                <div class="cf-range"><span>0%</span><span>100% · 5 GB</span></div>
-              </div>
-              <div class="detail" id="cf-d1-databases">Bancos observados</div>
-            </div>
-
-            <div class="stat cf-stat">
-              <div class="label">Erros Workers · mês atual</div>
-              <div class="value" id="cf-worker-errors">—</div>
-              <div class="detail">Falhas observadas no período. Meta operacional: zero.</div>
-            </div>
-
-            <div class="stat cf-stat">
-              <div class="label">Excedente estimado · Workers + D1</div>
-              <div class="value green" id="cf-extra-cost">US$ —</div>
-              <div class="detail" id="cf-extra-cost-detail">Estimativa variável até o fim do mês, além da base de US$ 5.</div>
-            </div>
-          </div>
-
-          <div id="cloudflare-status" class="empty" role="status" style="margin-top:12px">Aguardando consulta das métricas...</div>
-          <p class="detail" style="margin-top:10px">
+<div class="stats cf-stats" style="margin-top:14px">
+<div class="stat cf-stat">
+<div class="label">Requisições Workers · mês atual</div>
+<div class="value blue" id="cf-worker-requests">—</div>
+<div class="cf-usage">
+<div class="cf-usage-line"><strong id="cf-req-used">— usado</strong><span id="cf-req-free">— disponível</span></div>
+<div aria-label="Uso mensal de requisições Workers Paid" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="cf-meter" role="progressbar"><span id="cf-req-bar"></span></div>
+<div class="cf-range"><span>0%</span><span>100% · 10 mi/mês</span></div>
+</div>
+<div class="detail" id="cf-req-forecast">Projeção de fechamento: —</div>
+</div>
+<div class="stat cf-stat">
+<div class="label">CPU total Workers · mês atual</div>
+<div class="value" id="cf-worker-cpu">—</div>
+<div class="cf-usage">
+<div class="cf-usage-line"><strong id="cf-cpu-used">— usado</strong><span id="cf-cpu-free">— disponível</span></div>
+<div aria-label="Uso mensal de CPU Workers Paid" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="cf-meter" role="progressbar"><span id="cf-cpu-bar"></span></div>
+<div class="cf-range"><span>0%</span><span>100% · 30 mi ms/mês</span></div>
+</div>
+<div class="detail" id="cf-cpu-p99">CPU P99: — · indicador de desempenho, não franquia mensal.</div>
+<div class="detail" id="cf-cpu-forecast">Projeção de fechamento: —</div>
+</div>
+<div class="stat cf-stat">
+<div class="label">Linhas lidas D1 · mês atual</div>
+<div class="value orange" id="cf-d1-reads">—</div>
+<div class="cf-usage">
+<div class="cf-usage-line"><strong id="cf-reads-used">— usado</strong><span id="cf-reads-free">— disponível</span></div>
+<div aria-label="Uso mensal de linhas lidas D1 Paid" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="cf-meter" role="progressbar"><span id="cf-reads-bar"></span></div>
+<div class="cf-range"><span>0%</span><span>100% · 25 bi/mês</span></div>
+</div>
+<div class="detail" id="cf-reads-forecast">Projeção de fechamento: —</div>
+</div>
+<div class="stat cf-stat">
+<div class="label">Linhas escritas D1 · mês atual</div>
+<div class="value green" id="cf-d1-writes">—</div>
+<div class="cf-usage">
+<div class="cf-usage-line"><strong id="cf-writes-used">— usado</strong><span id="cf-writes-free">— disponível</span></div>
+<div aria-label="Uso mensal de linhas escritas D1 Paid" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="cf-meter" role="progressbar"><span id="cf-writes-bar"></span></div>
+<div class="cf-range"><span>0%</span><span>100% · 50 mi/mês</span></div>
+</div>
+<div class="detail" id="cf-writes-forecast">Projeção de fechamento: —</div>
+</div>
+<div class="stat cf-stat">
+<div class="label">Armazenamento D1</div>
+<div class="value" id="cf-d1-storage">—</div>
+<div class="cf-usage">
+<div class="cf-usage-line"><strong id="cf-storage-used">— usado</strong><span id="cf-storage-free">— disponível</span></div>
+<div aria-label="Uso do armazenamento incluído no D1 Paid" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="cf-meter" role="progressbar"><span id="cf-storage-bar"></span></div>
+<div class="cf-range"><span>0%</span><span>100% · 5 GB</span></div>
+</div>
+<div class="detail" id="cf-d1-databases">Bancos observados</div>
+</div>
+<div class="stat cf-stat">
+<div class="label">Erros Workers · mês atual</div>
+<div class="value" id="cf-worker-errors">—</div>
+<div class="detail">Falhas observadas no período. Meta operacional: zero.</div>
+</div>
+<div class="stat cf-stat">
+<div class="label">Excedente estimado · Workers + D1</div>
+<div class="value green" id="cf-extra-cost">US$ —</div>
+<div class="detail" id="cf-extra-cost-detail">Estimativa variável até o fim do mês, além da base de US$ 5.</div>
+</div>
+</div>
+<div class="empty" id="cloudflare-status" role="status" style="margin-top:12px">Aguardando consulta das métricas...</div>
+<p class="detail" style="margin-top:10px">
             O percentual usa as franquias mensais do Workers Paid, não os limites do Free.
             A projeção é linear com base no uso observado até agora. A estimativa cobre Workers Requests, CPU e D1; não inclui KV, R2, Workers Logs, outros produtos, impostos ou ajustes.
             A GraphQL Analytics é uma referência operacional e não substitui a página Billing da Cloudflare.
           </p>
-        </div>
-
-        <div class="panel-grid">
-
-          <div class="panel">
-            <h2>Abastecimentos pendentes</h2>
-
-            <div id="resumoPendentes" class="empty">
+</div>
+<div class="panel-grid">
+<div class="panel">
+<h2>Abastecimentos pendentes</h2>
+<div class="empty" id="resumoPendentes">
               Carregando pendências...
             </div>
-          </div>
-
-          <div class="panel">
-
-            <div class="atividade-cabecalho">
-              <h2>Atividade recente</h2>
-
-              <button
-                class="secondary"
-                type="button"
-                id="atualizarAtividade"
-              >
+</div>
+<div class="panel">
+<div class="atividade-cabecalho">
+<h2>Atividade recente</h2>
+<button class="secondary" id="atualizarAtividade" type="button">
                 ↻ Atualizar
               </button>
-            </div>
-
-            <div
-              id="atividadeRecente"
-              class="empty"
-              role="status"
-            >
+</div>
+<div class="empty" id="atividadeRecente" role="status">
               Carregando movimentações...
             </div>
-
-          </div>
-
-        </div>
-
-        <div class="notice">
-          <span id="estadoDashboard">
+</div>
+</div>
+<div class="notice">
+<span id="estadoDashboard">
             Conectando ao Cloudflare D1...
           </span>
-        </div>
-
-      </section>
-
-      <!-- ABASTECIMENTO -->
-
-      <section class="page" id="page-abastecimento">
-
-        <div class="heading">
-          <h1>Abastecimento</h1>
-          <p>
+</div>
+</section>
+<!-- ABASTECIMENTO -->
+<section class="page" id="page-abastecimento">
+<div class="heading">
+<h1>Abastecimento</h1>
+<p>
             Localize os produtos e registre o abastecimento
             diretamente no AXION.
           </p>
-        </div>
-
-        <div class="panel">
-          <h2>Lista de abastecimento</h2>
-
-          <div class="toolbar">
-            <input
-              id="buscaPendentes"
-              type="search"
-              placeholder="Buscar produto, EAN, posição, loja..."
-            >
-
-            <button
-              id="atualizarPendentes"
-              type="button"
-            >
+</div>
+<div class="panel">
+<h2>Lista de abastecimento</h2>
+<div class="toolbar">
+<input id="buscaPendentes" placeholder="Buscar por produto, EAN, referência, posição ou loja…" type="search"/>
+<button id="atualizarPendentes" type="button">
               ↻ Atualizar lista
             </button>
-          </div>
-
-          <div class="abast-selecao-toolbar">
-            <label class="abast-selecionar-visiveis">
-              <input type="checkbox" id="abast-selecionar-visiveis">
-              <span>Selecionar produtos visíveis</span>
-            </label>
-            <span id="abast-contador-selecao" class="abast-contador-selecao">0 selecionado(s)</span>
-            <div class="abast-acoes-lote">
-              <button type="button" id="abast-lote-ok" class="btn-ok" disabled>✓ Marcar selecionados como OK</button>
-              <button type="button" id="abast-lote-se" class="btn-se" disabled>Marcar selecionados como S/E</button>
-            </div>
-          </div>
-
-          <div id="resultadoCatalogo" class="feedback hidden" role="status" aria-live="polite"></div>
-
-          <div
-            id="feedbackAbastecimento"
-            class="feedback hidden"
-            role="status"
-          ></div>
-
-          <p
-            id="estadoPendentes"
-            class="status-line"
-            role="status"
-          >
+</div>
+<div class="abast-selecao-toolbar">
+<label class="abast-selecionar-visiveis">
+<input id="abast-selecionar-visiveis" type="checkbox"/>
+<span>Selecionar produtos visíveis</span>
+</label>
+<span class="abast-contador-selecao" id="abast-contador-selecao">0 selecionado(s)</span>
+<div class="abast-acoes-lote">
+<button class="btn-ok" disabled="" id="abast-lote-ok" type="button">✓ Marcar selecionados como OK</button>
+<button class="btn-se" disabled="" id="abast-lote-se" type="button">Marcar selecionados como S/E</button>
+</div>
+</div>
+<div aria-live="polite" class="feedback hidden" id="resultadoCatalogo" role="status"></div>
+<div class="feedback hidden" id="feedbackAbastecimento" role="status"></div>
+<p class="status-line" id="estadoPendentes" role="status">
             Aguardando consulta...
           </p>
-
-          <div class="table-wrap">
-            <table class="data-table">
-
-              <thead>
-                <tr>
-                  <th>Loja</th>
-                  <th>Marca</th>
-                  <th>Descrição</th>
-                  <th>Referência</th>
-                  <th>Cor</th>
-                  <th>Tamanho</th>
-                  <th>EAN</th>
-                  <th>Posições / locais</th>
-                  <th>Saldo*</th>
-                  <th>Pendente</th>
-                  <th>Ações</th>
-                  <th>Selecionar</th>
-                </tr>
-              </thead>
-
-              <tbody id="listaPendentes">
-                <tr>
-                  <td colspan="12">Carregando...</td>
-                </tr>
-              </tbody>
-
-            </table>
-          </div>
-
-          <p class="status-line" style="margin-top:16px">
+<div class="table-wrap">
+<table class="data-table">
+<thead>
+<tr>
+<th>Loja</th>
+<th>Marca</th>
+<th>Descrição</th>
+<th>Referência</th>
+<th>Cor</th>
+<th>Tamanho</th>
+<th>EAN</th>
+<th>Posições / locais</th>
+<th>Saldo*</th>
+<th>Pendente</th>
+<th>Ações</th>
+<th>Selecionar</th>
+</tr>
+</thead>
+<tbody id="listaPendentes">
+<tr>
+<td colspan="12">Carregando...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="status-line" style="margin-top:16px">
             * Saldo cadastrado, ainda não conferido por inventário.
             Não impede o abastecimento.
           </p>
-
-        </div>
-      </section>
-
-      <!-- ESTOQUE V1.6 -->
-      <section class="page" id="page-estoque">
-        <div class="heading"><h1>Estoque</h1><p>Consulta das posições físicas armazenadas no banco D1. O layout do mapa continua salvo separadamente no R2.</p></div>
-        <div class="stats" style="margin-bottom:20px">
-          <div class="stat"><div class="label">Linhas cadastradas</div><div class="value blue" id="est-linhas">—</div></div>
-          <div class="stat"><div class="label">Produtos</div><div class="value" id="est-produtos">—</div></div>
-          <div class="stat"><div class="label">EANs</div><div class="value green" id="est-eans">—</div></div>
-          <div class="stat"><div class="label">Posições</div><div class="value orange" id="est-posicoes">—</div></div>
-        </div>
-        <div class="panel" style="margin-bottom:20px">
-          <h2>Base de estoque</h2>
-          <p class="status-line">Fonte: D1 · Tabela posicoes_estoque. Atualização inicial feita a partir da aba DADOSPOSIÇÕES do arquivo de implantação. Os backups de estoque no R2 foram desativados; o R2 permanece ativo para o layout do mapa.</p>
-          <p class="status-line" id="est-atualizacao">Consultando base D1...</p>
-          <div class="feedback hidden" id="est-mensagem" role="status"></div>
-        </div>
-        <div class="panel" style="margin-bottom:20px">
-          <div class="est-header-row"><h2>Consultar estoque</h2><div class="toolbar est-refresh-row"><button class="secondary" id="est-recarregar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg><span>Atualizar consulta</span></button></div></div>
-          <div class="est-catalogo-search" aria-label="Busca de produto no catálogo DADOS USE">
-            <div class="est-catalogo-copy">
-              <strong>Buscar por EAN ou código interno</strong>
-              <span>Bipe ou digite o código para localizar o produto no catálogo USE e consultar suas posições físicas.</span>
-            </div>
-            <div class="est-catalogo-controls">
-              <input id="est-catalogo-codigo" type="search" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="Bipe ou digite o EAN / código interno" aria-label="EAN ou código interno">
-              <select id="est-catalogo-loja" aria-label="Filtrar por loja física">
-                <option value="">Todas as lojas</option>
-                <option value="66">Loja 66</option>
-                <option value="67">Loja 67</option>
-                <option value="68">Loja 68</option>
-              </select>
-              <button class="primary" id="est-catalogo-buscar" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Pesquisar</span></button>
-              <button class="secondary" id="est-catalogo-limpar" type="button"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span>Limpar</span></button>
-            </div>
-            <div id="est-catalogo-resultado" class="feedback hidden" role="status" aria-live="polite"></div>
-          </div>
-          <div class="toolbar est-actions-row"><button class="secondary" type="button" id="est-filtros-mobile" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg><span>Filtros por coluna</span></button><button class="secondary" type="button" id="est-limpar-filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
-          <p class="status-line est-count-row" id="est-resultados">Carregando...</p>
-          <div class="table-wrap est-table-wrap"><table class="data-table est-stock-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
-        </div>
-      </section>
+</div>
+</section>
+<!-- ESTOQUE V1.6 -->
+<section class="page" id="page-estoque">
+<div class="heading"><h1>Estoque</h1><p>Consulta das posições físicas armazenadas no banco D1. O layout do mapa continua salvo separadamente no R2.</p></div>
+<div class="stats" style="margin-bottom:20px">
+<div class="stat"><div class="label">Linhas cadastradas</div><div class="value blue" id="est-linhas">—</div></div>
+<div class="stat"><div class="label">Produtos</div><div class="value" id="est-produtos">—</div></div>
+<div class="stat"><div class="label">EANs</div><div class="value green" id="est-eans">—</div></div>
+<div class="stat"><div class="label">Posições</div><div class="value orange" id="est-posicoes">—</div></div>
+</div>
+<div class="panel" style="margin-bottom:20px">
+<h2>Base de estoque</h2>
+<p class="status-line">Fonte: D1 · Tabela posicoes_estoque. Atualização inicial feita a partir da aba DADOSPOSIÇÕES do arquivo de implantação. Os backups de estoque no R2 foram desativados; o R2 permanece ativo para o layout do mapa.</p>
+<p class="status-line" id="est-atualizacao">Consultando base D1...</p>
+<div class="feedback hidden" id="est-mensagem" role="status"></div>
+</div>
+<div class="panel" style="margin-bottom:20px">
+<div class="est-header-row"><h2>Consultar estoque</h2><div class="toolbar est-refresh-row"><button class="secondary" id="est-recarregar" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"></path></svg><span>Atualizar consulta</span></button></div></div>
+<div aria-label="Busca de produto no catálogo DADOS USE" class="est-catalogo-search">
+<div class="est-catalogo-copy">
+<strong>Buscar por EAN ou código interno</strong>
+<span>Leia o EAN ou informe o código interno para localizar o produto e consultar suas posições.</span>
+</div>
+<div class="est-catalogo-controls">
+<input aria-label="EAN ou código interno" autocomplete="off" id="est-catalogo-codigo" inputmode="numeric" placeholder="Leia ou digite o EAN / código interno" spellcheck="false" type="search"/>
+<select aria-label="Filtrar por loja física" id="est-catalogo-loja">
+<option value="">Todas as lojas</option>
+<option value="66">Loja 66</option>
+<option value="67">Loja 67</option>
+<option value="68">Loja 68</option>
+</select>
+<button class="primary" id="est-catalogo-buscar" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg><span>Pesquisar</span></button>
+<button class="secondary" id="est-catalogo-limpar" type="button"><svg aria-hidden="true" class="ax-btn-icon" viewbox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg><span>Limpar</span></button>
+</div>
+<div aria-live="polite" class="feedback hidden" id="est-catalogo-resultado" role="status"></div>
+</div>
+<div class="toolbar est-actions-row"><button aria-expanded="false" class="secondary" id="est-filtros-mobile" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 6h16M7 12h10m-7 6h4"></path></svg><span>Filtros por coluna</span></button><button class="secondary" id="est-limpar-filtros" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"></path></svg><span>Limpar filtros</span></button><span class="status-line" id="est-filtros-ativos" style="margin:0"></span></div>
+<p class="status-line est-count-row" id="est-resultados">Carregando...</p>
+<div class="table-wrap est-table-wrap"><table class="data-table est-stock-table"><thead><tr><th data-est-col="posicao">Posição</th><th data-est-col="ean">EAN</th><th data-est-col="ref">REF</th><th data-est-col="descricao">Descrição</th><th data-est-col="marca">Marca</th><th data-est-col="cor">Cor</th><th data-est-col="tamanho">Tamanho</th><th data-est-col="quantidade">Qtd.</th><th data-est-col="loja">Loja</th></tr></thead><tbody id="est-lista"></tbody></table></div>
+</div>
+</section>
 <!-- HISTÓRICO -->
-
-      <!-- IMPORTAÇÃO INTEGRAL DE POSIÇÕES -->
-      <section class="page" id="page-importar-posicoes">
-        <div class="heading"><h1>Atualizar posições</h1><p>Substitui integralmente a base física das lojas 66, 67 e 68. O catálogo USE e os dados operacionais permanecem intactos.</p></div>
-        <div class="panel ax-import-panel">
-          <h2>Importar planilha atualizada</h2>
-          <p class="status-line">Selecione o arquivo XLSX com a aba DADOSPOSIÇÕES. A importação valida as 11 colunas antes de alterar a base.</p>
-          <label class="ax-import-drop" for="ax-posicoes-arquivo"><strong>⇧ Selecionar arquivo XLSX</strong><span id="ax-posicoes-nome">Nenhum arquivo selecionado</span></label>
-          <input id="ax-posicoes-arquivo" type="file" accept=".xlsx,.xls" hidden>
-          <div id="ax-posicoes-preview" class="ax-import-preview hidden"></div>
-          <div id="ax-posicoes-feedback" class="feedback hidden" role="status" aria-live="polite"></div>
-          <div class="ax-import-progress hidden" id="ax-posicoes-progresso"><div id="ax-posicoes-barra"></div></div><div class="ax-import-progress-label hidden" id="ax-posicoes-progresso-label"><span id="ax-posicoes-etapa">Aguardando envio</span><strong id="ax-posicoes-percentual">0%</strong></div><div id="ax-posicoes-conclusao" class="hidden"></div>
-          <div class="toolbar"><button class="primary" id="ax-posicoes-validar" type="button" disabled>Validar planilha</button><button class="primary" id="ax-posicoes-confirmar" type="button" disabled>Confirmar substituição integral</button></div>
-          <p class="status-line">A base anterior será copiada para backup antes da troca. Se a validação ou o envio falhar, a base atual continuará ativa. O catálogo USE não será alterado.</p>
-        </div>
-      </section>
-
-      <section class="page" id="page-historico">
-
-        <div class="heading">
-          <h1>Histórico de abastecimentos</h1>
-          <p>
+<!-- IMPORTAÇÃO INTEGRAL DE POSIÇÕES -->
+<section class="page" id="page-importar-posicoes">
+<div class="heading"><h1>Atualizar posições</h1><p>Substitui integralmente a base física das lojas 66, 67 e 68. O catálogo USE e os dados operacionais permanecem intactos.</p></div>
+<div class="panel ax-import-panel">
+<h2>Importar planilha atualizada</h2>
+<p class="status-line">Selecione o arquivo XLSX com a aba DADOSPOSIÇÕES. A importação valida as 11 colunas antes de alterar a base.</p>
+<label class="ax-import-drop" for="ax-posicoes-arquivo"><strong>⇧ Selecionar arquivo XLSX</strong><span id="ax-posicoes-nome">Nenhum arquivo selecionado</span></label>
+<input accept=".xlsx,.xls" hidden="" id="ax-posicoes-arquivo" type="file"/>
+<div class="ax-import-preview hidden" id="ax-posicoes-preview"></div>
+<div aria-live="polite" class="feedback hidden" id="ax-posicoes-feedback" role="status"></div>
+<div class="ax-import-progress hidden" id="ax-posicoes-progresso"><div id="ax-posicoes-barra"></div></div><div class="ax-import-progress-label hidden" id="ax-posicoes-progresso-label"><span id="ax-posicoes-etapa">Aguardando envio</span><strong id="ax-posicoes-percentual">0%</strong></div><div class="hidden" id="ax-posicoes-conclusao"></div>
+<div class="toolbar"><button class="primary" disabled="" id="ax-posicoes-validar" type="button">Validar planilha</button><button class="primary" disabled="" id="ax-posicoes-confirmar" type="button">Confirmar substituição integral</button></div>
+<p class="status-line">A base anterior será copiada para backup antes da troca. Se a validação ou o envio falhar, a base atual continuará ativa. O catálogo USE não será alterado.</p>
+</div>
+</section>
+<section class="page" id="page-historico">
+<div class="heading">
+<h1>Histórico de abastecimentos</h1>
+<p>
             Consulte o arquivo histórico e acompanhe as movimentações do dia atual.
           </p>
-        </div>
-
-        <div class="stats" style="margin-bottom:22px">
-
-          <div class="stat">
-            <div class="label">Movimentações</div>
-            <div class="value blue" id="hist-total">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Unidades abastecidas</div>
-            <div class="value green" id="hist-ok">—</div>
-          </div>
-
-          <div class="stat">
-            <div class="label">Unidades sem estoque</div>
-            <div class="value orange" id="hist-se">—</div>
-          </div>
-
-        </div>
-
-        <div class="panel">
-
-          <div class="hist-cabecalho">
-            <div>
-              <h2>Arquivo de abastecimentos por data</h2>
-              <p class="status-line">Dias encerrados ficam arquivados no Google Sheets. Somente o dia atual permite editar ou excluir movimentações.</p>
-            </div>
-            <button type="button" class="hist-btn-perigo" id="hist-limpar-tudo" style="display:none" disabled>Histórico arquivado automaticamente</button>
-          </div>
-          <div id="hist-pastas" class="hist-pastas"></div>
-          <div id="hist-voltar" class="toolbar hidden"><button type="button" class="secondary" id="hist-voltar-btn"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></svg><span>Voltar às datas</span></button><strong id="hist-dia-titulo"></strong><button type="button" class="hist-btn-perigo" id="hist-limpar-dia" style="display:none" disabled>Limpeza desativada</button></div>
-          <div class="stats" id="hist-resumo-vendas" style="margin:14px 0;display:none"><div class="stat"><div class="label">Unidades vendidas</div><div class="value blue" id="hist-vendido">0</div></div><div class="stat"><div class="label">Pendentes</div><div class="value orange" id="hist-pendente">0</div></div></div>
-          <div id="hist-vendas-bloco" style="display:none"><h3>Vendas do dia</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Loja</th><th>Marca</th><th>Descrição</th><th>REF</th><th>Cor</th><th>Tamanho</th><th>Vendido</th><th>OK</th><th>S/E</th><th>Pendente</th></tr></thead><tbody id="hist-vendas-lista"></tbody></table></div><h3 style="margin:18px 0 10px">Movimentações do dia</h3></div>
-          <div id="hist-detalhes" style="display:none">
-
-          <div class="toolbar">
-
-            <input
-              id="hist-busca"
-              type="search"
-              placeholder="Buscar produto, REF, cor, tamanho, EAN..."
-            >
-
-            <input
-              id="hist-data"
-              type="date"
-              aria-label="Filtrar por data"
-            >
-
-            <select
-              id="hist-loja"
-              aria-label="Filtrar por loja"
-            >
-              <option value="">Todas as lojas</option>
-            </select>
-
-            <select
-              id="hist-tipo"
-              aria-label="Filtrar por operação"
-            >
-              <option value="">Todas as operações</option>
-              <option value="OK">OK</option>
-              <option value="S/E">S/E</option>
-            </select>
-
-            <button
-              class="secondary"
-              type="button"
-              id="hist-atualizar"
-            >
+</div>
+<div class="stats" style="margin-bottom:22px">
+<div class="stat">
+<div class="label">Movimentações</div>
+<div class="value blue" id="hist-total">—</div>
+</div>
+<div class="stat">
+<div class="label">Unidades abastecidas</div>
+<div class="value green" id="hist-ok">—</div>
+</div>
+<div class="stat">
+<div class="label">Unidades sem estoque</div>
+<div class="value orange" id="hist-se">—</div>
+</div>
+</div>
+<div class="panel">
+<div class="hist-cabecalho">
+<div>
+<h2>Arquivo de abastecimentos por data</h2>
+<p class="status-line">Dias encerrados ficam arquivados no Google Sheets. Somente o dia atual permite editar ou excluir movimentações.</p>
+</div>
+<button class="hist-btn-perigo" disabled="" id="hist-limpar-tudo" style="display:none" type="button">Histórico arquivado automaticamente</button>
+</div>
+<div class="hist-pastas" id="hist-pastas"></div>
+<div class="toolbar hidden" id="hist-voltar"><button class="secondary" id="hist-voltar-btn" type="button"><svg aria-hidden="true" class="ax-btn-icon" viewbox="0 0 24 24"><path d="m15 18-6-6 6-6"></path><path d="M9 12h11"></path></svg><span>Voltar às datas</span></button><strong id="hist-dia-titulo"></strong><button class="hist-btn-perigo" disabled="" id="hist-limpar-dia" style="display:none" type="button">Limpeza desativada</button></div>
+<div class="stats" id="hist-resumo-vendas" style="margin:14px 0;display:none"><div class="stat"><div class="label">Unidades vendidas</div><div class="value blue" id="hist-vendido">0</div></div><div class="stat"><div class="label">Pendentes</div><div class="value orange" id="hist-pendente">0</div></div></div>
+<div id="hist-vendas-bloco" style="display:none"><h3>Vendas do dia</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Loja</th><th>Marca</th><th>Descrição</th><th>REF</th><th>Cor</th><th>Tamanho</th><th>Vendido</th><th>OK</th><th>S/E</th><th>Pendente</th></tr></thead><tbody id="hist-vendas-lista"></tbody></table></div><h3 style="margin:18px 0 10px">Movimentações do dia</h3></div>
+<div id="hist-detalhes" style="display:none">
+<div class="toolbar">
+<input id="hist-busca" placeholder="Buscar produto, REF, cor, tamanho, EAN..." type="search"/>
+<input aria-label="Filtrar por data" id="hist-data" type="date"/>
+<select aria-label="Filtrar por loja" id="hist-loja">
+<option value="">Todas as lojas</option>
+</select>
+<select aria-label="Filtrar por operação" id="hist-tipo">
+<option value="">Todas as operações</option>
+<option value="OK">OK</option>
+<option value="S/E">S/E</option>
+</select>
+<button class="secondary" id="hist-atualizar" type="button">
               ↻ Atualizar
             </button>
-
-          </div>
-
-          <p
-            class="status-line"
-            id="hist-estado"
-            role="status"
-          >
+</div>
+<p class="status-line" id="hist-estado" role="status">
             Aguardando consulta...
           </p>
-
-          <div class="table-wrap">
-
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Hora</th>
-                  <th>Loja</th>
-                  <th>Marca</th>
-                  <th>Descrição</th>
-                  <th>REF</th>
-                  <th>Cor</th>
-                  <th>Tamanho</th>
-                  <th>EAN</th>
-                  <th>Operação</th>
-                  <th>Qtd.</th>
-                  <th>Origem</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-
-              <tbody id="hist-lista">
-                <tr>
-                  <td colspan="13">
+<div class="table-wrap">
+<table class="data-table">
+<thead>
+<tr>
+<th>Data</th>
+<th>Hora</th>
+<th>Loja</th>
+<th>Marca</th>
+<th>Descrição</th>
+<th>REF</th>
+<th>Cor</th>
+<th>Tamanho</th>
+<th>EAN</th>
+<th>Operação</th>
+<th>Qtd.</th>
+<th>Origem</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="hist-lista">
+<tr>
+<td colspan="13">
                     Abra o Histórico para consultar.
                   </td>
-                </tr>
-              </tbody>
-
-            </table>
-
-          </div>
-
-          </div>
-        </div>
-
-      </section>
-
-      <!-- CONFIGURAÇÕES -->
-
-      <section class="page" id="page-configuracoes">
-
-        <div class="heading">
-          <h1>Configurações</h1>
-          <p>Informações do sistema.</p>
-        </div>
-
-        <div class="panel" style="margin-bottom:20px">
-          <h2>Lojas autorizadas a descontar estoque</h2>
-          <p class="status-line">Somente as lojas marcadas poderão registrar abastecimentos que geram desconto. A validação também acontece no Worker, então não depende apenas desta tela.</p>
-          <div id="cfg-desconto-lojas" style="display:grid;gap:12px;margin:18px 0">
-            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="66" checked> Loja 66</label>
-            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="67"> Loja 67</label>
-            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="68"> Loja 68</label>
-          </div>
-          <div class="toolbar"><button class="primary" id="cfg-salvar-desconto" type="button"><svg class="ax-btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg><span>Salvar permissões</span></button></div>
-          <div class="feedback hidden" id="cfg-desconto-msg" role="status"></div>
-        </div>
-        <div class="panel">
-          <h2>AXION Web</h2>
-          <p>Versão da interface: 4.2 · D1</p>
-          <p style="color:var(--muted);line-height:1.8">
-            Autenticação: Cloudflare Workers<br>
-            Interface: GitHub Pages<br>
-            Catálogo e posições: Cloudflare D1<br>
-            Layout do mapa: Cloudflare R2<br>
-            Abastecimento: OK / S/E<br>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<!-- CONFIGURAÇÕES -->
+<section class="page" id="page-configuracoes">
+<div class="heading">
+<h1>Configurações</h1>
+<p>Informações do sistema.</p>
+</div>
+<div class="panel" style="margin-bottom:20px">
+<h2>Lojas autorizadas a descontar estoque</h2>
+<p class="status-line">Somente as lojas marcadas poderão registrar abastecimentos que geram desconto. A validação também acontece no Worker, então não depende apenas desta tela.</p>
+<div id="cfg-desconto-lojas" style="display:grid;gap:12px;margin:18px 0">
+<label style="display:flex;align-items:center;gap:10px"><input checked="" type="checkbox" value="66"/> Loja 66</label>
+<label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="67"/> Loja 67</label>
+<label style="display:flex;align-items:center;gap:10px"><input type="checkbox" value="68"/> Loja 68</label>
+</div>
+<div class="toolbar"><button class="primary" id="cfg-salvar-desconto" type="button"><svg aria-hidden="true" class="ax-btn-icon" viewbox="0 0 24 24"><path d="M5 3h12l4 4v14H3V3z"></path><path d="M7 3v6h10V3M7 21v-8h10v8"></path></svg><span>Salvar permissões</span></button></div>
+<div class="feedback hidden" id="cfg-desconto-msg" role="status"></div>
+</div>
+<div class="panel">
+<h2>AXION Web</h2>
+<p>Versão da interface: 4.2 · D1</p>
+<p style="color:var(--muted);line-height:1.8">
+            Autenticação: Cloudflare Workers<br/>
+            Interface: GitHub Pages<br/>
+            Catálogo e posições: Cloudflare D1<br/>
+            Layout do mapa: Cloudflare R2<br/>
+            Abastecimento: OK / S/E<br/>
             Histórico: Ativo
           </p>
-        </div>
-
-      </section>
-
-    </div>
-  </div>
 </div>
-
+</section>
+</div>
+</div>
+</div>
 <!-- MODAL DE CONFIRMAÇÃO DE ABASTECIMENTO -->
-<div id="modalAbastecimento" class="modal hidden">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
-    <div class="ax-modal-head">
-      <h2 id="modalTitulo" class="ax-modal-title">
-        <span class="ax-modal-mark" aria-hidden="true">▱</span>
+<div class="modal hidden" id="modalAbastecimento">
+<div aria-labelledby="modalTitulo" aria-modal="true" class="modal-card" role="dialog">
+<div class="ax-modal-head">
+<h2 class="ax-modal-title" id="modalTitulo">
+<span aria-hidden="true" class="ax-modal-mark">▱</span>
         Confirmar abastecimento
       </h2>
-      <button class="ax-modal-close" type="button" id="fecharModalAbastecimento" aria-label="Fechar">×</button>
-    </div>
-
-    <div class="ax-modal-body">
-      <div id="modalProduto" class="modal-product"></div>
-
-      <section id="origemEstoqueWrap">
-        <div class="ax-origem-heading">
-          <span class="ax-origem-icon" aria-hidden="true">⌖</span>
-          <div>
-            <strong>Posição física de origem</strong>
-            <small id="lojaOrigemDetalhe">Você pode selecionar posições de qualquer loja. A configuração define somente quais lojas podem ter o saldo descontado.</small>
-          </div>
-        </div>
-        <div id="origemEstoqueLista" class="ax-origem-lista" aria-live="polite"></div>
-        <div id="origemEstoqueAviso" class="ax-origem-aviso">
+<button aria-label="Fechar" class="ax-modal-close" id="fecharModalAbastecimento" type="button">×</button>
+</div>
+<div class="ax-modal-body">
+<div class="modal-product" id="modalProduto"></div>
+<section id="origemEstoqueWrap">
+<div class="ax-origem-heading">
+<span aria-hidden="true" class="ax-origem-icon">⌖</span>
+<div>
+<strong>Posição física de origem</strong>
+<small id="lojaOrigemDetalhe">Você pode selecionar posições de qualquer loja. A configuração define somente quais lojas podem ter o saldo descontado.</small>
+</div>
+</div>
+<div aria-live="polite" class="ax-origem-lista" id="origemEstoqueLista"></div>
+<div class="ax-origem-aviso" id="origemEstoqueAviso">
           Todas as lojas podem ser selecionadas como origem física. Somente lojas autorizadas terão baixa de quantidade.
         </div>
-      </section>
-
-      <form id="formAbastecimento">
-        <div class="ax-qtd-area">
-          <label for="quantidadeAbastecimento">Quantidade a registrar</label>
-          <div class="ax-qtd-control">
-            <button type="button" id="qtdAbastMenos" aria-label="Diminuir quantidade">−</button>
-            <input id="quantidadeAbastecimento" type="number" min="1" step="1" required>
-            <button type="button" id="qtdAbastMais" aria-label="Aumentar quantidade">+</button>
-          </div>
-        </div>
-
-        <p id="modalErro" role="alert"></p>
-
-        <div class="ax-modal-actions">
-          <button class="secondary" type="button" id="cancelarAbastecimento">× &nbsp; Cancelar</button>
-          <button class="primary" type="submit" id="confirmarAbastecimento">Confirmar OK</button>
-        </div>
-      </form>
-    </div>
-  </div>
+</section>
+<form id="formAbastecimento">
+<div class="ax-qtd-area">
+<label for="quantidadeAbastecimento">Quantidade a registrar</label>
+<div class="ax-qtd-control">
+<button aria-label="Diminuir quantidade" id="qtdAbastMenos" type="button">−</button>
+<input id="quantidadeAbastecimento" min="1" required="" step="1" type="number"/>
+<button aria-label="Aumentar quantidade" id="qtdAbastMais" type="button">+</button>
 </div>
-
+</div>
+<p id="modalErro" role="alert"></p>
+<div class="ax-modal-actions">
+<button class="secondary" id="cancelarAbastecimento" type="button">×   Cancelar</button>
+<button class="primary" id="confirmarAbastecimento" type="submit">Confirmar OK</button>
+</div>
+</form>
+</div>
+</div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
