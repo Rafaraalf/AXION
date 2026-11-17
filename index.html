@@ -2814,7 +2814,78 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
  #page-abastecimento .data-table tbody td,#page-estoque .est-stock-table tbody td{font-size:8px!important;padding:7px 3px!important}
  #page-abastecimento .data-table td:nth-child(11) button{font-size:8px!important;padding:6px 1px!important}
 }
-</style></head>
+</style>
+<style id="axion-abast-info-cleanup">
+/* Abastecimento: EANs e locais em blocos independentes, sem texto amontoado. */
+#page-abastecimento .data-table td.abast-eans,
+#page-abastecimento .data-table td.abast-locais {
+  white-space: normal !important;
+  vertical-align: middle;
+  min-width: 0;
+}
+#page-abastecimento .abast-ean-list,
+#page-abastecimento .abast-local-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+}
+#page-abastecimento .abast-ean-item {
+  display: block;
+  max-width: 100%;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(67, 143, 205, .13);
+  border: 1px solid rgba(117, 181, 231, .20);
+  color: #dceeff;
+  font-size: 10px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+#page-abastecimento .abast-local-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(7, 20, 38, .30);
+  border: 1px solid rgba(133, 181, 220, .14);
+  box-sizing: border-box;
+}
+#page-abastecimento .abast-local-name {
+  min-width: 0;
+  color: #d9eaff;
+  font-size: 10px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+#page-abastecimento .abast-local-qty {
+  flex: 0 0 auto;
+  color: #8fd5ff;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+#page-abastecimento .data-table .position-pill,
+#page-abastecimento .data-table .positions-detail {
+  display: none !important;
+}
+@media (max-width: 900px) {
+  #page-abastecimento .abast-ean-item,
+  #page-abastecimento .abast-local-name,
+  #page-abastecimento .abast-local-qty {
+    font-size: 9px;
+  }
+}
+</style>
+
+</head>
 <body>
 <div aria-label="Carregando dados" aria-live="polite" id="axion-loading" role="status">
 <div class="ax-loading-card">
@@ -4427,46 +4498,71 @@ function renderizarPendentes() {
     const eans = eansDoItem(item);
     const celulaEAN = linha.insertCell();
 
-    celulaEAN.textContent = eans.length
-      ? eans.join(", ")
-      : "Não cadastrado";
+    if (eans.length) {
+      celulaEAN.className = "abast-eans";
+      const listaEans = document.createElement("div");
+      listaEans.className = "abast-ean-list";
 
-    if (!eans.length) {
+      eans.forEach((ean, indice) => {
+        const codigo = document.createElement("span");
+        codigo.className = "abast-ean-item";
+        codigo.textContent = ean;
+        codigo.title = `EAN ${indice + 1}: ${ean}`;
+        listaEans.appendChild(codigo);
+      });
+
+      celulaEAN.appendChild(listaEans);
+    } else {
+      celulaEAN.textContent = "Não cadastrado";
       celulaEAN.className = "not-found";
     }
 
-    // POSIÇÕES
-
+    // POSIÇÕES: uma linha por local, sem repetir etiquetas e resumo.
     const posicoes = posicoesDoItem(item);
     const celulaPosicao = linha.insertCell();
+    const locais = localizacoesDoItem(item);
 
-    if (posicoes.length) {
-      for (const posicao of posicoes) {
-        const etiqueta = document.createElement("span");
+    if (locais.length) {
+      celulaPosicao.className = "abast-locais";
+      const listaLocais = document.createElement("div");
+      listaLocais.className = "abast-local-list";
 
-        etiqueta.className = "position-pill";
-        etiqueta.textContent = posicao;
+      locais.forEach(local => {
+        const registro = document.createElement("div");
+        registro.className = "abast-local-item";
 
-        celulaPosicao.appendChild(etiqueta);
-      }
+        const nome = document.createElement("span");
+        nome.className = "abast-local-name";
+        nome.textContent = local.posicao || "Sem posição";
 
-      const locais = localizacoesDoItem(item);
+        const qtd = document.createElement("span");
+        qtd.className = "abast-local-qty";
+        qtd.textContent = `${Number(local.saldo) || 0} un.`;
 
-      if (locais.length) {
-        const detalhe = document.createElement("div");
+        registro.append(nome, qtd);
+        registro.title = `Loja ${local.loja || "?"} · ${local.posicao || "Sem posição"} · ${Number(local.saldo) || 0} unidades`;
+        listaLocais.appendChild(registro);
+      });
 
-        detalhe.className = "positions-detail";
+      celulaPosicao.appendChild(listaLocais);
+    } else if (posicoes.length) {
+      celulaPosicao.className = "abast-locais";
+      const listaLocais = document.createElement("div");
+      listaLocais.className = "abast-local-list";
 
-        detalhe.textContent = locais.map(local =>
-          `Loja ${local.loja || "?"} · ${local.posicao || "Sem posição"}: ` +
-          `${Number(local.saldo) || 0}`
-        ).join(" · ");
+      posicoes.forEach(posicao => {
+        const registro = document.createElement("div");
+        registro.className = "abast-local-item";
+        const nome = document.createElement("span");
+        nome.className = "abast-local-name";
+        nome.textContent = posicao;
+        registro.appendChild(nome);
+        listaLocais.appendChild(registro);
+      });
 
-        celulaPosicao.appendChild(detalhe);
-      }
-
+      celulaPosicao.appendChild(listaLocais);
     } else {
-      celulaPosicao.textContent = "SEM POSIÇÃO CADASTRADA";
+      celulaPosicao.textContent = "Sem posição cadastrada";
       celulaPosicao.className = "not-found";
     }
 
