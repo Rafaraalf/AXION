@@ -6857,7 +6857,7 @@ async function carregarPeriodosAtivos() {
   if(status) status.textContent="Consultando execuções temporárias de hoje...";
   try {
     const dados=await requisicaoAPI("/api/use/consultas-periodo");
-    const consultas=Array.isArray(dados.consultas)?dados.consultas:[];
+    const consultas=Array.isArray(dados.consultas)?dados.consultas:(Array.isArray(dados.execucoes)?dados.execucoes:[]);
     const anterior=axionPeriodoRunId;
     select.replaceChildren();
     if(!consultas.length){
