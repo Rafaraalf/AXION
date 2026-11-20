@@ -5886,11 +5886,18 @@ async function carregarPendentes() {
   } catch (erro) {
     if (token !== tokenSessao) return;
 
+    // Nunca manter na tela itens de outra fonte (ex.: diário) quando a
+    // consulta temporária falhar. Isso evita apresentar dados incorretos.
+    pendentesCache = [];
+    pendentesCarregados = false;
+    pendentesSelecionados.clear();
+    renderizarPendentes();
+
     $("estadoPendentes").textContent =
       "Erro ao carregar pendências: " + erro.message;
 
     $("resumoPendentes").textContent =
-      "Não foi possível consultar o abastecimento no D1.";
+      "A lista foi limpa para evitar misturar dados do diário com o período.";
 
   } finally {
     if (token === tokenSessao) {
