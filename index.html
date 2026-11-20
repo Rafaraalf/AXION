@@ -2904,6 +2904,16 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
   font-weight: 700;
   overflow-wrap: anywhere;
 }
+#page-abastecimento .abast-local-store {
+  flex: 0 0 auto;
+  color: #ffd166;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(255, 209, 102, .10);
+}
 #page-abastecimento .abast-local-qty {
   flex: 0 0 auto;
   color: #8fd5ff;
@@ -6122,12 +6132,18 @@ function renderizarPendentes() {
         nome.className = "abast-local-name";
         nome.textContent = local.posicao || "Sem posição";
 
+        const lojaFisica = document.createElement("span");
+        lojaFisica.className = "abast-local-store";
+        lojaFisica.textContent = local.loja ? `Loja ${local.loja}` : "Loja —";
+
         const qtd = document.createElement("span");
         qtd.className = "abast-local-qty";
         qtd.textContent = `${Number(local.saldo) || 0} un.`;
 
-        registro.append(nome, qtd);
-        registro.title = `Loja ${local.loja || "?"} · ${local.posicao || "Sem posição"} · ${Number(local.saldo) || 0} unidades`;
+        // A loja exibida aqui é a loja física da posição (coluna K no arquivo
+        // de posições), não a loja do relatório USE que identifica a venda.
+        registro.append(nome, lojaFisica, qtd);
+        registro.title = `Loja física ${local.loja || "não informada"} · ${local.posicao || "Sem posição"} · ${Number(local.saldo) || 0} unidades`;
         listaLocais.appendChild(registro);
       });
 
