@@ -4289,6 +4289,24 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
             Consulte o arquivo histórico e acompanhe as movimentações do dia atual.
           </p>
 </div>
+
+<div class="panel" id="ax-use-periodos" style="margin-top:18px">
+  <div class="hist-cabecalho">
+    <div>
+      <h2>Consultas USE por período</h2>
+      <p class="status-line">Execuções manuais do NEXO, sem substituir o relatório diário.</p>
+    </div>
+    <button class="secondary" id="ax-use-periodos-atualizar" type="button">↻ Atualizar consultas</button>
+  </div>
+  <div class="table-wrap" style="margin-top:12px;overflow-x:auto">
+    <table class="data-table" style="min-width:680px">
+      <thead><tr><th>Data inicial</th><th>Data final</th><th>Execução</th><th>Registros</th><th>Lojas</th><th>Status</th><th>Executado em</th></tr></thead>
+      <tbody id="ax-use-periodos-lista"><tr><td colspan="7">Carregando consultas...</td></tr></tbody>
+    </table>
+  </div>
+  <p class="status-line" id="ax-use-periodos-status" role="status"></p>
+</div>
+
 <div class="stats" style="margin-bottom:22px">
 <div class="stat">
 <div class="label">Movimentações</div>
@@ -6197,6 +6215,47 @@ async function confirmarMovimento(evento) {
 // HISTÓRICO - CONSULTA COMPARTILHADA
 // =====================================================
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  const botao = document.getElementById("ax-use-periodos-atualizar");
+  if (botao) botao.addEventListener("click", carregarConsultasPeriodoUSE);
+});
+
+async function carregarConsultasPeriodoUSE() {
+  const corpo = document.getElementById("ax-use-periodos-lista");
+  const status = document.getElementById("ax-use-periodos-status");
+  if (!corpo) return;
+  try {
+    const dados = await requisicaoAPI("/api/use/consultas-periodo");
+    const execucoes = Array.isArray(dados.execucoes) ? dados.execucoes : [];
+    corpo.replaceChildren();
+    if (!execucoes.length) {
+      const tr = corpo.insertRow(); const td = tr.insertCell();
+      td.colSpan = 7; td.textContent = "Nenhuma consulta manual por período registrada.";
+    } else {
+      for (const x of execucoes) {
+        const tr = corpo.insertRow();
+        const formatar = v => v ? String(v).split("-").reverse().join("/") : "—";
+        const criado = x.criado_em ? new Date(x.criado_em).toLocaleString("pt-BR") : "—";
+        const valores = [
+          formatar(x.data_inicio), formatar(x.data_fim),
+          String(x.run_id || "").slice(0, 12),
+          `${Number(x.total_recebido || 0).toLocaleString("pt-BR")} / ${Number(x.total_esperado || 0).toLocaleString("pt-BR")}`,
+          Array.isArray(x.lojas) ? x.lojas.join(", ") : String(x.lojas || "—"),
+          String(x.status || "—"), criado
+        ];
+        valores.forEach(v => tr.insertCell().textContent = v);
+      }
+    }
+    if (status) status.textContent = `${execucoes.length} consulta(s) manual(is) listada(s).`;
+  } catch (e) {
+    if (status) status.textContent = "Não foi possível carregar as consultas por período: " + (e.message || e);
+    corpo.replaceChildren();
+    const tr = corpo.insertRow(); const td = tr.insertCell();
+    td.colSpan = 7; td.textContent = "Falha ao consultar o histórico de períodos.";
+  }
+}
+
 async function consultarHistorico(forcar = false) {
   const token = tokenSessao;
 
@@ -6216,6 +6275,7 @@ async function consultarHistorico(forcar = false) {
 
   const consulta = (async () => {
     const dados = await requisicaoAPI("/api/historico");
+    carregarConsultasPeriodoUSE();
 
     if (token !== tokenSessao) {
       throw new Error("Sessão alterada.");
