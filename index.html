@@ -3992,6 +3992,10 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 <svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><path d="M4 7h11a5 5 0 0 1 0 10H8"></path><path d="m8 13-4 4 4 4"></path><path d="M20 7h-5"></path><path d="m17 4 3 3-3 3"></path></svg>
 <span>Abastecimento</span>
 </button>
+<button data-page="periodo">
+<svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"></path></svg>
+<span>Por período</span>
+</button>
 <button data-page="estoque">
 <svg aria-hidden="true" class="ax-nav-icon" viewbox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3.5 7.8 12 12l8.5-4.2M12 12v9"></path><path d="m7.5 5.2 9 4.5"></path></svg>
 <span>Estoque</span>
@@ -4171,6 +4175,12 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
             diretamente no AXION.
           </p>
 </div>
+<div class="panel" id="painel-controle-periodo" style="display:none;margin-bottom:16px">
+  <div class="hist-cabecalho"><div><h2>Consulta temporária por período</h2><p class="status-line">Selecione uma consulta realizada hoje pelo NEXO. Os registros e confirmações serão apagados ao fim do dia e nunca serão enviados ao Google Sheets.</p></div><button class="secondary" id="periodo-atualizar-lista" type="button">↻ Atualizar consultas</button></div>
+  <label for="periodo-execucao" style="display:block;margin:12px 0 6px;font-weight:600">Consulta disponível</label>
+  <select id="periodo-execucao" style="width:100%;max-width:520px;padding:11px;border-radius:10px"><option value="">Carregando consultas...</option></select>
+  <p class="status-line" id="periodo-status" role="status">Carregando consultas do dia...</p>
+</div>
 <div class="panel">
 <h2>Lista de abastecimento</h2>
 <div class="toolbar">
@@ -4290,22 +4300,6 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
           </p>
 </div>
 
-<div class="panel" id="ax-use-periodos" style="margin-top:18px">
-  <div class="hist-cabecalho">
-    <div>
-      <h2>Consultas USE por período</h2>
-      <p class="status-line">Execuções manuais do NEXO, sem substituir o relatório diário.</p>
-    </div>
-    <button class="secondary" id="ax-use-periodos-atualizar" type="button">↻ Atualizar consultas</button>
-  </div>
-  <div class="table-wrap" style="margin-top:12px;overflow-x:auto">
-    <table class="data-table" style="min-width:680px">
-      <thead><tr><th>Data inicial</th><th>Data final</th><th>Execução</th><th>Registros</th><th>Lojas</th><th>Status</th><th>Executado em</th></tr></thead>
-      <tbody id="ax-use-periodos-lista"><tr><td colspan="7">Carregando consultas...</td></tr></tbody>
-    </table>
-  </div>
-  <p class="status-line" id="ax-use-periodos-status" role="status"></p>
-</div>
 
 <div class="stats" style="margin-bottom:22px">
 <div class="stat">
@@ -4497,6 +4491,8 @@ async function axionRestaurarSessao() {
 }
 
 
+let axionModoPeriodo = false;
+let axionPeriodoRunId = "";
 let pendentesCache = [];
 let pendentesCarregados = false;
 const pendentesSelecionados = new Set();
@@ -4879,10 +4875,11 @@ $("cfg-salvar-desconto").addEventListener("click",async()=>{
 function axionAtivarPagina(pagina) {
   const paginas = document.querySelectorAll("#appView .content section.page");
   const botoes = document.querySelectorAll("#appView [data-page]");
+  const paginaConteudo = pagina === "periodo" ? "abastecimento" : pagina;
   let encontrada = false;
 
   paginas.forEach(secao => {
-    const ativa = secao.id === "page-" + pagina;
+    const ativa = secao.id === "page-" + paginaConteudo;
     secao.classList.toggle("active", ativa);
     // O estilo inline evita que regras CSS antigas escondam a página selecionada.
     secao.style.setProperty("display", ativa ? "block" : "none", "important");
@@ -4898,6 +4895,12 @@ function axionAtivarPagina(pagina) {
 
   const botaoAtivo = document.querySelector(`#appView [data-page="${pagina}"]`);
   if (botaoAtivo) $("tituloPagina").textContent = botaoAtivo.textContent.trim();
+  const tituloAbastecimento = document.querySelector("#page-abastecimento .heading h1");
+  const subtituloAbastecimento = document.querySelector("#page-abastecimento .heading p");
+  if (tituloAbastecimento) tituloAbastecimento.textContent = pagina === "periodo" ? "Abastecimento por período" : "Abastecimento";
+  if (subtituloAbastecimento) subtituloAbastecimento.textContent = pagina === "periodo" ? "Use as vendas de uma consulta temporária para localizar posições e registrar o abastecimento." : "Localize os produtos e registre o abastecimento diretamente no AXION.";
+  const painelPeriodo = $("painel-controle-periodo");
+  if (painelPeriodo) painelPeriodo.style.display = pagina === "periodo" ? "block" : "none";
 
   const conteudo = document.querySelector("#appView .content");
   if (conteudo) {
@@ -4948,6 +4951,17 @@ async function requisicaoAPI(caminho, opcoes = {}) {
   finally {axionOcultarCarregamento();}
 }
 async function requisicaoAPIInterna(caminho, opcoes = {}) {
+  if (axionModoPeriodo && caminho === "/api/pendentes") {
+    if (!axionPeriodoRunId) throw new Error("Selecione uma consulta por período primeiro.");
+    caminho = "/api/periodo/pendentes?run_id=" + encodeURIComponent(axionPeriodoRunId);
+  } else if (axionModoPeriodo && caminho === "/api/abastecer") {
+    if (!axionPeriodoRunId) throw new Error("Selecione uma consulta por período primeiro.");
+    let corpo = {};
+    try { corpo = JSON.parse(opcoes.body || "{}"); } catch {}
+    corpo.run_id = axionPeriodoRunId;
+    opcoes = { ...opcoes, body: JSON.stringify(corpo) };
+    caminho = "/api/periodo/abastecer";
+  }
   const token = tokenSessao;
 
   if (!token) {
@@ -5589,11 +5603,9 @@ async function registrarPendentesEmLote(tipo) {
     }
 
     historicoCarregado = false;
-    await Promise.allSettled([
-      carregarPendentes(),
-      carregarDashboard(),
-      carregarAtividadeRecente(true)
-    ]);
+    await Promise.allSettled(axionModoPeriodo
+      ? [carregarPendentes()]
+      : [carregarPendentes(), carregarDashboard(), carregarAtividadeRecente(true)]);
 
     if (falhas.length) {
       const resumoFalhas = falhas.slice(0, 5).join(" | ");
@@ -6172,11 +6184,9 @@ async function confirmarMovimento(evento) {
     );
 
     historicoCarregado = false;
-    await Promise.allSettled([
-      carregarPendentes(),
-      carregarDashboard(),
-      carregarAtividadeRecente(true)
-    ]);
+    await Promise.allSettled(axionModoPeriodo
+      ? [carregarPendentes()]
+      : [carregarPendentes(), carregarDashboard(), carregarAtividadeRecente(true)]);
 
   } catch (erro) {
     if (token !== tokenSessao) return;
@@ -6216,46 +6226,6 @@ async function confirmarMovimento(evento) {
 // =====================================================
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  const botao = document.getElementById("ax-use-periodos-atualizar");
-  if (botao) botao.addEventListener("click", carregarConsultasPeriodoUSE);
-});
-
-async function carregarConsultasPeriodoUSE() {
-  const corpo = document.getElementById("ax-use-periodos-lista");
-  const status = document.getElementById("ax-use-periodos-status");
-  if (!corpo) return;
-  try {
-    const dados = await requisicaoAPI("/api/use/consultas-periodo");
-    const execucoes = Array.isArray(dados.execucoes) ? dados.execucoes : [];
-    corpo.replaceChildren();
-    if (!execucoes.length) {
-      const tr = corpo.insertRow(); const td = tr.insertCell();
-      td.colSpan = 7; td.textContent = "Nenhuma consulta manual por período registrada.";
-    } else {
-      for (const x of execucoes) {
-        const tr = corpo.insertRow();
-        const formatar = v => v ? String(v).split("-").reverse().join("/") : "—";
-        const criado = x.criado_em ? new Date(x.criado_em).toLocaleString("pt-BR") : "—";
-        const valores = [
-          formatar(x.data_inicio), formatar(x.data_fim),
-          String(x.run_id || "").slice(0, 12),
-          `${Number(x.total_recebido || 0).toLocaleString("pt-BR")} / ${Number(x.total_esperado || 0).toLocaleString("pt-BR")}`,
-          Array.isArray(x.lojas) ? x.lojas.join(", ") : String(x.lojas || "—"),
-          String(x.status || "—"), criado
-        ];
-        valores.forEach(v => tr.insertCell().textContent = v);
-      }
-    }
-    if (status) status.textContent = `${execucoes.length} consulta(s) manual(is) listada(s).`;
-  } catch (e) {
-    if (status) status.textContent = "Não foi possível carregar as consultas por período: " + (e.message || e);
-    corpo.replaceChildren();
-    const tr = corpo.insertRow(); const td = tr.insertCell();
-    td.colSpan = 7; td.textContent = "Falha ao consultar o histórico de períodos.";
-  }
-}
-
 async function consultarHistorico(forcar = false) {
   const token = tokenSessao;
 
@@ -6275,7 +6245,6 @@ async function consultarHistorico(forcar = false) {
 
   const consulta = (async () => {
     const dados = await requisicaoAPI("/api/historico");
-    carregarConsultasPeriodoUSE();
 
     if (token !== tokenSessao) {
       throw new Error("Sessão alterada.");
@@ -6880,6 +6849,47 @@ if (sidebarToggle) {
   });
 }
 
+
+async function carregarPeriodosAtivos() {
+  const select=$("periodo-execucao"), status=$("periodo-status");
+  if (!select) return;
+  select.disabled=true;
+  if(status) status.textContent="Consultando execuções temporárias de hoje...";
+  try {
+    const dados=await requisicaoAPI("/api/use/consultas-periodo");
+    const consultas=Array.isArray(dados.consultas)?dados.consultas:[];
+    const anterior=axionPeriodoRunId;
+    select.replaceChildren();
+    if(!consultas.length){
+      const op=document.createElement("option");op.value="";op.textContent="Nenhuma consulta por período disponível hoje";select.appendChild(op);
+      axionPeriodoRunId="";pendentesCache=[];pendentesCarregados=false;renderizarPendentes();
+      if(status)status.textContent="Execute o NEXO Sync por período. A consulta aparecerá aqui quando terminar.";
+      return;
+    }
+    for(const x of consultas){
+      const op=document.createElement("option");op.value=String(x.run_id||"");
+      const br=v=>v?String(v).split("-").reverse().join("/"):"—";
+      op.textContent=`${br(x.data_inicio)} até ${br(x.data_fim)} · ${Number(x.total_recebido||0).toLocaleString("pt-BR")} registros · ${new Date(x.criado_em).toLocaleTimeString("pt-BR")}`;
+      select.appendChild(op);
+    }
+    axionPeriodoRunId=consultas.some(x=>x.run_id===anterior)?anterior:String(consultas[0].run_id||"");
+    select.value=axionPeriodoRunId;
+    if(status)status.textContent=`${consultas.length} consulta(s) temporária(s) disponível(is). Serão apagadas ao fim do dia.`;
+    pendentesCarregados=false;pendentesSelecionados.clear();
+    await carregarPendentes();
+  } catch(e) {
+    select.replaceChildren();const op=document.createElement("option");op.value="";op.textContent="Falha ao carregar consultas";select.appendChild(op);
+    axionPeriodoRunId="";if(status)status.textContent="Erro: "+e.message;
+  } finally {select.disabled=false;}
+}
+
+$("periodo-atualizar-lista")?.addEventListener("click",carregarPeriodosAtivos);
+$("periodo-execucao")?.addEventListener("change",async e=>{
+  axionPeriodoRunId=String(e.target.value||"");
+  pendentesCarregados=false;pendentesSelecionados.clear();
+  if(axionPeriodoRunId) await carregarPendentes();
+});
+
 // =====================================================
 // NAVEGAÇÃO
 // =====================================================
@@ -6887,8 +6897,12 @@ if (sidebarToggle) {
 document.querySelectorAll("#appView [data-page]").forEach(botao => {
   botao.addEventListener("click", () => {
     const pagina = botao.dataset.page;
+    axionModoPeriodo = pagina === "periodo";
     if (!axionAtivarPagina(pagina)) return;
 
+    if (pagina === "periodo") {
+      carregarPeriodosAtivos();
+    }
     if (pagina === "dashboard") {
       carregarDashboard();
       carregarAtividadeRecente();
