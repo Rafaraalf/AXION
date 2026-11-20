@@ -4183,6 +4183,159 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 }
 </style>
 
+
+<style id="axion-mobile-bottom-navigation-final">
+/* AXION | Navegação mobile em uma única faixa */
+.ax-mobile-settings { display:none; }
+
+@media (max-width:760px) {
+  #appView .sidebar {
+    position:fixed !important;
+    z-index:1000 !important;
+    left:0 !important; right:0 !important;
+    top:auto !important; bottom:0 !important;
+    display:block !important;
+    width:100% !important; height:auto !important;
+    max-height:none !important;
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom)) !important;
+    overflow:visible !important;
+    border:0 !important;
+    border-top:1px solid rgba(117,190,238,.24) !important;
+    background:rgba(5,20,39,.97) !important;
+    backdrop-filter:blur(22px) saturate(160%) !important;
+    -webkit-backdrop-filter:blur(22px) saturate(160%) !important;
+    box-shadow:0 -8px 28px rgba(0,0,0,.28) !important;
+  }
+
+  #appView .sidebar-brand,
+  #appView .sidebar-caption,
+  #appView .sidebar-bottom { display:none !important; }
+
+  #appView .nav {
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    grid-auto-flow:row !important;
+    gap:3px !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+  }
+
+  /* Apenas os cinco destinos principais ficam na barra inferior. */
+  #appView .nav button[data-page="importar-posicoes"],
+  #appView .nav button[data-page="configuracoes"] {
+    display:none !important;
+  }
+
+  #appView .nav button {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+    width:100% !important;
+    min-width:0 !important;
+    min-height:56px !important;
+    height:56px !important;
+    margin:0 !important;
+    padding:5px 2px !important;
+    border:1px solid transparent !important;
+    border-radius:11px !important;
+    background:transparent !important;
+    color:#9db4ca !important;
+    font-size:9px !important;
+    line-height:1.12 !important;
+    text-align:center !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+  }
+
+  #appView .nav button .ax-nav-icon {
+    display:block !important;
+    width:19px !important;
+    height:19px !important;
+    flex:0 0 19px !important;
+  }
+
+  #appView .nav button span {
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:9px !important;
+    line-height:1.12 !important;
+  }
+
+  #appView .nav button.active {
+    color:#55caff !important;
+    background:rgba(40,157,225,.17) !important;
+    border-color:rgba(69,190,255,.28) !important;
+    box-shadow:inset 0 0 0 1px rgba(69,190,255,.08) !important;
+  }
+
+  #appView .nav button.active:before {
+    left:calc(50% - 10px) !important;
+    right:calc(50% - 10px) !important;
+    top:-1px !important;
+    bottom:auto !important;
+    width:20px !important;
+    height:2px !important;
+  }
+
+  #appView .topbar {
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:10px !important;
+  }
+
+  #appView .topbar-left { flex:1 1 auto !important; min-width:0 !important; }
+
+  #appView .ax-mobile-settings {
+    display:grid !important;
+    place-items:center !important;
+    flex:0 0 36px !important;
+    width:36px !important;
+    height:36px !important;
+    margin-left:auto !important;
+    padding:8px !important;
+    border:1px solid #31516b !important;
+    border-radius:10px !important;
+    background:#122b43 !important;
+    color:#9edfff !important;
+  }
+
+  #appView .ax-mobile-settings svg {
+    display:block !important;
+    width:19px !important;
+    height:19px !important;
+    fill:none !important;
+    stroke:currentColor !important;
+    stroke-width:1.7 !important;
+    stroke-linecap:round !important;
+    stroke-linejoin:round !important;
+  }
+
+  #appView .ax-mobile-settings.active {
+    background:rgba(40,157,225,.2) !important;
+    border-color:#40c4fa !important;
+    color:#55caff !important;
+  }
+
+  #appView .content {
+    padding-bottom:calc(82px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+@media (max-width:380px) {
+  #appView .nav button span { font-size:8px !important; }
+  #appView .nav button { min-height:53px !important; height:53px !important; }
+}
+</style>
+
 </head>
 <body>
 <div aria-label="Carregando dados" aria-live="polite" id="axion-loading" role="status">
@@ -4261,6 +4414,9 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 <button aria-expanded="true" aria-label="Recolher menu" class="sidebar-toggle" id="sidebar-toggle" title="Recolher menu" type="button">☰</button>
 <strong id="tituloPagina">Dashboard</strong>
 </div>
+<button class="ax-mobile-settings" type="button" data-page="configuracoes" aria-label="Abrir configurações" title="Configurações">
+<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"></path><path d="m19.4 15 .1.1a1.8 1.8 0 0 1-2.5 2.5l-.1-.1a1.8 1.8 0 0 0-3.1 1.3v.2a1.8 1.8 0 0 1-3.6 0v-.2a1.8 1.8 0 0 0-3.1-1.3l-.1.1a1.8 1.8 0 0 1-2.5-2.5l.1-.1a1.8 1.8 0 0 0-1.3-3.1h-.2a1.8 1.8 0 0 1 0-3.6h.2a1.8 1.8 0 0 0 1.3-3.1l-.1-.1a1.8 1.8 0 0 1 2.5-2.5l.1.1a1.8 1.8 0 0 0 3.1-1.3v-.2a1.8 1.8 0 0 1 3.6 0v.2a1.8 1.8 0 0 0 3.1 1.3l.1-.1a1.8 1.8 0 0 1 2.5 2.5l-.1.1a1.8 1.8 0 0 0 1.3 3.1h.2a1.8 1.8 0 0 1 0 3.6h-.2a1.8 1.8 0 0 0-1.3 3.1Z"></path></svg>
+</button>
 <span>AXION WEB · v4.2 D1</span>
 </header>
 <div class="content">
