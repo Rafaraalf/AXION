@@ -3949,6 +3949,240 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 
 </style>
 
+
+<style id="axion-mobile-confirmacao-fix">
+/* AXION | Correção definitiva do modal de confirmação no celular */
+@media (max-width: 760px) {
+  #modalAbastecimento {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10050 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    padding: max(10px, env(safe-area-inset-top))
+             10px
+             max(10px, env(safe-area-inset-bottom)) !important;
+    background: rgba(3, 9, 18, .84) !important;
+    backdrop-filter: blur(8px);
+  }
+
+  #modalAbastecimento.hidden {
+    display: none !important;
+  }
+
+  #modalAbastecimento .modal-card {
+    display: flex !important;
+    flex-direction: column !important;
+    width: min(100%, 520px) !important;
+    max-width: 520px !important;
+    max-height: calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    min-height: 0 !important;
+    margin: auto !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+    background: linear-gradient(155deg, #192b42, #101d30) !important;
+    box-shadow: 0 24px 80px rgba(0,0,0,.65) !important;
+  }
+
+  #modalAbastecimento .ax-modal-head {
+    flex: 0 0 auto !important;
+    min-height: 64px;
+    padding: 12px 14px !important;
+    gap: 10px !important;
+    background: #17283d;
+  }
+
+  #modalAbastecimento .ax-modal-title {
+    min-width: 0;
+    gap: 9px !important;
+    font-size: 17px !important;
+    line-height: 1.2 !important;
+  }
+
+  #modalAbastecimento .ax-modal-mark {
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px !important;
+    border-radius: 10px !important;
+    font-size: 19px !important;
+  }
+
+  #modalAbastecimento .ax-modal-close {
+    width: 36px !important;
+    height: 36px !important;
+    flex: 0 0 36px !important;
+  }
+
+  #modalAbastecimento .ax-modal-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 13px 14px calc(14px + env(safe-area-inset-bottom)) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #modalAbastecimento .modal-product {
+    margin: 0 0 15px !important;
+    padding: 11px 12px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    overflow-wrap: anywhere;
+  }
+
+  #modalAbastecimento .ax-origem-heading {
+    gap: 9px !important;
+    margin-bottom: 10px !important;
+  }
+
+  #modalAbastecimento .ax-origem-heading .ax-origem-icon {
+    flex: 0 0 auto;
+    font-size: 19px !important;
+  }
+
+  #modalAbastecimento .ax-origem-heading strong {
+    font-size: 14px !important;
+    line-height: 1.3;
+  }
+
+  #modalAbastecimento .ax-origem-heading small {
+    margin-top: 4px !important;
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
+
+  #modalAbastecimento .ax-origem-lista {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 8px !important;
+    margin: 9px 0 11px !important;
+  }
+
+  #modalAbastecimento .ax-origem-card {
+    min-height: 58px !important;
+    padding: 10px 11px !important;
+    gap: 9px !important;
+    border-radius: 11px !important;
+  }
+
+  #modalAbastecimento .ax-origem-info strong {
+    font-size: 12px !important;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  #modalAbastecimento .ax-origem-info small {
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+  }
+
+  #modalAbastecimento .ax-origem-radio {
+    width: 18px !important;
+    height: 18px !important;
+    flex-basis: 18px !important;
+  }
+
+  #modalAbastecimento .ax-origem-saldo {
+    padding: 5px 7px !important;
+    font-size: 10px !important;
+  }
+
+  #modalAbastecimento .ax-origem-aviso {
+    margin: 10px 0 13px !important;
+    padding: 10px 11px !important;
+    border-radius: 10px !important;
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
+
+  #modalAbastecimento .ax-qtd-area {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 9px !important;
+    padding: 12px 0 !important;
+  }
+
+  #modalAbastecimento .ax-qtd-area label {
+    font-size: 14px !important;
+  }
+
+  #modalAbastecimento .ax-qtd-control {
+    display: grid !important;
+    grid-template-columns: 52px minmax(0, 1fr) 52px !important;
+    width: 100% !important;
+    min-height: 48px;
+  }
+
+  #modalAbastecimento .ax-qtd-control button {
+    width: 52px !important;
+    min-width: 52px !important;
+    height: 48px !important;
+    font-size: 22px !important;
+  }
+
+  #modalAbastecimento .ax-qtd-control input {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 48px !important;
+    padding: 8px !important;
+    font-size: 18px !important;
+  }
+
+  #modalAbastecimento #modalErro {
+    margin: 8px 0 0 !important;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  #modalAbastecimento .ax-modal-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) !important;
+    gap: 8px !important;
+    margin-top: 12px !important;
+    padding-top: 11px;
+    border-top: 1px solid #2b435b;
+  }
+
+  #modalAbastecimento .ax-modal-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    padding: 10px 8px !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    white-space: normal;
+  }
+
+  /* A barra inferior do aplicativo permanece atrás do modal. */
+  .sidebar {
+    z-index: 100 !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #modalAbastecimento .ax-modal-head {
+    padding: 10px 11px !important;
+  }
+
+  #modalAbastecimento .ax-modal-body {
+    padding: 10px 11px calc(12px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #modalAbastecimento .ax-modal-title {
+    font-size: 15px !important;
+  }
+
+  #modalAbastecimento .ax-modal-actions button {
+    font-size: 11px !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div aria-label="Carregando dados" aria-live="polite" id="axion-loading" role="status">
