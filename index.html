@@ -975,6 +975,25 @@ input[type=checkbox],input[type=radio] {accent-color:#38bdf8;cursor:pointer;}
 }
 
 
+
+/* AXION | Leitura de código de barras: somente navegador mobile */
+.est-camera-btn{display:none!important}
+.est-camera-modal{position:fixed;inset:0;z-index:15000;background:rgba(3,10,20,.94);padding:18px;display:grid;place-items:center}
+.est-camera-modal.hidden{display:none!important}
+.est-camera-card{width:min(100%,520px);background:#14263b;border:1px solid #3b607d;border-radius:18px;padding:16px;box-shadow:0 24px 80px #000b}
+.est-camera-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.est-camera-head strong{font-size:16px;color:#eaf7ff}
+.est-camera-close{border:1px solid #456078;background:#1b354d;color:#eaf7ff;border-radius:9px;padding:9px 12px}
+.est-camera-video-wrap{position:relative;overflow:hidden;background:#050b12;border-radius:12px;aspect-ratio:4/3}
+.est-camera-video{display:block;width:100%;height:100%;object-fit:cover}
+.est-camera-frame{position:absolute;left:9%;right:9%;top:34%;height:32%;border:2px solid #38bdf8;border-radius:12px;box-shadow:0 0 0 999px #0003;pointer-events:none}
+.est-camera-status{font-size:13px;line-height:1.5;color:#b8cde0;margin:12px 2px 2px}
+@media(max-width:760px){
+  #page-estoque .est-catalogo-controls .est-camera-btn{display:inline-flex!important}
+  #page-estoque .est-catalogo-controls .est-camera-btn svg{width:18px;height:18px}
+}
+@media(min-width:761px){.est-camera-modal{display:none!important}}
+
 /* AXION 3.10 | Busca de catálogo DADOS USE na tela Consultar estoque */
 #page-estoque .est-catalogo-search{
   margin:0 0 18px;padding:17px;border:1px solid #31536e;border-radius:13px;
@@ -4666,6 +4685,9 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 <option value="67">Loja 67</option>
 <option value="68">Loja 68</option>
 </select>
+<button class="secondary est-camera-btn" id="est-catalogo-camera" type="button" aria-label="Ler código de barras com a câmera" title="Ler código de barras">
+<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg><span>Câmera</span>
+</button>
 <button class="primary" id="est-catalogo-buscar" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg><span>Pesquisar</span></button>
 <button class="secondary" id="est-catalogo-limpar" type="button"><svg aria-hidden="true" class="ax-btn-icon" viewbox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg><span>Limpar</span></button>
 </div>
@@ -4854,6 +4876,7 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js"></script>
 <script>
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
@@ -5074,6 +5097,104 @@ $('est-catalogo-buscar').addEventListener('click',consultarCatalogoEstoque);
 $('est-catalogo-codigo').addEventListener('keydown',event=>{
  if(event.key==='Enter'){event.preventDefault();consultarCatalogoEstoque();}
 });
+
+// Leitor de código de barras da tela Estoque.
+// A leitura só pode ser iniciada pelo botão exibido no navegador mobile.
+let estCameraReader = null;
+let estCameraControls = null;
+let estCameraIniciando = false;
+
+function fecharCameraEstoque(){
+  const modal = $('est-camera-modal');
+  if (estCameraControls) {
+    try { estCameraControls.stop(); } catch(e) {}
+    estCameraControls = null;
+  }
+  if (estCameraReader) {
+    try { estCameraReader.reset(); } catch(e) {}
+    estCameraReader = null;
+  }
+  const video = $('est-camera-video');
+  if (video && video.srcObject) {
+    video.srcObject.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+  }
+  if (modal) modal.classList.add('hidden');
+  estCameraIniciando = false;
+}
+
+async function abrirCameraEstoque(){
+  if (window.matchMedia('(min-width: 761px)').matches) return;
+  if (estCameraIniciando) return;
+  estCameraIniciando = true;
+
+  const modal = $('est-camera-modal');
+  const video = $('est-camera-video');
+  const status = $('est-camera-status');
+  modal.classList.remove('hidden');
+  status.textContent = 'Abrindo câmera...';
+
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error('Este navegador não permite acessar a câmera. Abra o AXION por HTTPS em um navegador atualizado.');
+    }
+    if (!window.ZXingBrowser || !window.ZXingBrowser.BrowserMultiFormatReader) {
+      throw new Error('O leitor de código de barras não carregou. Verifique a conexão e atualize a página.');
+    }
+
+    estCameraReader = new ZXingBrowser.BrowserMultiFormatReader();
+    status.textContent = 'Solicitando acesso à câmera. Permita o uso quando o celular perguntar.';
+
+    estCameraControls = await estCameraReader.decodeFromVideoDevice(
+      undefined,
+      video,
+      (resultado, erro) => {
+        if (resultado) {
+          const codigoLido = String(resultado.getText() || '').replace(/\D/g, '');
+          if (!codigoLido) return;
+
+          const campo = $('est-catalogo-codigo');
+          campo.value = codigoLido;
+          fecharCameraEstoque();
+          consultarCatalogoEstoque();
+          return;
+        }
+        if (erro && erro.name !== 'NotFoundException' &&
+            erro.name !== 'ChecksumException' &&
+            erro.name !== 'FormatException') {
+          status.textContent = 'Mantenha o código dentro da área destacada e tente novamente.';
+        }
+      }
+    );
+
+    status.textContent = 'Câmera ativa. Posicione o código de barras dentro da área destacada.';
+  } catch (erro) {
+    status.textContent = erro && erro.message
+      ? erro.message
+      : 'Não foi possível iniciar a câmera. Confira a permissão do navegador.';
+    estCameraIniciando = false;
+    if (estCameraControls || estCameraReader) {
+      // Mantém a mensagem visível, mas libera a câmera para uma nova tentativa.
+      if (estCameraControls) {
+        try { estCameraControls.stop(); } catch(e) {}
+        estCameraControls = null;
+      }
+      estCameraReader = null;
+    }
+  }
+}
+
+$('est-catalogo-camera').addEventListener('click', abrirCameraEstoque);
+$('est-camera-fechar').addEventListener('click', fecharCameraEstoque);
+$('est-camera-modal').addEventListener('click', event => {
+  if (event.target === $('est-camera-modal')) fecharCameraEstoque();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !$('est-camera-modal').classList.contains('hidden')) {
+    fecharCameraEstoque();
+  }
+});
+
 $('est-catalogo-limpar').addEventListener('click',()=>{
  $('est-catalogo-codigo').value='';
  $('est-catalogo-loja').value='';
@@ -6489,6 +6610,7 @@ function fecharConfirmacao() {
 
   movimentoAtual = null;
   $("modalAbastecimento").classList.add("hidden");
+  fecharCameraEstoque();
   $("modalErro").textContent = "";
 }
 
@@ -7457,5 +7579,20 @@ axionRestaurarSessao();
 
 
 </script>
+
+<div class="est-camera-modal hidden" id="est-camera-modal" role="dialog" aria-modal="true" aria-labelledby="est-camera-title">
+  <div class="est-camera-card">
+    <div class="est-camera-head">
+      <strong id="est-camera-title">Ler código de barras</strong>
+      <button class="est-camera-close" id="est-camera-fechar" type="button">Fechar</button>
+    </div>
+    <div class="est-camera-video-wrap">
+      <video class="est-camera-video" id="est-camera-video" autoplay muted playsinline></video>
+      <div class="est-camera-frame"></div>
+    </div>
+    <p class="est-camera-status" id="est-camera-status" aria-live="polite">Posicione o código de barras dentro da área destacada.</p>
+  </div>
+</div>
+
 </body>
 </html>
