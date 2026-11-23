@@ -4875,6 +4875,19 @@ input::placeholder,textarea::placeholder{color:#a9c1d9!important;opacity:1!impor
 </div>
 </div>
 </div>
+<div class="est-camera-modal hidden" id="est-camera-modal" role="dialog" aria-modal="true" aria-labelledby="est-camera-title">
+  <div class="est-camera-card">
+    <div class="est-camera-head">
+      <strong id="est-camera-title">Ler código de barras</strong>
+      <button class="est-camera-close" id="est-camera-fechar" type="button">Fechar</button>
+    </div>
+    <div class="est-camera-video-wrap">
+      <video class="est-camera-video" id="est-camera-video" autoplay muted playsinline></video>
+      <div class="est-camera-frame"></div>
+    </div>
+    <p class="est-camera-status" id="est-camera-status" aria-live="polite">Posicione o código de barras dentro da área destacada.</p>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js"></script>
 <script>
@@ -7580,19 +7593,7 @@ axionRestaurarSessao();
 
 </script>
 
-<div class="est-camera-modal hidden" id="est-camera-modal" role="dialog" aria-modal="true" aria-labelledby="est-camera-title">
-  <div class="est-camera-card">
-    <div class="est-camera-head">
-      <strong id="est-camera-title">Ler código de barras</strong>
-      <button class="est-camera-close" id="est-camera-fechar" type="button">Fechar</button>
-    </div>
-    <div class="est-camera-video-wrap">
-      <video class="est-camera-video" id="est-camera-video" autoplay muted playsinline></video>
-      <div class="est-camera-frame"></div>
-    </div>
-    <p class="est-camera-status" id="est-camera-status" aria-live="polite">Posicione o código de barras dentro da área destacada.</p>
-  </div>
-</div>
+
 
 </body>
 </html>
