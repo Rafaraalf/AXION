@@ -5725,6 +5725,35 @@ function localizacoesDoItem(item) {
     : [];
 }
 
+// Ordem visual padrão do AXION: posições físicas das lojas 66, 67 e 68.
+// Mantém os locais juntos e coloca produtos localizados antes dos sem posição.
+function axionOrdemLojaPosicao(local) {
+  const lojaTexto = String(local?.loja ?? "").trim();
+  const achou = lojaTexto.match(/(?:^|\D)(66|67|68)(?:\D|$)/);
+  const loja = achou ? Number(achou[1]) : 999;
+  const posicao = String(local?.posicao ?? "").trim();
+  return { loja, posicao };
+}
+
+function ordenarLocaisDoItem(item) {
+  return localizacoesDoItem(item)
+    .filter(local => String(local?.posicao ?? "").trim() !== "")
+    .slice()
+    .sort((a, b) => {
+      const A = axionOrdemLojaPosicao(a);
+      const B = axionOrdemLojaPosicao(b);
+      return A.loja - B.loja ||
+        A.posicao.localeCompare(B.posicao, "pt-BR", { numeric: true });
+    });
+}
+
+function axionPrioridadePosicaoItem(item) {
+  const locais = ordenarLocaisDoItem(item);
+  if (!locais.length) return { localizado: 1, loja: 999, posicao: "" };
+  const principal = axionOrdemLojaPosicao(locais[0]);
+  return { localizado: 0, loja: principal.loja, posicao: principal.posicao };
+}
+
 function eansDoItem(item) {
   return [...new Set([
     ...String(item.ean ?? "").split(","),
@@ -6193,6 +6222,12 @@ function renderizarPendentes() {
     return campos.some(valor =>
       String(valor ?? "").toLowerCase().includes(busca)
     );
+  }).slice().sort((a, b) => {
+    const A = axionPrioridadePosicaoItem(a);
+    const B = axionPrioridadePosicaoItem(b);
+    return A.localizado - B.localizado ||
+      A.loja - B.loja ||
+      A.posicao.localeCompare(B.posicao, "pt-BR", { numeric: true });
   });
 
   corpo.replaceChildren();
@@ -6251,7 +6286,7 @@ function renderizarPendentes() {
     // POSIÇÕES: uma linha por local, sem repetir etiquetas e resumo.
     const posicoes = posicoesDoItem(item);
     const celulaPosicao = linha.insertCell();
-    const locais = localizacoesDoItem(item);
+    const locais = ordenarLocaisDoItem(item);
 
     if (locais.length) {
       celulaPosicao.className = "abast-locais";
